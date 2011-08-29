@@ -13,4 +13,12 @@ Any additions are appreciated and will be released under the license that is aff
 
 
 
+Areas that are currently undergoing main development:
 
+1)List item short click
+	A) Open selected file
+	B) Highlight selected list item
+2)List item long clicks
+	A) Edit selected file 
+	B) File selected sharing 
+	C) Highlight selected list item
