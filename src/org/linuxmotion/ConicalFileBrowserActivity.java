@@ -1,42 +1,41 @@
 package org.linuxmotion;
 
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.File;
-import java.io.IOException;
 import java.util.Vector;
 
 import org.linuxmotion.models.FileArrayAdapter;
+import org.linuxmotion.models.FileDeleteDialogClickListener;
 import org.linuxmotion.utils.Constants;
 import org.linuxmotion.utils.FileUtils;
 
+import android.app.AlertDialog;
 import android.app.ListActivity;
+import android.app.AlertDialog.Builder;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.ContextMenu;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.AdapterView;
-import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 public class ConicalFileBrowserActivity extends ListActivity {
 	
 	private static String TAG = ConicalFileBrowserActivity.class.getSimpleName();
 
-	private static LinearLayout mLayout;
-	private static ListView mEmptyListView;
+
 	
 	private static String mCurrentPath;
 	private static Vector<String> mLastPath = new Vector<String>();
@@ -45,6 +44,23 @@ public class ConicalFileBrowserActivity extends ListActivity {
 	private static boolean mAboutToExit = false;
 
 	
+	final Handler mUIRefresher = new Handler(){
+		
+		public void handleMessage(Message msg) {
+			
+			switch(msg.what){
+			
+			case Constants.REFRESH_UI:{
+				createBroadCast(mCurrentPath);		
+				
+			}
+			
+			
+			
+			}
+		}
+		
+	};
 	private BroadcastReceiver fileBroadcastReciver = new BroadcastReceiver(){
 
 		@Override
@@ -82,12 +98,7 @@ public class ConicalFileBrowserActivity extends ListActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-        mLayout = new LinearLayout(this);
-        
-        mEmptyListView = new ListView(this);
-        mEmptyListView.setId(android.R.id.list);
-        mLayout.addView(mEmptyListView);
-        
+     
         setContentView(R.layout.main);
         if(mFirstView){
         	Log.d(TAG,"First time starting, or restarting");
@@ -140,17 +151,13 @@ public class ConicalFileBrowserActivity extends ListActivity {
 			break;
 		}
 		case 1:{
+			this.mCurrentPath = f.getPath();
+			deleteAlertBox(f);
+			
 			Log.d(TAG, "Item number is " + menuItemIndex);
-			if(f.delete()){
-				Log.d(TAG, "File deleted");
-				
-			}else{
-				
-
-				Log.d(TAG, "File not deleted");
-			}
-
-			createBroadCast(f);
+			
+			// Instead post a handler that refreshes the ui
+			
 			break;
 		}
 		case 3:{
@@ -161,6 +168,59 @@ public class ConicalFileBrowserActivity extends ListActivity {
 		}
 		return true;
     }
+    
+    protected void deleteAlertBox(File file) {
+  
+    	
+    	Builder delete = new AlertDialog.Builder(this);
+    	delete.setTitle("Warning");
+    	delete.setMessage("Are you sure you want to delete the file");
+    	delete.setCancelable(false);
+    	
+    	FileDeleteDialogClickListener deletedialog = new FileDeleteDialogClickListener(this, file){
+
+			@Override
+			public void onClick(DialogInterface arg0, int arg1) {
+				// TODO Auto-generated method stub
+				File f = retreiveFile();
+				
+				if(f.delete()){
+					
+					Toast.makeText(this.retreiveApplicationContext(), "Your file has been deleted",Toast.LENGTH_SHORT);
+					mUIRefresher.sendEmptyMessage(Constants.REFRESH_UI);
+				}
+				else{
+					
+					// Did not delete file
+					// post a handler
+					Toast.makeText(this.retreiveApplicationContext(), "Your file has been not deleted",Toast.LENGTH_SHORT);
+					mUIRefresher.sendEmptyMessage(Constants.REFRESH_UI);
+					
+				}
+			}
+    		
+    		
+    	};
+    
+    	delete.setPositiveButton("Delete", deletedialog);
+    	
+    	delete.setNegativeButton("Cancel", new DialogInterface.OnClickListener(){
+
+			@Override
+			public void onClick(DialogInterface arg0, int arg1) {
+				// Do nothing
+				
+			}
+    		
+    		
+    		
+    	});
+    	
+    	delete.show();
+    }
+
+	
+
     
     @Override
 	public void onBackPressed(){

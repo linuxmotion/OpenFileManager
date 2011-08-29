@@ -7,5 +7,8 @@ public class Constants {
 	public static final String UPDATE_INTENT = "org.linuxmotion.intent.UPDATE_UI";
 	
 	public static final String SDCARD_DIR = "/sdcard";
+	
+	
+	public static final int REFRESH_UI = 1;
 
 }
