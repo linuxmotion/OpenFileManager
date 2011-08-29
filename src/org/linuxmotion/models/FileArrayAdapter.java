@@ -23,6 +23,7 @@ public class FileArrayAdapter extends ArrayAdapter<File> {
 	private static String TAG = "FileArrayAdapter";
 	private File[] mFiles;
 	private Context mContext;
+	private boolean mEmptylist = false;
 	
 	public FileArrayAdapter(Context context, int textViewResourceId, File[] files) {
 		super(context, textViewResourceId, files);
@@ -31,16 +32,27 @@ public class FileArrayAdapter extends ArrayAdapter<File> {
 		this.mContext = context;
 	
 	}
+	public FileArrayAdapter(Context context, int textViewResourceId, File file) {
+		super(context, textViewResourceId);
+		
+		mEmptylist = true;
+		mFiles = file.listFiles();
+		mContext = context;
+	
+	}
 	
 	 @Override
      public View getView(int position, View convertView, ViewGroup parent) {
              View v = convertView;
              if (v == null) {
                      LayoutInflater vi = (LayoutInflater) this.mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-             v = vi.inflate(R.layout.file_list_item, null);
+                     v = vi.inflate(R.layout.file_list_item, null);
              }
 
-             
+             if(mFiles.length == 1 && mEmptylist){
+            	 Log.d(TAG, "The listview is empty");
+             }
+             else{
              File it = this.mFiles[position];
              log(it.toString());
              if (it != null) {
@@ -54,8 +66,9 @@ public class FileArrayAdapter extends ArrayAdapter<File> {
                     		 // If it a pic set it as
                     		 // a pic, else set it as 
                     		 // a blnk doc file icon
+                    		 
                     		 String name = it.getName();
-                    		 name.endsWith(".png");
+                    		 
                     		 String[] name_extension = name.split(".",2);
                     		 log("Name: "+ name_extension[0] + "  Extension: " + name_extension[1]);
                     		 
@@ -109,7 +122,8 @@ public class FileArrayAdapter extends ArrayAdapter<File> {
              v.setOnClickListener(listener);
              v.setOnLongClickListener(listener);
              
-
+             }
+             
              return v;
      }
 	 
