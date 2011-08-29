@@ -2,6 +2,7 @@ package org.linuxmotion.models;
 
 import java.io.File;
 
+import org.linuxmotion.ConicalFileBrowserActivity;
 import org.linuxmotion.utils.Constants;
 
 import android.content.ComponentName;
@@ -234,12 +235,14 @@ public class onFileClickListener implements OnClickListener, OnLongClickListener
 			
 			Intent updateintent = new Intent(Constants.UPDATE_INTENT);
 			updateintent.putExtra("PATH", mPath);
+			ConicalFileBrowserActivity.resetExitStatus();
 			this.mContext.sendBroadcast(updateintent);
 			
 		}else{
+				
+			// Open the file here
 			
-
-			Log.d(TAG, "Is  not a directory");
+			Log.d(TAG, "The file should be opened here");
 			
 		}
 		// TODO Auto-generated method stub
@@ -250,7 +253,9 @@ public class onFileClickListener implements OnClickListener, OnLongClickListener
 		// TODO Auto-generated method stub
 		Log.d(TAG, "Long click");
 		v.setSelected(true);
+		v.requestFocus();
 		//v.createContextMenu(mContextMenu);
+		v.setSelected(false);
 		return false;
 	}
 

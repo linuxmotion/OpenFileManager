@@ -1,6 +1,7 @@
 package org.linuxmotion;
 
 
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -24,6 +25,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.AdapterView;
+import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -32,6 +34,9 @@ import android.widget.Toast;
 public class ConicalFileBrowserActivity extends ListActivity {
 	
 	private static String TAG = ConicalFileBrowserActivity.class.getSimpleName();
+
+	private static LinearLayout mLayout;
+	private static ListView mEmptyListView;
 	
 	private static String mCurrentPath;
 	private static Vector<String> mLastPath = new Vector<String>();
@@ -52,29 +57,15 @@ public class ConicalFileBrowserActivity extends ListActivity {
 			String path = extras.getString("PATH");
 			mLastPath.add(mCurrentPath);
 			mCurrentPath = path;
-			if(mCurrentPath.startsWith("/mnt/sdcard") || mCurrentPath.startsWith("/sdcard") || mCurrentPath.equals("/")){
-				
-			 ListAdapter adapter = createAdapter(mCurrentPath); 
-		     setListAdapter(adapter);
-		     }
-			else{
-				final Runtime run = Runtime.getRuntime();
-				DataOutputStream out = null;
-				Process p = null;
-                try {
-					p = run.exec("su");
-				
-                out = new DataOutputStream(p.getOutputStream());
-                String[] s = {"",""};
-                
-				 p = run.exec("su", s, new File(mCurrentPath));
 			
-                }
-				catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}	
-			}
+				 ListAdapter adapter = createAdapter(mCurrentPath); 
+			        if(adapter != null){
+			        	setListAdapter(adapter);
+			        	ListView list = (ListView)findViewById(android.R.id.list);
+			        	list.setAdapter(adapter);
+			        	//this.registerForContextMenu(list);
+			        }
+			
 			
 		}
 		
@@ -91,20 +82,29 @@ public class ConicalFileBrowserActivity extends ListActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-     
+        mLayout = new LinearLayout(this);
+        
+        mEmptyListView = new ListView(this);
+        mEmptyListView.setId(android.R.id.list);
+        mLayout.addView(mEmptyListView);
         
         setContentView(R.layout.main);
         if(mFirstView){
+        	Log.d(TAG,"First time starting, or restarting");
         	mFirstView = false;
         	mCurrentPath = Constants.SDCARD_DIR;
         }
         
         ListAdapter adapter = createAdapter(mCurrentPath); 
-        setListAdapter(adapter);
         
-        ListView list = (ListView)findViewById(android.R.id.list);
-        list.setAdapter(adapter);
-        this.registerForContextMenu(list);
+        if(adapter != null){
+        	setListAdapter(adapter);
+        	ListView list = (ListView)findViewById(android.R.id.list);
+        	list.setAdapter(adapter);
+        	registerForContextMenu(list);
+        }
+        
+        
         
         IntentFilter filter = new IntentFilter(Constants.UPDATE_INTENT);
         registerReceiver(this.fileBroadcastReciver, filter);
@@ -127,10 +127,11 @@ public class ConicalFileBrowserActivity extends ListActivity {
 	
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-		AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
+    	
+		AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
 		int menuItemIndex = item.getItemId();
-		ListAdapter adapt = this.getListAdapter();
-		File f = (File) adapt.getItem(info.position);
+		
+		File f = (File) getListAdapter().getItem(info.position);
 		Log.d(TAG, f.toString());
 		switch(menuItemIndex){
 		
@@ -164,11 +165,11 @@ public class ConicalFileBrowserActivity extends ListActivity {
     @Override
 	public void onBackPressed(){
     	Log.d(TAG, "Back button pressed");
-    	backButtonIsUp();
+    	backButtonPressed();
 		
     }
     
-    private void backButtonIsUp(){
+    private void backButtonPressed(){
     	if(mAboutToExit){
     		Log.d(TAG,"About to Exit");
     		mAboutToExit = false;
@@ -183,7 +184,7 @@ public class ConicalFileBrowserActivity extends ListActivity {
     		
 	       	File f = new File(mCurrentPath);
 	    	if(f.getParent() != null)Log.d(TAG, f.getParent());
-	 
+	    	
 	    	
 	    	if(f.getParent()== null){
 
@@ -205,12 +206,13 @@ public class ConicalFileBrowserActivity extends ListActivity {
     	
     }
     
-    private void createBroadCast(String path){
+    public void createBroadCast(String path){
 
     	File f = new File(path);
     	Intent updateintent = new Intent(Constants.UPDATE_INTENT); 	
     	if(f.getParentFile() != null)updateintent.putExtra("PATH",f.getParent());
     	else updateintent.putExtra("PATH","/");
+    	mAboutToExit = false;
 		sendBroadcast(updateintent);
     	
     }
@@ -220,6 +222,7 @@ public class ConicalFileBrowserActivity extends ListActivity {
     	Intent updateintent = new Intent(Constants.UPDATE_INTENT); 	
     	if(path.getParentFile() != null)updateintent.putExtra("PATH",path.getParent());
     	else updateintent.putExtra("PATH","/");
+    	mAboutToExit = false;
 		sendBroadcast(updateintent);
     	
     }
@@ -231,12 +234,27 @@ public class ConicalFileBrowserActivity extends ListActivity {
     */
     protected FileArrayAdapter createAdapter(String path)
     { 
+    	Log.d(TAG, "the current path is " + path);
     	File[] files = FileUtils.getFilesInDirectory(path);
-    
-    	FileArrayAdapter adapter = new FileArrayAdapter(this,  R.layout.simple_text_view, files);
+    	FileArrayAdapter adapter;
+    	if(files != null){
+    		
+    		adapter = new FileArrayAdapter(this.getBaseContext(),  R.layout.simple_text_view, files);
+    		
+    	}
+    	else {
+    		adapter = new FileArrayAdapter(this.getBaseContext(),  R.layout.simple_text_view, new File(path));
+    	}
     	
     	return adapter;
     }
     
+    
+    public static void resetExitStatus(){
+    	
+    
+    	mAboutToExit = false;
+    	
+    }
   
 }
