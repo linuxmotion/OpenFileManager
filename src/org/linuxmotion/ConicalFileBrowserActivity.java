@@ -151,7 +151,7 @@ public class ConicalFileBrowserActivity extends ListActivity {
 			break;
 		}
 		case 1:{
-			this.mCurrentPath = f.getPath();
+			mCurrentPath = f.getPath();
 			deleteAlertBox(f);
 			
 			Log.d(TAG, "Item number is " + menuItemIndex);
