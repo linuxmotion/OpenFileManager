@@ -19,7 +19,7 @@ package org.linuxmotion.models;
 
 import java.io.File;
 
-import org.linuxmotion.ConicalFileBrowserActivity;
+import org.linuxmotion.openFileManagerActivity;
 import org.linuxmotion.utils.Constants;
 
 import android.content.ComponentName;
@@ -252,7 +252,7 @@ public class onFileClickListener implements OnClickListener, OnLongClickListener
 			
 			Intent updateintent = new Intent(Constants.UPDATE_INTENT);
 			updateintent.putExtra("PATH", mPath);
-			ConicalFileBrowserActivity.resetExitStatus();
+			openFileManagerActivity.resetExitStatus();
 			this.mContext.sendBroadcast(updateintent);
 			
 		}else{
