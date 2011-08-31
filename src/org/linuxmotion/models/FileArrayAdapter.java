@@ -86,8 +86,8 @@ public class FileArrayAdapter extends ArrayAdapter<File> {
                     		 
                     		 String name = it.getName();
                     		 
-                    		 String[] name_extension = name.split(".",2);
-                    		 log("Name: "+ name_extension[0] + "  Extension: " + name_extension[1]);
+                    		 String[] name_extension = name.split("\\.",2);
+                    		 log("Name: "+ name_extension[0] + "\nExtension: " + name_extension[1]);
                     		 
                     		 if(name.endsWith(".png") || name.endsWith(".jpg")){
                     			 log("Setting gallery image");
@@ -134,7 +134,7 @@ public class FileArrayAdapter extends ArrayAdapter<File> {
 	             		FileExtras.setText(extras);
 	             	}
              }
-             onFileClickListener listener = new onFileClickListener(it.isDirectory(), this.mContext, it.getPath());
+             onFileClickListener listener = new onFileClickListener(this.mContext, it);
              
              v.setOnClickListener(listener);
              v.setOnLongClickListener(listener);

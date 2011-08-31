@@ -21,6 +21,8 @@ import java.io.File;
 
 import org.linuxmotion.openFileManagerActivity;
 import org.linuxmotion.utils.Constants;
+import org.linuxmotion.utils.FileUtils;
+import org.linuxmotion.utils.Constants.FileType;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -40,8 +42,7 @@ public class onFileClickListener implements OnClickListener, OnLongClickListener
 	private static final String TAG = "onFileClickListerner";
 	private boolean mIsDirectory;
 	private Context mContext;
-	private String mPath;
-	private File mPAthFile;
+	private File mFile;
 	private ContextMenu mContextMenu = new ContextMenu(){
 
 		@Override
@@ -230,11 +231,13 @@ public class onFileClickListener implements OnClickListener, OnLongClickListener
 		
 	};
 	
-	public onFileClickListener(boolean isDirectory, Context context, String path){
-		this.mIsDirectory = isDirectory;
+	public onFileClickListener(Context context, File file){
+		this.mIsDirectory = file.isDirectory();
 		this.mContext = context;
-		this.mPath = path;
-		this.mPAthFile = new File(this.mPath);
+		this.mFile = file;
+		
+		// Is this file if it is not a directory
+		// a image, a video, or a document
 		
 	}
 	
@@ -251,20 +254,62 @@ public class onFileClickListener implements OnClickListener, OnLongClickListener
 			Log.d(TAG, "Is a directory");
 			
 			Intent updateintent = new Intent(Constants.UPDATE_INTENT);
-			updateintent.putExtra("PATH", mPath);
+			updateintent.putExtra("PATH", mFile.getPath());
 			openFileManagerActivity.resetExitStatus();
 			this.mContext.sendBroadcast(updateintent);
 			
 		}else{
-				
-			// Open the file here
 			
 			Log.d(TAG, "The file should be opened here");
+			// Open the file here
+			FileType type = FileUtils.checkFileExtension(mFile);
+		
+			switch(type){
+			
+			case IMAGE: 
+				handleImageIntent();
+			case PLAIN_TEXT:
+				handlePlainTextIntent();
+			case DOCUMENT:
+				handleDocumentIntent();
+			case VIDEO:
+				handleVideoIntent();
+			
+			}
+			
+			
 			
 		}
 		// TODO Auto-generated method stub
 
 	}
+	private void handleVideoIntent() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void handleDocumentIntent() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void handlePlainTextIntent() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void handleImageIntent() {
+
+		// in onCreate or any event where your want the user to
+        // select a file
+		Log.d(TAG, "Sending image braodcast");
+		Intent image_intent = new Intent(Constants.IMAGE_INTENT);
+		image_intent.putExtra("IMAGE", this.mFile.toString());
+		this.mContext.sendBroadcast(image_intent);
+
+		
+	}
+
 	@Override
 	public boolean onLongClick(View v) {
 		// TODO Auto-generated method stub

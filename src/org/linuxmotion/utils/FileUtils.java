@@ -19,6 +19,9 @@ package org.linuxmotion.utils;
 
 import java.io.File;
 
+import org.linuxmotion.R;
+import org.linuxmotion.utils.Constants.FileType;
+
 import android.util.Log;
 
 public class FileUtils {
@@ -50,6 +53,48 @@ public class FileUtils {
 			return null;
 		}
 	} 
+	
+	
+	public static FileType checkFileExtension(File file){
+		
+		 
+		 String name = file.getName();
+		 
+		 String[] name_extension = name.split("\\.",2);
+		 
+		 log("Name: "+ name_extension[0] + " \n Extension: " + name_extension[1]);
+		 
+		 if(name.endsWith(".png") || name.endsWith(".jpg") || name.endsWith(".gif")){
+			 log("file type is a picture");
+			 return FileType.IMAGE;
+			 
+		 }else if(name.endsWith(".doc") || name.endsWith(".docx") || name.endsWith(".odf")){
+
+			 log("File type is a document");
+			 return FileType.DOCUMENT;
+			 
+		 }else if(name.endsWith(".avi") || name.endsWith(".mp4")){
+			 
+			 log("File type is a video");
+			 return FileType.VIDEO;
+			 
+		 }
+		 
+		 return FileType.UNKNOWN;
+		
+		
+		
+		
+		
+		
+		
+	}
+	
+	private static void log(String message){
+		
+		Log.d(TAG, message);
+		
+	}
 	
 
 	

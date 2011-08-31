@@ -35,6 +35,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.DialogInterface.OnClickListener;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -52,7 +53,7 @@ import android.widget.Toast;
 public class openFileManagerActivity extends ListActivity {
 	
 	private static String TAG = openFileManagerActivity.class.getSimpleName();
-
+	private static boolean DEBUG = (true || Constants.FULL_DBG);
 
 	
 	private static String mCurrentPath;
@@ -63,7 +64,7 @@ public class openFileManagerActivity extends ListActivity {
 	private static boolean mAboutToExit = false;
 
 	
-	final Handler mUIRefresher = new Handler(){
+	public final Handler mUIRefresher = new Handler(){
 		
 		public void handleMessage(Message msg) {
 			
@@ -85,10 +86,13 @@ public class openFileManagerActivity extends ListActivity {
 		@Override
 		public void onReceive(Context arg0, Intent intent) {
 			// TODO Auto-generated method stub
+		Log.d(TAG, "intentReceived");
 			
+		Bundle extras = intent.getExtras();
 		
+		if(extras.containsKey("PATH")){
+			log("Statndard UI refresh");
 			Intent update = intent;
-			Bundle extras = update.getExtras();
 			String path = extras.getString("PATH");
 			mLastPath.add(mCurrentPath);
 			mCurrentPath = path;
@@ -102,6 +106,32 @@ public class openFileManagerActivity extends ListActivity {
 			        }
 			
 			
+			}
+		else if(extras.containsKey("IMAGE")){
+			// in onCreate or any event where your want the user to
+            // select a file
+			File f = new File( extras.getString("IMAGE"));
+			String file = f.toString();
+			String[] split = file.split("\\.", 2);
+			
+            Intent imageintent = new Intent(Intent.ACTION_VIEW);
+            imageintent.setDataAndType(Uri.parse("file://" + f.toString()), "image/" + split[1] );
+            startActivity(imageintent);
+
+		}else if(extras.containsKey("VIDEO")){
+			// in onCreate or any event where your want the user to
+            // select a file
+			File f = new File( extras.getString("IMAGE"));
+			String file = f.toString();
+			String[] split = file.split("\\.", 2);
+			
+            Intent imageintent = new Intent(Intent.ACTION_VIEW);
+            imageintent.setDataAndType(Uri.parse("file://" + f.toString()), "video/" + split[1] );
+            startActivity(imageintent);
+
+		}
+			
+		
 		}
 		
 		
@@ -120,7 +150,7 @@ public class openFileManagerActivity extends ListActivity {
      
         setContentView(R.layout.main);
         if(mFirstView){
-        	Log.d(TAG,"First time starting, or restarting");
+        	log("First time starting, or restarting");
         	mFirstView = false;
         	mCurrentPath = Constants.SDCARD_DIR;
         	// Show GPL usage license
@@ -139,6 +169,7 @@ public class openFileManagerActivity extends ListActivity {
         
         
         IntentFilter filter = new IntentFilter(Constants.UPDATE_INTENT);
+        filter.addAction(Constants.IMAGE_INTENT);
         registerReceiver(this.fileBroadcastReciver, filter);
     }
     @Override
@@ -164,25 +195,25 @@ public class openFileManagerActivity extends ListActivity {
 		int menuItemIndex = item.getItemId();
 		
 		File f = (File) getListAdapter().getItem(info.position);
-		Log.d(TAG, f.toString());
+		log( f.toString());
 		switch(menuItemIndex){
 		
 		case 0:{
-			Log.d(TAG, "Item number is " + menuItemIndex);
+			log("Item number is " + menuItemIndex);
 			break;
 		}
 		case 1:{
 			mCurrentPath = f.getPath();
 			deleteAlertBox(f);
 			
-			Log.d(TAG, "Item number is " + menuItemIndex);
+			log( "Item number is " + menuItemIndex);
 			
 			// Instead post a handler that refreshes the ui
 			
 			break;
 		}
 		case 3:{
-			Log.d(TAG, "Item number is " + menuItemIndex);
+			log("Item number is " + menuItemIndex);
 			break;
 		}
 		
@@ -282,14 +313,14 @@ public class openFileManagerActivity extends ListActivity {
     
     @Override
 	public void onBackPressed(){
-    	Log.d(TAG, "Back button pressed");
+    	log( "Back button pressed");
     	backButtonPressed();
 		
     }
     
     private void backButtonPressed(){
     	if(mAboutToExit){
-    		Log.d(TAG,"About to Exit");
+    		log("About to Exit");
     		mAboutToExit = false;
     		mFirstView = true;
     		unregisterReceiver(fileBroadcastReciver);
@@ -347,7 +378,7 @@ public class openFileManagerActivity extends ListActivity {
     */
     protected FileArrayAdapter createAdapter(String path)
     { 
-    	Log.d(TAG, "the current path is " + path);
+    	log( "the current path is " + path);
     	File[] files = FileUtils.getFilesInDirectory(path);
     	FileArrayAdapter adapter;
     	if(files != null){
@@ -360,6 +391,12 @@ public class openFileManagerActivity extends ListActivity {
     	}
     	
     	return adapter;
+    }
+    
+    private void log(String message){
+    	
+    	if(DEBUG)Log.d(TAG, message);
+    	
     }
     
     
