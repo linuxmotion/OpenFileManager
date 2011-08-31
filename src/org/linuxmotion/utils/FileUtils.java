@@ -60,33 +60,47 @@ public class FileUtils {
 		 
 		 String name = file.getName();
 		 
-		 String[] name_extension = name.split("\\.",2);
+		 if(hasExtension(name)){
+			 String[] name_extension = name.split("\\.",2);
+		 	log("Name: "+ name_extension[0] + " \n Extension: " + name_extension[1]);
+		 	
+		
+		 for(String format : Constants.VideoFormats )
+		 {
+			 if(name.endsWith(format)){
+				 log("The file extension is a video format");
+				 return FileType.VIDEO; 
+			 }
+				 
+			 
+		 }
+		 for(String format : Constants.ImageFormats )
+		 {
+			 if(name.endsWith(format)){
+				 log("The file extension is a image format");
+				 return FileType.IMAGE; 
+				 }
+			 
+		 }
+		 for(String format : Constants.DocumentFormats )
+		 {
+			 if(name.endsWith(format)){
+				 log("The file extension is a document format");
+				 return FileType.DOCUMENT; 
+			 }
+			 
+		 }
+		 	
+		 	
+		 }
+		 else
+			 log("Name: "+ name);
+			 
 		 
-		 log("Name: "+ name_extension[0] + " \n Extension: " + name_extension[1]);
+		 //log("Name: "+ name_extension[0] + " \n Extension: " + name_extension[1]);
 		 
 	
-		 int i = 0;
-		 for(String formats : Constants.VideoFormats )
-		 {
-			 if(formats.endsWith(Constants.VideoFormats[i++]))
-				 return FileType.VIDEO; 
-			 
-		 }
-		 i = 0;
-		 for(String formats : Constants.ImageFormats )
-		 {
-			 if(formats.endsWith(Constants.ImageFormats[i++]))
-				 return FileType.IMAGE; 
-			 
-		 }
-		 i = 0;
-		 for(String formats : Constants.DocumentFormats )
-		 {
-			 if(formats.endsWith(Constants.DocumentFormats[i++]))
-				 return FileType.DOCUMENT; 
-			 
-		 }
-		 i = 0;
+		 
 		 
 		 return FileType.UNKNOWN;
 		
@@ -95,6 +109,26 @@ public class FileUtils {
 		
 		
 		
+		
+	}
+	
+	public static boolean hasExtension(String filename){
+		
+		log("Filename: " + filename);
+		char[] tfile = filename.toCharArray();
+		for(int i = tfile.length-1; i >= 0 ; i--){
+			
+			if(tfile[i] == '.' && i != 0){
+				log("File extension found");
+				return true;
+				
+			}
+			
+		}
+		
+		log("Does not have an extension");
+		return false;
+			
 		
 	}
 	

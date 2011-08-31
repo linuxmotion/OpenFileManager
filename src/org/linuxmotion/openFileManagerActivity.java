@@ -70,17 +70,26 @@ public class openFileManagerActivity extends ListActivity {
 			
 			switch(msg.what){
 			
-			case Constants.REFRESH_UI:{
+			case Constants.REFRESH_UI:
 				createBroadCast(mCurrentPath);		
+				
+			case 10:
+				unknown();
 				
 			}
 			
 			
-			
-			}
 		}
+			
+		
 		
 	};
+	
+	private void unknown(){
+		
+		Toast.makeText(this, "Unknown file type", Toast.LENGTH_SHORT).show();
+	}
+	
 	private BroadcastReceiver fileBroadcastReciver = new BroadcastReceiver(){
 
 		@Override
@@ -89,6 +98,10 @@ public class openFileManagerActivity extends ListActivity {
 		Log.d(TAG, "intentReceived");
 			
 		Bundle extras = intent.getExtras();
+		
+		log(Boolean.toString(extras.containsKey("IMAGE")));
+		log(Boolean.toString(extras.containsKey("VIDEO")));
+		log(Boolean.toString(extras.containsKey("DOCUMENT")));
 		
 		if(extras.containsKey("PATH")){
 			log("Standard UI refresh");
@@ -110,7 +123,7 @@ public class openFileManagerActivity extends ListActivity {
 			// in onCreate or any event where your want the user to
             // select a file
 			File f = new File( extras.getString("IMAGE"));
-			String file = f.toString();
+			String file = f.getName();
 			String[] split = file.split("\\.", 2);
 			
             Intent imageintent = new Intent(Intent.ACTION_VIEW);
@@ -121,7 +134,7 @@ public class openFileManagerActivity extends ListActivity {
 			// in onCreate or any event where your want the user to
             // select a file
 			File f = new File( extras.getString("VIDEO"));
-			String file = f.toString();
+			String file = f.getName();
 			String[] split = file.split("\\.", 2);
 			
             Intent imageintent = new Intent(Intent.ACTION_VIEW);
@@ -132,12 +145,18 @@ public class openFileManagerActivity extends ListActivity {
 			// in onCreate or any event where your want the user to
             // select a file
 			File f =   new File(extras.getString("DOCUMENT")) ;
-			String file = f.toString();
+			String file = f.getName();
 			String[] split = file.split("\\.", 2);
 			
             Intent imageintent = new Intent(Intent.ACTION_VIEW);
             imageintent.setDataAndType(Uri.parse("file://" + f.toString()), "text/" + split[1] );
             startActivity(imageintent);
+
+		}
+		else if(extras.containsKey("UNKNWON")){
+			// in onCreate or any event where your want the user to
+            // select a file
+			mUIRefresher.sendEmptyMessage(10);
 
 		}
 		

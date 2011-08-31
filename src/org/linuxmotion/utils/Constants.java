@@ -41,7 +41,8 @@ public class Constants {
 	public static final String[] VideoFormats ={
 		".avi",
 		".mp4",
-		".swf"
+		".swf",
+		".flv"
 		
 		 
 	};

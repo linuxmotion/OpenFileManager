@@ -23,6 +23,8 @@ import java.util.Date;
 
 import org.linuxmotion.R;
 import org.linuxmotion.utils.Constants;
+import org.linuxmotion.utils.FileUtils;
+import org.linuxmotion.utils.Constants.FileType;
 
 import android.content.Context;
 import android.util.Log;
@@ -85,19 +87,37 @@ public class FileArrayAdapter extends ArrayAdapter<File> {
                     		 // a blnk doc file icon
                     		 
                     		 String name = it.getName();
-                    		 
-                    		 String[] name_extension = name.split("\\.",2);
-                    		 log("Name: "+ name_extension[0] + "\nExtension: " + name_extension[1]);
-                    		 
-                    		 if(name.endsWith(".png") || name.endsWith(".jpg")){
-                    			 log("Setting gallery image");
-                    			 iv.setBackgroundResource(R.drawable.ic_menu_gallery); 
+                    	                    		 
+                    		 log("Full name: " + name);
+                    		 if(FileUtils.hasExtension(name)){
                     			 
-                    		 }else{
-
-                    			 log("Setting compose image");
-                    			 iv.setBackgroundResource(R.drawable.ic_menu_compose);
+                    			 String[] name_extension = name.split("\\.",2);
+                    			 log("Name: "+ name_extension[0] + "\nExtension: " + name_extension[1]  );
+                    		 
                     		 }
+                    		 else {
+                    			 
+                    			 
+                    			 
+                    		 }
+                    		 
+                    		 FileType extensiontype = FileUtils.checkFileExtension(it);
+                    		 switch(extensiontype){
+                    		 case IMAGE:
+                    			 iv.setBackgroundResource(R.drawable.ic_menu_gallery); 
+                    			 break;
+                    		 case DOCUMENT:
+                    			 iv.setBackgroundResource(R.drawable.ic_menu_compose);
+                    			 break;
+                    		 case VIDEO:
+                    			 iv.setBackgroundResource(R.drawable.icon);
+                    			 break;
+                    		 case UNKNOWN:
+                    			 iv.setBackgroundResource(R.drawable.icon);
+                    			 break;
+                    		 
+                    		 }
+                    		 
                     		
                          
                     	 }else{

@@ -278,6 +278,9 @@ public class onFileClickListener implements OnClickListener, OnLongClickListener
 			case VIDEO:
 				handleVideoIntent();
 				break;
+			case UNKNOWN:
+				handleUnknownIntent();
+				break;
 			}
 			
 			
@@ -286,9 +289,16 @@ public class onFileClickListener implements OnClickListener, OnLongClickListener
 		// TODO Auto-generated method stub
 
 	}
+	private void handleUnknownIntent() {
+		// TODO Auto-generated method stub
+		Log.d(TAG, "Sending unknown braodcast");
+		Intent video_intent = new Intent(Constants.VIDEO_INTENT);
+		video_intent.putExtra("UNKNOWN", "");
+		this.mContext.sendBroadcast(video_intent);
+	}
 	private void handleVideoIntent() {
 		// TODO Auto-generated method stub
-		Log.d(TAG, "Sending image braodcast");
+		Log.d(TAG, "Sending video braodcast");
 		Intent video_intent = new Intent(Constants.VIDEO_INTENT);
 		video_intent.putExtra("VIDEO", this.mFile.toString());
 		this.mContext.sendBroadcast(video_intent);
@@ -296,7 +306,7 @@ public class onFileClickListener implements OnClickListener, OnLongClickListener
 
 	private void handleDocumentIntent() {
 		// TODO Auto-generated method stub
-		Log.d(TAG, "Sending image braodcast");
+		Log.d(TAG, "Sending document braodcast");
 		Intent document_intent = new Intent(Constants.DOCUMENT_INTENT);
 		document_intent.putExtra("DOCUMENT", this.mFile.toString());
 		this.mContext.sendBroadcast(document_intent);
@@ -304,9 +314,9 @@ public class onFileClickListener implements OnClickListener, OnLongClickListener
 
 	private void handlePlainTextIntent() {
 		// TODO Auto-generated method stub
-		Log.d(TAG, "Sending image braodcast");
+		Log.d(TAG, "Sending document braodcast");
 		Intent plain_text_intent = new Intent(Constants.PLAIN_TEXT_INTENT);
-		plain_text_intent.putExtra("TEXT", this.mFile.toString());
+		plain_text_intent.putExtra("DOCUMENT", this.mFile.toString());
 		this.mContext.sendBroadcast(plain_text_intent);
 		
 	}
