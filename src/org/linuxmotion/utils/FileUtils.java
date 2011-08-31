@@ -64,21 +64,29 @@ public class FileUtils {
 		 
 		 log("Name: "+ name_extension[0] + " \n Extension: " + name_extension[1]);
 		 
-		 if(name.endsWith(".png") || name.endsWith(".jpg") || name.endsWith(".gif")){
-			 log("file type is a picture");
-			 return FileType.IMAGE;
-			 
-		 }else if(name.endsWith(".doc") || name.endsWith(".docx") || name.endsWith(".odf")){
-
-			 log("File type is a document");
-			 return FileType.DOCUMENT;
-			 
-		 }else if(name.endsWith(".avi") || name.endsWith(".mp4")){
-			 
-			 log("File type is a video");
-			 return FileType.VIDEO;
+	
+		 int i = 0;
+		 for(String formats : Constants.VideoFormats )
+		 {
+			 if(formats.endsWith(Constants.VideoFormats[i++]))
+				 return FileType.VIDEO; 
 			 
 		 }
+		 i = 0;
+		 for(String formats : Constants.ImageFormats )
+		 {
+			 if(formats.endsWith(Constants.ImageFormats[i++]))
+				 return FileType.IMAGE; 
+			 
+		 }
+		 i = 0;
+		 for(String formats : Constants.DocumentFormats )
+		 {
+			 if(formats.endsWith(Constants.DocumentFormats[i++]))
+				 return FileType.DOCUMENT; 
+			 
+		 }
+		 i = 0;
 		 
 		 return FileType.UNKNOWN;
 		

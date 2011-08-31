@@ -29,10 +29,41 @@ public class Constants {
 	
 	public static final String DOCUMENT_INTENT = "org.linuxmotion.intent.HANDLE_DOCUMENT";
 	
+	public static final String PLAIN_TEXT_INTENT = "org.linuxmotion.intent.HANDLE_TEXT";
+	
+	
 	public static final String SDCARD_DIR = "/sdcard";
 	
 	
 	public static final int REFRESH_UI = 1;
+	
+	
+	public static final String[] VideoFormats ={
+		".avi",
+		".mp4",
+		".swf"
+		
+		 
+	};
+	public static final String[] ImageFormats ={
+		
+		".png",
+		".jpg",
+		".gif"
+		 
+	};
+	
+	public static final String[] DocumentFormats ={
+		".doc",
+		".docx",
+		".odf",
+		".js",
+		".html",
+		".log",
+		".txt",
+		
+		 
+	};
 
 	public enum FileType{ 
 		IMAGE(0), 

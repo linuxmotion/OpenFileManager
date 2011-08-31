@@ -91,8 +91,7 @@ public class openFileManagerActivity extends ListActivity {
 		Bundle extras = intent.getExtras();
 		
 		if(extras.containsKey("PATH")){
-			log("Statndard UI refresh");
-			Intent update = intent;
+			log("Standard UI refresh");
 			String path = extras.getString("PATH");
 			mLastPath.add(mCurrentPath);
 			mCurrentPath = path;
@@ -121,7 +120,7 @@ public class openFileManagerActivity extends ListActivity {
 		}else if(extras.containsKey("VIDEO")){
 			// in onCreate or any event where your want the user to
             // select a file
-			File f = new File( extras.getString("IMAGE"));
+			File f = new File( extras.getString("VIDEO"));
 			String file = f.toString();
 			String[] split = file.split("\\.", 2);
 			
@@ -129,7 +128,19 @@ public class openFileManagerActivity extends ListActivity {
             imageintent.setDataAndType(Uri.parse("file://" + f.toString()), "video/" + split[1] );
             startActivity(imageintent);
 
+		}else if(extras.containsKey("DOCUMENT")){
+			// in onCreate or any event where your want the user to
+            // select a file
+			File f =   new File(extras.getString("DOCUMENT")) ;
+			String file = f.toString();
+			String[] split = file.split("\\.", 2);
+			
+            Intent imageintent = new Intent(Intent.ACTION_VIEW);
+            imageintent.setDataAndType(Uri.parse("file://" + f.toString()), "text/" + split[1] );
+            startActivity(imageintent);
+
 		}
+		
 			
 		
 		}
@@ -170,6 +181,10 @@ public class openFileManagerActivity extends ListActivity {
         
         IntentFilter filter = new IntentFilter(Constants.UPDATE_INTENT);
         filter.addAction(Constants.IMAGE_INTENT);
+        filter.addAction(Constants.VIDEO_INTENT);
+        filter.addAction(Constants.PLAIN_TEXT_INTENT);
+        filter.addAction(Constants.DOCUMENT_INTENT);
+        
         registerReceiver(this.fileBroadcastReciver, filter);
     }
     @Override
@@ -246,7 +261,7 @@ public class openFileManagerActivity extends ListActivity {
 			public void onClick(DialogInterface arg0, int arg1) {
 				// TODO Auto-generated method stub
 				mFirstView = true;
-				mShowGPL = false;
+				mShowGPL = true;
 				finish();
 			}
     		

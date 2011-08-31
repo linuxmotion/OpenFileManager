@@ -268,13 +268,16 @@ public class onFileClickListener implements OnClickListener, OnLongClickListener
 			
 			case IMAGE: 
 				handleImageIntent();
+				break;
 			case PLAIN_TEXT:
 				handlePlainTextIntent();
+				break;
 			case DOCUMENT:
 				handleDocumentIntent();
+				break;
 			case VIDEO:
 				handleVideoIntent();
-			
+				break;
 			}
 			
 			
@@ -285,16 +288,26 @@ public class onFileClickListener implements OnClickListener, OnLongClickListener
 	}
 	private void handleVideoIntent() {
 		// TODO Auto-generated method stub
-		
+		Log.d(TAG, "Sending image braodcast");
+		Intent video_intent = new Intent(Constants.VIDEO_INTENT);
+		video_intent.putExtra("VIDEO", this.mFile.toString());
+		this.mContext.sendBroadcast(video_intent);
 	}
 
 	private void handleDocumentIntent() {
 		// TODO Auto-generated method stub
-		
+		Log.d(TAG, "Sending image braodcast");
+		Intent document_intent = new Intent(Constants.DOCUMENT_INTENT);
+		document_intent.putExtra("DOCUMENT", this.mFile.toString());
+		this.mContext.sendBroadcast(document_intent);
 	}
 
 	private void handlePlainTextIntent() {
 		// TODO Auto-generated method stub
+		Log.d(TAG, "Sending image braodcast");
+		Intent plain_text_intent = new Intent(Constants.PLAIN_TEXT_INTENT);
+		plain_text_intent.putExtra("TEXT", this.mFile.toString());
+		this.mContext.sendBroadcast(plain_text_intent);
 		
 	}
 
