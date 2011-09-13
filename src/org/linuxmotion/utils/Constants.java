@@ -23,13 +23,8 @@ public class Constants {
 	
 	public static final String UPDATE_INTENT = "org.linuxmotion.intent.UPDATE_UI";
 
-	public static final String IMAGE_INTENT = "org.linuxmotion.intent.HANDLE_IMAGE";
-	
-	public static final String VIDEO_INTENT = "org.linuxmotion.intent.HANDEL_VIDEO";
-	
-	public static final String DOCUMENT_INTENT = "org.linuxmotion.intent.HANDLE_DOCUMENT";
-	
-	public static final String PLAIN_TEXT_INTENT = "org.linuxmotion.intent.HANDLE_TEXT";
+	public static final String RESOURCE_VIEW_INTENT = "org.linuxmotion.intent.HANDLE_VIEW_RESOURCE";
+
 	
 	
 	public static final String SDCARD_DIR = "/sdcard";
@@ -38,89 +33,6 @@ public class Constants {
 	public static final int REFRESH_UI = 1;
 	
 	
-	public static final String[] VideoFormats ={
-		".avi",
-		".mp4",
-		".swf",
-		".flv"
-		
-		 
-	};
-	public static final String[] ImageFormats ={
-		
-		".png",
-		".jpg",
-		".gif"
-		 
-	};
-	
-	public static final String[] DocumentFormats ={
-		".doc",
-		".docx",
-		".odf",
-		".js",
-		".html",
-		".log",
-		".txt",
-		
-		 
-	};
 
-	public enum FileType{ 
-		IMAGE(0), 
-		PLAIN_TEXT(1), 
-		DOCUMENT(2), 
-		VIDEO(3),
-		UNKNOWN(4);
-		
-		int TYPE;
-		
-		
-		FileType(int i){
-			this.TYPE = i;
-			
-		}
-		
-		public int getIntFromType(FileType type){
-			
-			switch(type){
-			case IMAGE: 
-				return 0;
-			case PLAIN_TEXT:
-				return 1;
-			case DOCUMENT:
-				return 2;
-			case VIDEO:
-				return 3;
-			
-			
-			}
-			return TYPE;
-		}
-		
-		public FileType getTypeFromInt(int type){
-		
-			switch(type){
-			case 0: 
-				return IMAGE;
-			case 1:
-				return PLAIN_TEXT;
-			case 2:
-				return DOCUMENT;
-			case 3:
-				return VIDEO;
-			default: 
-				return UNKNOWN;
-			
-			
-			}
-		}
-		public int getTypeInt(){
-			
-			return TYPE;
-		}
-		
-		
-	};
 	
 }
