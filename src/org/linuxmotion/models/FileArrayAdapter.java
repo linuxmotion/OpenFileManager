@@ -24,14 +24,13 @@ import java.util.Date;
 import org.linuxmotion.R;
 import org.linuxmotion.utils.Constants;
 import org.linuxmotion.utils.FileUtils;
-import org.linuxmotion.utils.Constants.FileType;
 
 import android.content.Context;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.MimeTypeMap;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -101,22 +100,8 @@ public class FileArrayAdapter extends ArrayAdapter<File> {
                     			 
                     		 }
                     		 
-                    		 FileType extensiontype = FileUtils.checkFileExtension(it);
-                    		 switch(extensiontype){
-                    		 case IMAGE:
-                    			 iv.setBackgroundResource(R.drawable.ic_menu_gallery); 
-                    			 break;
-                    		 case DOCUMENT:
-                    			 iv.setBackgroundResource(R.drawable.ic_menu_compose);
-                    			 break;
-                    		 case VIDEO:
-                    			 iv.setBackgroundResource(R.drawable.icon);
-                    			 break;
-                    		 case UNKNOWN:
-                    			 iv.setBackgroundResource(R.drawable.icon);
-                    			 break;
-                    		 
-                    		 }
+                    		 String ext = MimeTypeMap.getFileExtensionFromUrl(it.getName());
+                    		 setIconType(iv, ext);
                     		 
                     		
                          
@@ -164,6 +149,15 @@ public class FileArrayAdapter extends ArrayAdapter<File> {
              return v;
      }
 	 
+	private void setIconType(ImageView iv, String ext) {
+		// set the image type by the icon.
+		// Creat a maper that map the  extension to a file type
+		// video, document, picture, or music
+		
+		iv.setBackgroundResource(R.drawable.icon);
+		return;
+		
+	}
 	private static void log(String message){
 		
 		if(DBG)Log.d(TAG, message);

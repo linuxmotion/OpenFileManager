@@ -29,11 +29,13 @@ import org.linuxmotion.utils.FileUtils;
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.app.AlertDialog.Builder;
+import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.DialogInterface.OnClickListener;
 import android.net.Uri;
 import android.os.Bundle;
@@ -45,6 +47,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -99,9 +102,6 @@ public class openFileManagerActivity extends ListActivity {
 			
 		Bundle extras = intent.getExtras();
 		
-		log(Boolean.toString(extras.containsKey("IMAGE")));
-		log(Boolean.toString(extras.containsKey("VIDEO")));
-		log(Boolean.toString(extras.containsKey("DOCUMENT")));
 		
 		if(extras.containsKey("PATH")){
 			log("Standard UI refresh");
@@ -120,19 +120,28 @@ public class openFileManagerActivity extends ListActivity {
 			
 			}
 		else if(extras.containsKey("RESOURCE")){
+		MimeTypeMap MIME = MimeTypeMap.getSingleton();
 		
-		String mimetype = MimeType.getMimeTypeFromExtension(MimeTypeMap.getFileExtensionFromUrl(extras.getString("RESOURCE")));
+
+		String path = extras.getString("RESOURCE");
+		String mimetype = MIME.getMimeTypeFromExtension(MimeTypeMap.getFileExtensionFromUrl(path));
 			if(mimetype != null){
 				Intent resourceintent = new Intent(Intent.ACTION_VIEW);
-	            		resourceintent.setDataAndType(Uri.parse("file://" + f.toString()), mimetype );
-	            		startActivity(resourceintent);
+	            		resourceintent.setDataAndType(Uri.parse("file://" + path), mimetype );
+	            		try{
+	            			startActivity(resourceintent);
+	            		}
+	            		catch(ActivityNotFoundException e){
+	            			e.printStackTrace();
+	            			mUIRefresher.sendEmptyMessage(10);
+	            		}
 			}
 			else
 				mUIRefresher.sendEmptyMessage(10);
 		}
 		
 		
-		
+		}
 		
 	};
 
@@ -146,13 +155,17 @@ public class openFileManagerActivity extends ListActivity {
         
      
         setContentView(R.layout.main);
+        
         if(mFirstView){
         	log("First time starting, or restarting");
         	mFirstView = false;
         	mCurrentPath = Constants.SDCARD_DIR;
-        	// Show GPL usage license
-        	if(mShowGPL)GPLAlertBox();
+        	
+        	
         }
+        // Show GPL usage license
+        mShowGPL = shouldIssueGPLLicense();
+        if(mShowGPL)GPLAlertBox();
         
         ListAdapter adapter = createAdapter(mCurrentPath); 
         
@@ -166,14 +179,23 @@ public class openFileManagerActivity extends ListActivity {
         
         
         IntentFilter filter = new IntentFilter(Constants.UPDATE_INTENT);
-        filter.addAction(Constants.IMAGE_INTENT);
-        filter.addAction(Constants.VIDEO_INTENT);
-        filter.addAction(Constants.PLAIN_TEXT_INTENT);
-        filter.addAction(Constants.DOCUMENT_INTENT);
+        filter.addAction(Constants.RESOURCE_VIEW_INTENT);
         
         registerReceiver(this.fileBroadcastReciver, filter);
     }
-    @Override
+    private boolean shouldIssueGPLLicense() {
+
+    		SharedPreferences prefs = getSharedPreferences(Constants.OPEN_FILE_MANAGER_PREFERENCES, 0);
+    		int version = prefs.getInt(Constants.APP_NAME, -1);
+    		
+    		if(version != Constants.VERSION_LEVEL)
+    			return true;
+    			
+    		
+    	
+		return false;
+	}
+	@Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
       if (v.getId()==android.R.id.list) {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)menuInfo;
@@ -235,6 +257,12 @@ public class openFileManagerActivity extends ListActivity {
 
 			@Override
 			public void onClick(DialogInterface arg0, int arg1) {
+
+	    		SharedPreferences prefs = getSharedPreferences(Constants.OPEN_FILE_MANAGER_PREFERENCES, 0);
+	    		SharedPreferences.Editor edit = prefs.edit();
+	    		edit.putInt(Constants.APP_NAME, Constants.VERSION_LEVEL);
+	    		edit.commit();
+	    		
 				mShowGPL = false;
 			}
     		

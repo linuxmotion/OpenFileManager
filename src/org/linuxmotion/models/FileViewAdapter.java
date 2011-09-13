@@ -17,10 +17,11 @@
  */
 package org.linuxmotion.models;
 
-import org.linuxmotion.R;
 
 import java.io.File;
 import java.util.List;
+
+import org.linuxmotion.R;
 
 
 import android.content.Context;

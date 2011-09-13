@@ -21,18 +21,10 @@ import java.io.File;
 
 import org.linuxmotion.openFileManagerActivity;
 import org.linuxmotion.utils.Constants;
-import org.linuxmotion.utils.FileUtils;
-import org.linuxmotion.utils.Constants.FileType;
 
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.util.Log;
-import android.view.ContextMenu;
-import android.view.KeyEvent;
-import android.view.MenuItem;
-import android.view.SubMenu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
@@ -67,7 +59,7 @@ public class onFileClickListener implements OnClickListener, OnLongClickListener
 		}else{
 			
 			Log.d(TAG, "Sending media broadcast");
-			Intent video_intent = new Intent(Constants.VIDEO_INTENT);
+			Intent resource_intent = new Intent(Constants.RESOURCE_VIEW_INTENT);
 			resource_intent.putExtra("RESOURCE", mFile.toString());
 			mContext.sendBroadcast(resource_intent);
 					
@@ -75,7 +67,6 @@ public class onFileClickListener implements OnClickListener, OnLongClickListener
 		}
 
 	}
-	priva
 
 	@Override
 	public boolean onLongClick(View v) {

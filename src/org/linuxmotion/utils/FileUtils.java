@@ -19,9 +19,6 @@ package org.linuxmotion.utils;
 
 import java.io.File;
 
-import org.linuxmotion.R;
-import org.linuxmotion.utils.Constants.FileType;
-
 import android.util.Log;
 
 public class FileUtils {
@@ -55,62 +52,6 @@ public class FileUtils {
 	} 
 	
 	
-	public static FileType checkFileExtension(File file){
-		
-		 
-		 String name = file.getName();
-		 
-		 if(hasExtension(name)){
-			 String[] name_extension = name.split("\\.",2);
-		 	log("Name: "+ name_extension[0] + " \n Extension: " + name_extension[1]);
-		 	
-		
-		 for(String format : Constants.VideoFormats )
-		 {
-			 if(name.endsWith(format)){
-				 log("The file extension is a video format");
-				 return FileType.VIDEO; 
-			 }
-				 
-			 
-		 }
-		 for(String format : Constants.ImageFormats )
-		 {
-			 if(name.endsWith(format)){
-				 log("The file extension is a image format");
-				 return FileType.IMAGE; 
-				 }
-			 
-		 }
-		 for(String format : Constants.DocumentFormats )
-		 {
-			 if(name.endsWith(format)){
-				 log("The file extension is a document format");
-				 return FileType.DOCUMENT; 
-			 }
-			 
-		 }
-		 	
-		 	
-		 }
-		 else
-			 log("Name: "+ name);
-			 
-		 
-		 //log("Name: "+ name_extension[0] + " \n Extension: " + name_extension[1]);
-		 
-	
-		 
-		 
-		 return FileType.UNKNOWN;
-		
-		
-		
-		
-		
-		
-		
-	}
 	
 	public static boolean hasExtension(String filename){
 		

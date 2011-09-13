@@ -17,6 +17,8 @@
  */
 package org.linuxmotion.utils;
 
+import android.webkit.MimeTypeMap;
+
 public class Constants {
 	
 	public static final boolean FULL_DBG = false;
@@ -31,6 +33,24 @@ public class Constants {
 	
 	
 	public static final int REFRESH_UI = 1;
+
+	public static final String OPEN_FILE_MANAGER_PREFERENCES = "OpenFileManagerPreferences";
+
+	public static final String APP_NAME = "OpenFileManager-Version-Level";
+
+	public static final int VERSION_LEVEL = 0;
+	
+	
+	public static MimeTypeMap MIME = MimeTypeMap.getSingleton();
+	
+		
+			
+		
+		
+		
+		
+		
+	}
 	
 	
 
