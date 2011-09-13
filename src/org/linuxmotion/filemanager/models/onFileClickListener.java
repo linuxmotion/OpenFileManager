@@ -15,12 +15,12 @@
  *    along with openFileManager.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.linuxmotion.models;
+package org.linuxmotion.filemanager.models;
 
 import java.io.File;
 
-import org.linuxmotion.openFileManagerActivity;
-import org.linuxmotion.utils.Constants;
+import org.linuxmotion.filemanager.openFileManagerActivity;
+import org.linuxmotion.filemanager.utils.Constants;
 
 import android.content.Context;
 import android.content.Intent;

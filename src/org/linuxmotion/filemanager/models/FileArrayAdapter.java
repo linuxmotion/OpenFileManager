@@ -15,15 +15,15 @@
  *    along with openFileManager.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.linuxmotion.models;
+package org.linuxmotion.filemanager.models;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.linuxmotion.R;
-import org.linuxmotion.utils.Constants;
-import org.linuxmotion.utils.FileUtils;
+import org.linuxmotion.filemanager.R;
+import org.linuxmotion.filemanager.utils.Constants;
+import org.linuxmotion.filemanager.utils.FileUtils;
 
 import android.content.Context;
 import android.util.Log;

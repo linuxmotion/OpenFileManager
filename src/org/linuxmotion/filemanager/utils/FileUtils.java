@@ -15,7 +15,7 @@
  *    along with openFileManager.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.linuxmotion.utils;
+package org.linuxmotion.filemanager.utils;
 
 import java.io.File;
 

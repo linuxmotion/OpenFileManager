@@ -15,16 +15,16 @@
  *    along with openFileManager.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.linuxmotion;
+package org.linuxmotion.filemanager;
 
 
 import java.io.File;
 import java.util.Vector;
 
-import org.linuxmotion.models.FileArrayAdapter;
-import org.linuxmotion.models.FileDeleteDialogClickListener;
-import org.linuxmotion.utils.Constants;
-import org.linuxmotion.utils.FileUtils;
+import org.linuxmotion.filemanager.models.FileArrayAdapter;
+import org.linuxmotion.filemanager.models.FileDeleteDialogClickListener;
+import org.linuxmotion.filemanager.utils.Constants;
+import org.linuxmotion.filemanager.utils.FileUtils;
 
 import android.app.AlertDialog;
 import android.app.ListActivity;

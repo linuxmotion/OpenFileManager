@@ -15,42 +15,39 @@
  *    along with openFileManager.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.linuxmotion.models;
+package org.linuxmotion.filemanager.utils;
 
-import java.io.File;
+import android.webkit.MimeTypeMap;
 
-import android.content.Context;
-import android.content.DialogInterface;
+public class Constants {
+	
+	public static final boolean FULL_DBG = false;
+	
+	public static final String UPDATE_INTENT = "org.linuxmotion.intent.UPDATE_UI";
 
-public abstract class FileDeleteDialogClickListener implements DialogInterface.OnClickListener {
+	public static final String RESOURCE_VIEW_INTENT = "org.linuxmotion.intent.HANDLE_VIEW_RESOURCE";
 
-	private static File mFile;
-	Context mContext;
-	
-	public FileDeleteDialogClickListener(Context context, File file){
-		
-		mFile = file;
-		mContext = context;
-		
-	}
 	
 	
-	public File retreiveFile(){
-		
-		return mFile;
-		
-	}
-	
-	public Context retreiveApplicationContext(){
-		
-		return mContext;
-		
-		
-	}
+	public static final String SDCARD_DIR = "/sdcard";
 	
 	
+	public static final int REFRESH_UI = 1;
+
+	public static final String OPEN_FILE_MANAGER_PREFERENCES = "OpenFileManagerPreferences";
+
+	public static final String APP_NAME = "OpenFileManager-Version-Level";
+
+	public static final int VERSION_LEVEL = 0;
 	
+	
+	public static MimeTypeMap MIME = MimeTypeMap.getSingleton();
+	
+		
+			
+		
+	
+	
+
 	
 }
-
-
