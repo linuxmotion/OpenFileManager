@@ -119,49 +119,16 @@ public class openFileManagerActivity extends ListActivity {
 			
 			
 			}
-		else if(extras.containsKey("IMAGE")){
-			// in onCreate or any event where your want the user to
-            // select a file
-			File f = new File( extras.getString("IMAGE"));
-			String file = f.getName();
-			String[] split = file.split("\\.", 2);
-			
-            Intent imageintent = new Intent(Intent.ACTION_VIEW);
-            imageintent.setDataAndType(Uri.parse("file://" + f.toString()), "image/" + split[1] );
-            startActivity(imageintent);
-
-		}else if(extras.containsKey("VIDEO")){
-			// in onCreate or any event where your want the user to
-            // select a file
-			File f = new File( extras.getString("VIDEO"));
-			String file = f.getName();
-			String[] split = file.split("\\.", 2);
-			
-            Intent imageintent = new Intent(Intent.ACTION_VIEW);
-            imageintent.setDataAndType(Uri.parse("file://" + f.toString()), "video/" + split[1] );
-            startActivity(imageintent);
-
-		}else if(extras.containsKey("DOCUMENT")){
-			// in onCreate or any event where your want the user to
-            // select a file
-			File f =   new File(extras.getString("DOCUMENT")) ;
-			String file = f.getName();
-			String[] split = file.split("\\.", 2);
-			
-            Intent imageintent = new Intent(Intent.ACTION_VIEW);
-            imageintent.setDataAndType(Uri.parse("file://" + f.toString()), "text/" + split[1] );
-            startActivity(imageintent);
-
-		}
-		else if(extras.containsKey("UNKNWON")){
-			// in onCreate or any event where your want the user to
-            // select a file
-			mUIRefresher.sendEmptyMessage(10);
-
-		}
+		else if(extras.containsKey("RESOURCE")){
 		
-			
-		
+		String mimetype = MimeType.getMimeTypeFromExtension(MimeTypeMap.getFileExtensionFromUrl(extras.getString("RESOURCE")));
+			if(mimetype != null){
+				Intent resourceintent = new Intent(Intent.ACTION_VIEW);
+	            		resourceintent.setDataAndType(Uri.parse("file://" + f.toString()), mimetype );
+	            		startActivity(resourceintent);
+			}
+			else
+				mUIRefresher.sendEmptyMessage(10);
 		}
 		
 		
