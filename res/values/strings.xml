@@ -8,4 +8,8 @@
 		<item>Delete</item>
 		<item>Send</item>
 	</string-array>
+	
+	
+    <string name="application_settings">Application Settings</string>
+	
 </resources>

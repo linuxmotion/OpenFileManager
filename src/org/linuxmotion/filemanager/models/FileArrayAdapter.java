@@ -139,10 +139,11 @@ public class FileArrayAdapter extends ArrayAdapter<File> {
 	             		FileExtras.setText(extras);
 	             	}
              }
-             onFileClickListener listener = new onFileClickListener(this.mContext, it);
+             //HMMMMM
+            // onFileClickListener listener = new onFileClickListener(this.mContext, it);
              
-             v.setOnClickListener(listener);
-             v.setOnLongClickListener(listener);
+            // v.setOnClickListener(listener);
+             //v.setOnLongClickListener(listener);
              
              }
              

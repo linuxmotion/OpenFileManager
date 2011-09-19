@@ -17,64 +17,24 @@
  */
 package org.linuxmotion.filemanager.models;
 
-import java.io.File;
-
-import org.linuxmotion.filemanager.openFileManagerActivity;
-import org.linuxmotion.filemanager.utils.Constants;
-
-import android.content.Context;
-import android.content.Intent;
 import android.util.Log;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.View.OnLongClickListener;
+import android.widget.AdapterView;
 
-public class onFileClickListener implements OnClickListener, OnLongClickListener {
+public class onFileClickListener implements AdapterView.OnItemLongClickListener{
 
-	private static final String TAG = "onFileClickListerner";
-	private boolean mIsDirectory;
-	private Context mContext;
-	private File mFile;
+	private static final String TAG = onFileClickListener.class.getSimpleName();
 	
-	
-	public onFileClickListener(Context context, File file){
-		mIsDirectory = file.isDirectory();
-		mContext = context;
-		mFile = file;
-		
-	}
-	
-	@Override
-	public void onClick(View v) {
-		
-		if(mIsDirectory){
-			
-			Log.d(TAG, "Sending UI refresh broadcast");
-			
-			Intent updateintent = new Intent(Constants.UPDATE_INTENT);
-			updateintent.putExtra("PATH", mFile.getPath());
-			openFileManagerActivity.resetExitStatus();
-			mContext.sendBroadcast(updateintent);
-			
-		}else{
-			
-			Log.d(TAG, "Sending media broadcast");
-			Intent resource_intent = new Intent(Constants.RESOURCE_VIEW_INTENT);
-			resource_intent.putExtra("RESOURCE", mFile.toString());
-			mContext.sendBroadcast(resource_intent);
-					
-			
-		}
 
-	}
+  
 
 	@Override
-	public boolean onLongClick(View v) {
+	public boolean onItemLongClick(AdapterView<?> parent, View v, int position, long id) {
+		
+		Log.d(TAG, "Item long clicked");
 		// TODO Auto-generated method stub
-		Log.d(TAG, "Long click");
-		v.setSelected(true);
-		v.requestFocus();
 		return false;
 	}
+
 
 }

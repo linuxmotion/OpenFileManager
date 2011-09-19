@@ -21,30 +21,31 @@ package org.linuxmotion.filemanager;
 import java.io.File;
 import java.util.Vector;
 
+import org.linuxmotion.filemanager.models.DualTouchListListener;
 import org.linuxmotion.filemanager.models.FileArrayAdapter;
-import org.linuxmotion.filemanager.models.FileDeleteDialogClickListener;
+import org.linuxmotion.filemanager.preferences.ApplicationSettings;
+import org.linuxmotion.filemanager.utils.Alerts;
 import org.linuxmotion.filemanager.utils.Constants;
 import org.linuxmotion.filemanager.utils.FileUtils;
 
-import android.app.AlertDialog;
 import android.app.ListActivity;
-import android.app.AlertDialog.Builder;
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.DialogInterface.OnClickListener;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.ContextMenu;
+import android.view.GestureDetector;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.webkit.MimeTypeMap;
@@ -53,10 +54,11 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
-public class openFileManagerActivity extends ListActivity {
+public class openFileManagerActivity extends ListActivity implements Alerts.GPLAlertClickDispatcher, 
+Alerts.deleteAlertClickDispatcher, DualTouchListListener.DualTouchListListenerDispatcher{
 	
 	private static String TAG = openFileManagerActivity.class.getSimpleName();
-	private static boolean DEBUG = (true || Constants.FULL_DBG);
+	private static boolean DEBUG = (true | Constants.FULL_DBG);
 
 	
 	private static String mCurrentPath;
@@ -65,7 +67,10 @@ public class openFileManagerActivity extends ListActivity {
 	private static boolean mFirstView = true;
 	private static boolean mShowGPL = true;
 	private static boolean mAboutToExit = false;
+	
+	private static Alerts mAlerts;
 
+	private ListView mList;
 	
 	public final Handler mUIRefresher = new Handler(){
 		
@@ -112,6 +117,7 @@ public class openFileManagerActivity extends ListActivity {
 				 ListAdapter adapter = createAdapter(mCurrentPath); 
 			        if(adapter != null){
 			        	setListAdapter(adapter);
+			        	
 			        	ListView list = (ListView)findViewById(android.R.id.list);
 			        	list.setAdapter(adapter);
 			        	//this.registerForContextMenu(list);
@@ -145,15 +151,18 @@ public class openFileManagerActivity extends ListActivity {
 		
 	};
 
-
 	
 	
     /** Called when the activity is first created. */
     @Override
+    
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-     
+     mAlerts = new Alerts(this);
+     mAlerts.setGPLDispatcher(this);
+     mAlerts.setDeleteDispatcher(this);
+        
         setContentView(R.layout.main);
         
         if(mFirstView){
@@ -164,16 +173,30 @@ public class openFileManagerActivity extends ListActivity {
         	
         }
         // Show GPL usage license
-        mShowGPL = shouldIssueGPLLicense();
-        if(mShowGPL)GPLAlertBox();
+        mShowGPL = Alerts.shouldIssueGPLLicense(this);
+        if(mShowGPL)mAlerts.ShowGPLAlert();
         
         ListAdapter adapter = createAdapter(mCurrentPath); 
         
         if(adapter != null){
         	setListAdapter(adapter);
-        	ListView list = (ListView)findViewById(android.R.id.list);
-        	list.setAdapter(adapter);
-        	registerForContextMenu(list);
+        	mList = (ListView)findViewById(android.R.id.list);
+        	mList.setLongClickable(true);
+        	mList.setAdapter(adapter);
+        
+        	 final GestureDetector gestureDetector = new GestureDetector(new DualTouchListListener(this).setDispatcher(this));
+        	 View.OnTouchListener gestureListener = new View.OnTouchListener() {
+				@Override
+				public boolean onTouch(View arg0, MotionEvent event) {
+					// TODO Auto-generated method stub
+					arg0.cancelLongPress();
+					return gestureDetector.onTouchEvent(event); 
+					
+				}};
+
+        	mList.setOnTouchListener(gestureListener);        	
+        	//HMMMMMM
+        	registerForContextMenu(mList);
         }
         
         
@@ -181,25 +204,13 @@ public class openFileManagerActivity extends ListActivity {
         IntentFilter filter = new IntentFilter(Constants.UPDATE_INTENT);
         filter.addAction(Constants.RESOURCE_VIEW_INTENT);
         
-        registerReceiver(this.fileBroadcastReciver, filter);
+        registerReceiver(fileBroadcastReciver, filter);
     }
-    private boolean shouldIssueGPLLicense() {
 
-    		SharedPreferences prefs = getSharedPreferences(Constants.OPEN_FILE_MANAGER_PREFERENCES, 0);
-    		int version = prefs.getInt(Constants.APP_NAME, -1);
-    		
-    		if(version != Constants.VERSION_LEVEL)
-    			return true;
-    			
-    		
-    	
-		return false;
-	}
-	@Override
+    @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
       if (v.getId()==android.R.id.list) {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)menuInfo;
-        ListAdapter adapt = this.getListAdapter();
         
         //Log.d(TAG,(String) adapt.getItem(0) );
         menu.setHeaderTitle(R.string.file_options);
@@ -227,11 +238,7 @@ public class openFileManagerActivity extends ListActivity {
 		}
 		case 1:{
 			mCurrentPath = f.getPath();
-			deleteAlertBox(f);
-			
-			log( "Item number is " + menuItemIndex);
-			
-			// Instead post a handler that refreshes the ui
+			mAlerts.showDeleteAlertBox(f);
 			
 			break;
 		}
@@ -244,110 +251,13 @@ public class openFileManagerActivity extends ListActivity {
 		return true;
     }
     
-    protected void GPLAlertBox(){
-    	
-    	Builder bGPL = new AlertDialog.Builder(this);
-    	String message = "openFileManager  Copyright (C) 2011  \nCreated by John A Weyrauch.\n " + 
-    "This program comes with ABSOLUTELY NO WARRANTY. For details press menu, then about. " +
-    "This is free software, and you are welcome to use, modify, or redistribute it" +
-    "under certain conditions.";
-    	
-    	bGPL.setTitle("GPL Usage license").setMessage(message).setCancelable(false);
-    	bGPL.setPositiveButton("Proceed", new OnClickListener(){
-
-			@Override
-			public void onClick(DialogInterface arg0, int arg1) {
-
-	    		SharedPreferences prefs = getSharedPreferences(Constants.OPEN_FILE_MANAGER_PREFERENCES, 0);
-	    		SharedPreferences.Editor edit = prefs.edit();
-	    		edit.putInt(Constants.APP_NAME, Constants.VERSION_LEVEL);
-	    		edit.commit();
-	    		
-				mShowGPL = false;
-			}
-    		
-    		
-    		
-    	});
-    	bGPL.setNegativeButton("Quit", new OnClickListener(){
-
-			@Override
-			public void onClick(DialogInterface arg0, int arg1) {
-				// TODO Auto-generated method stub
-				mFirstView = true;
-				mShowGPL = true;
-				finish();
-			}
-    		
-    		
-    		
-    	});
-    	
-
-    	bGPL.show();
-    }
+   
     
-    protected void deleteAlertBox(File file) {
-  
-    	
-    	Builder delete = new AlertDialog.Builder(this);
-    	delete.setTitle("Warning");
-    	delete.setMessage("Are you sure you want to delete the file");
-    	delete.setCancelable(false);
-    	
-    	FileDeleteDialogClickListener deletedialog = new FileDeleteDialogClickListener(this, file){
-
-			@Override
-			public void onClick(DialogInterface arg0, int arg1) {
-				// TODO Auto-generated method stub
-				File f = retreiveFile();
-				
-				if(f.delete()){
-					
-					Toast.makeText(this.retreiveApplicationContext(), "Your file has been deleted",Toast.LENGTH_SHORT).show();
-					mUIRefresher.sendEmptyMessage(Constants.REFRESH_UI);
-				}
-				else{
-					
-					// Did not delete file
-					// post a handler
-					Toast.makeText(this.retreiveApplicationContext(), "Your file has been not deleted",Toast.LENGTH_SHORT).show();
-					mUIRefresher.sendEmptyMessage(Constants.REFRESH_UI);
-					
-				}
-			}
-    		
-    		
-    	};
-    
-    	delete.setPositiveButton("Delete", deletedialog);
-    	
-    	delete.setNegativeButton("Cancel", new DialogInterface.OnClickListener(){
-
-			@Override
-			public void onClick(DialogInterface arg0, int arg1) {
-				// Do nothing
-				
-			}
-    		
-    		
-    		
-    	});
-    	
-    	delete.show();
-    }
-
-	
-
     
     @Override
 	public void onBackPressed(){
     	log( "Back button pressed");
-    	backButtonPressed();
-		
-    }
-    
-    private void backButtonPressed(){
+    	
     	if(mAboutToExit){
     		log("About to Exit");
     		mAboutToExit = false;
@@ -381,7 +291,7 @@ public class openFileManagerActivity extends ListActivity {
 	    		
 	    	}
     	}
-    	
+		
     }
     
     public void createBroadCast(String path){
@@ -397,8 +307,40 @@ public class openFileManagerActivity extends ListActivity {
     	else updateintent.putExtra("PATH","/");
     	mAboutToExit = false;
 		sendBroadcast(updateintent);
+
+    }
+    
+    @Override
+    public void onListItemClick(ListView l, View v,int position, long id){
+    	log("List item clicked");
+    	
+    	
+    	File f = (File) getListAdapter().getItem(position);
+    	
+    	if(f.isDirectory()){
+			
+			Log.d(TAG, "Sending UI refresh broadcast");
+			
+			Intent updateintent = new Intent(Constants.UPDATE_INTENT);
+			updateintent.putExtra("PATH", f.getPath());
+			openFileManagerActivity.resetExitStatus();
+			sendBroadcast(updateintent);
+			
+		}else{
+			
+			Log.d(TAG, "Sending media broadcast");
+			Intent resource_intent = new Intent(Constants.RESOURCE_VIEW_INTENT);
+			resource_intent.putExtra("RESOURCE", f.toString());
+			sendBroadcast(resource_intent);
+					
+			
+		}
+    	
+    	
     	
     }
+    
+ 
     
     
     /**
@@ -429,12 +371,91 @@ public class openFileManagerActivity extends ListActivity {
     }
     
     
-    
     public static void resetExitStatus(){
     	
     
     	mAboutToExit = false;
     	
     }
+	
+	@Override
+	public void onAgreeSelected() {
+		
+		SharedPreferences prefs = getSharedPreferences(Constants.OPEN_FILE_MANAGER_PREFERENCES, 0);
+		SharedPreferences.Editor edit = prefs.edit();
+		edit.putInt(Constants.APP_NAME, Constants.VERSION_LEVEL);
+		edit.commit();
+		
+		mShowGPL = false;
+		
+	}
+	@Override
+	public void onQuitSelected() {
+		mFirstView = true;
+		mShowGPL = true;
+		finish();
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void onSelectedDelete(File f) {
+		
+		
+		if(f.delete()){
+			
+			Toast.makeText(getApplicationContext(), "Your file has been deleted",Toast.LENGTH_SHORT).show();
+			mUIRefresher.sendEmptyMessage(Constants.REFRESH_UI);
+		}
+		else{
+			
+			// Did not delete file
+			// post a handler
+			Toast.makeText(getApplicationContext(), "Your file has been not deleted",Toast.LENGTH_SHORT).show();
+			mUIRefresher.sendEmptyMessage(Constants.REFRESH_UI);
+			
+		}
+	}
+
+	@Override
+	public void dispatchLeftFling() {
+		
+		
+		log("Dispatching RTL fling event");
+		
+	}
+
+	@Override
+	public void dispatchRightFling() {
+		this.onBackPressed();
+		mList.cancelLongPress();
+		log("Dispatching LTR fling event");
+		
+	}
+		
+	
+	
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater menuinflate = new MenuInflater(this);
+		menuinflate.inflate(R.menu.main_menu, menu);
+		return true;
+	}	
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		
+		case R.id.settings_menu:
+			launchSettingMenu();
+			break;
+		}
+	    return(super.onOptionsItemSelected(item));
+	}	
+	
+	 private void launchSettingMenu() {    	
+	        Intent settings = new Intent(this, ApplicationSettings.class);
+	        startActivity(settings);
+		}
   
 }

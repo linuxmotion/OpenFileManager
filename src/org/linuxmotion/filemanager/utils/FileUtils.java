@@ -26,7 +26,12 @@ public class FileUtils {
 	
 	
 	
-	
+	/**
+	 * 
+	 * 
+	 * @param directory the director path from which to retrive the files from
+	 * @return
+	 */
 	public static File[] getFilesInDirectory(String directory){
 		
 		
@@ -35,7 +40,8 @@ public class FileUtils {
 			
 			Log.d("FileUtils", "Path exists");
 			if(temp.listFiles() != null){
-				return temp.listFiles();
+				
+				return sortFiles(temp);
 			}
 			else {
 				// If this point is reached then the directory doesnt contain any 
@@ -52,7 +58,151 @@ public class FileUtils {
 	} 
 	
 	
+	/**
+	 * Starts the sorting process. This is a wrapper function that
+	 * calls all of the sort functions, that individually sort 
+	 * files by different parameters. Although each function 
+	 * only serves one task, each time it is accumulated
+	 * 
+	 * @param temp
+	 * @return
+	 */
+	private static File[] sortFiles(File temp) {
+		
+		File[] FILES = temp.listFiles();
+		
+		
+		
+		SortByFileFolder(FILES);
+		SortHiddenFilesFolders(FILES);
+		//FILES = ShowHideHiddenFilesFolders(FILES);
+
+		
+		return FILES;
+	}
+
+
+
+	private static File[] ShowHideHiddenFilesFolders(File[] FILES) {
+		
+	boolean loop = false;
+	boolean hide = true;
+	int length = FILES.length;
+	for(int i = 0; i < length-1; i++){
+		File f = FILES[i];
+		
+		if(f.isDirectory() && f.getName().startsWith(".") && hide ){
+			
+			FILES[i] = null;
+			
+			
+		}
+		
+		
+	}
 	
+		
+		do{
+			
+			loop = false;
+			for(int i = 0; i < FILES.length-1; i++){
+				
+
+				if(FILES[i] == null){
+					FILES[i] = FILES[i+1];
+					loop = true;
+				}
+			}
+	
+			
+		}while(loop);
+		
+		int nullstart = 0;
+	
+			for(int i = 0; i < FILES.length-1; i++){
+				
+
+				if(FILES[i] == null){
+					nullstart = i;
+					break;
+				}
+			}
+	
+			File[] Files = new File[nullstart];
+			for(int i = 0; i < nullstart; i++){
+				
+				Files[i] = FILES[i];
+				
+			}
+	
+		return Files;
+	}
+
+
+
+	private static void SortByFileFolder(File[] FILES) {
+		
+
+		boolean loop = false;
+		
+		do{
+			loop = false;
+			
+			for(int i = 0; i < FILES.length-1; i++){
+				File f = FILES[i];
+				File t = FILES[i+1];
+				
+				if(!f.isDirectory() && t.isDirectory()){
+					FILES[i] = t;
+					FILES[i+1] = f;
+					loop = true;
+					
+				}
+				
+				
+				
+			}
+		}while(loop);
+		
+	}
+
+
+
+	private static void SortHiddenFilesFolders(File[] FILES) {
+		
+
+		boolean loop = false;
+		
+		do{
+			loop = false;
+			
+			for(int i = FILES.length-1; i > 0; i--){
+				
+				File t = FILES[i];
+				File f = FILES[i-1];
+				
+				boolean a = t.isDirectory();
+					boolean b = t.getName().startsWith(".");
+						boolean c = f.isDirectory() ;
+							boolean d = f.getName().startsWith(".");
+				
+				if( a && b && c && !d){
+					
+					FILES[i-1] = t;
+					FILES[i] = f;
+					loop = true;
+					
+				}
+				
+				
+				
+			}
+		}while(loop);
+		
+	}
+
+
+
 	public static boolean hasExtension(String filename){
 		
 		log("Filename: " + filename);
