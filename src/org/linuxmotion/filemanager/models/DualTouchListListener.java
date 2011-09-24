@@ -9,21 +9,22 @@ import android.view.GestureDetector.SimpleOnGestureListener;
 
 public class DualTouchListListener extends SimpleOnGestureListener {
 
-	private static final int REL_SWIPE_MAX_OFF_PATH = 60;
+	public static final int REL_SWIPE_MAX_OFF_PATH = 50;
 
-	private static final int REL_SWIPE_THRESHOLD_VELOCITY = 30;
+	public static final int REL_SWIPE_THRESHOLD_VELOCITY = 20;
 
-	private static final int REL_SWIPE_MIN_DISTANCE = 10;
+	public static final int REL_SWIPE_MIN_DISTANCE = 10;
 	
 	private static String TAG = DualTouchListListener.class.getSimpleName();
 	private DualTouchListListenerDispatcher mDualTouchListListenerDispatcher;
 
 	private Context mContext;
+
+	private boolean mInSlideMode = false;;
 	
 	public DualTouchListListener(Context context){
 		
 		mContext = context;
-		
 		
 	}
 	
@@ -35,17 +36,22 @@ public class DualTouchListListener extends SimpleOnGestureListener {
 		try {
 			if (Math.abs(e1.getY() - e2.getY()) > REL_SWIPE_MAX_OFF_PATH) {
 				Log.d(TAG,"Fling consumed");
-				return false; 
+				
 			}
 	        if(e1.getX() - e2.getX() > REL_SWIPE_MIN_DISTANCE && 
 	            Math.abs(velocityX) > REL_SWIPE_THRESHOLD_VELOCITY) { 
-	        	if(mDualTouchListListenerDispatcher != null)mDualTouchListListenerDispatcher.dispatchLeftFling(); 
-	        }  else if (e2.getX() - e1.getX() > REL_SWIPE_MIN_DISTANCE && 
-	            Math.abs(velocityX) > REL_SWIPE_THRESHOLD_VELOCITY) 
-	        { 
+	        	Log.d(TAG,"Calling left fling");
 	        	
-	        	if(mDualTouchListListenerDispatcher != null)mDualTouchListListenerDispatcher.dispatchRightFling(); 
-	        } 
+	        	if(mDualTouchListListenerDispatcher != null)mDualTouchListListenerDispatcher.dispatchLeftFling();
+	        	return true;
+	        }  else if (e2.getX() - e1.getX() > REL_SWIPE_MIN_DISTANCE &&
+	        		Math.abs(velocityX) > REL_SWIPE_THRESHOLD_VELOCITY) 
+	        { 
+	        	Log.d(TAG,"Calling right fling");
+	        	if(mDualTouchListListenerDispatcher != null)mDualTouchListListenerDispatcher.dispatchRightFling();
+	        	return true;
+	        
+	        }
 	        
             
         } catch (Exception e) {

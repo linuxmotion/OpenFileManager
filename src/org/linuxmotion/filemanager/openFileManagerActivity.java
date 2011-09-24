@@ -23,15 +23,15 @@ import java.util.Vector;
 
 import org.linuxmotion.filemanager.models.DualTouchListListener;
 import org.linuxmotion.filemanager.models.FileArrayAdapter;
+import org.linuxmotion.filemanager.openFileManagerBroadcastReceiver.openFileManagerReceiverDispatcher;
 import org.linuxmotion.filemanager.preferences.ApplicationSettings;
+import org.linuxmotion.filemanager.preferences.PreferenceUtils;
 import org.linuxmotion.filemanager.utils.Alerts;
 import org.linuxmotion.filemanager.utils.Constants;
 import org.linuxmotion.filemanager.utils.FileUtils;
 
 import android.app.ListActivity;
 import android.content.ActivityNotFoundException;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -55,20 +55,22 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 public class openFileManagerActivity extends ListActivity implements Alerts.GPLAlertClickDispatcher, 
-Alerts.deleteAlertClickDispatcher, DualTouchListListener.DualTouchListListenerDispatcher{
+Alerts.deleteAlertClickDispatcher, DualTouchListListener.DualTouchListListenerDispatcher, openFileManagerReceiverDispatcher{
 	
 	private static String TAG = openFileManagerActivity.class.getSimpleName();
 	private static boolean DEBUG = (true | Constants.FULL_DBG);
 
 	
-	private static String mCurrentPath;
-	private static Vector<String> mLastPath = new Vector<String>();
+	private String mCurrentPath;
+	private static Vector<String> sLastPath;
 
-	private static boolean mFirstView = true;
-	private static boolean mShowGPL = true;
-	private static boolean mAboutToExit = false;
+	private boolean mFirstView = true;
+	private boolean mShowGPL = true;
+	private boolean mAboutToExit = false;
 	
-	private static Alerts mAlerts;
+	private static openFileManagerBroadcastReceiver sReceiver;
+	
+	private Alerts mAlerts;
 
 	private ListView mList;
 	
@@ -81,7 +83,7 @@ Alerts.deleteAlertClickDispatcher, DualTouchListListener.DualTouchListListenerDi
 			case Constants.REFRESH_UI:
 				createBroadCast(mCurrentPath);		
 				
-			case 10:
+			case Constants.UNKNOWN_FILE_TYPE:
 				unknown();
 				
 			}
@@ -92,65 +94,6 @@ Alerts.deleteAlertClickDispatcher, DualTouchListListener.DualTouchListListenerDi
 		
 		
 	};
-	
-	private void unknown(){
-		
-		Toast.makeText(this, "Unknown file type", Toast.LENGTH_SHORT).show();
-	}
-	
-	private BroadcastReceiver fileBroadcastReciver = new BroadcastReceiver(){
-
-		@Override
-		public void onReceive(Context arg0, Intent intent) {
-			// TODO Auto-generated method stub
-		Log.d(TAG, "intentReceived");
-			
-		Bundle extras = intent.getExtras();
-		
-		
-		if(extras.containsKey("PATH")){
-			log("Standard UI refresh");
-			String path = extras.getString("PATH");
-			mLastPath.add(mCurrentPath);
-			mCurrentPath = path;
-			
-				 ListAdapter adapter = createAdapter(mCurrentPath); 
-			        if(adapter != null){
-			        	setListAdapter(adapter);
-			        	
-			        	ListView list = (ListView)findViewById(android.R.id.list);
-			        	list.setAdapter(adapter);
-			        	//this.registerForContextMenu(list);
-			        }
-			
-			
-			}
-		else if(extras.containsKey("RESOURCE")){
-		MimeTypeMap MIME = MimeTypeMap.getSingleton();
-		
-
-		String path = extras.getString("RESOURCE");
-		String mimetype = MIME.getMimeTypeFromExtension(MimeTypeMap.getFileExtensionFromUrl(path));
-			if(mimetype != null){
-				Intent resourceintent = new Intent(Intent.ACTION_VIEW);
-	            		resourceintent.setDataAndType(Uri.parse("file://" + path), mimetype );
-	            		try{
-	            			startActivity(resourceintent);
-	            		}
-	            		catch(ActivityNotFoundException e){
-	            			e.printStackTrace();
-	            			mUIRefresher.sendEmptyMessage(10);
-	            		}
-			}
-			else
-				mUIRefresher.sendEmptyMessage(10);
-		}
-		
-		
-		}
-		
-	};
-
 	
 	
     /** Called when the activity is first created. */
@@ -163,12 +106,15 @@ Alerts.deleteAlertClickDispatcher, DualTouchListListener.DualTouchListListenerDi
      mAlerts.setGPLDispatcher(this);
      mAlerts.setDeleteDispatcher(this);
         
+     
         setContentView(R.layout.main);
         
         if(mFirstView){
         	log("First time starting, or restarting");
         	mFirstView = false;
         	mCurrentPath = Constants.SDCARD_DIR;
+        	 
+        	sLastPath = new Vector<String>();
         	
         	
         }
@@ -183,28 +129,96 @@ Alerts.deleteAlertClickDispatcher, DualTouchListListener.DualTouchListListenerDi
         	mList = (ListView)findViewById(android.R.id.list);
         	mList.setLongClickable(true);
         	mList.setAdapter(adapter);
-        
-        	 final GestureDetector gestureDetector = new GestureDetector(new DualTouchListListener(this).setDispatcher(this));
-        	 View.OnTouchListener gestureListener = new View.OnTouchListener() {
-				@Override
-				public boolean onTouch(View arg0, MotionEvent event) {
-					// TODO Auto-generated method stub
-					arg0.cancelLongPress();
-					return gestureDetector.onTouchEvent(event); 
-					
-				}};
-
-        	mList.setOnTouchListener(gestureListener);        	
-        	//HMMMMMM
+        	final GestureDetector gestureDetector = new GestureDetector(new DualTouchListListener(this).setDispatcher(this));
+        	View.OnTouchListener gestureListener = setupTouchListeners(gestureDetector);        	
+        	mList.setOnTouchListener(gestureListener);           	
         	registerForContextMenu(mList);
         }
         
         
         
-        IntentFilter filter = new IntentFilter(Constants.UPDATE_INTENT);
-        filter.addAction(Constants.RESOURCE_VIEW_INTENT);
         
-        registerReceiver(fileBroadcastReciver, filter);
+        
+       
+    }
+    
+    private View.OnTouchListener setupTouchListeners(final GestureDetector gestureDetector) {
+    	
+
+        
+   	 View.OnTouchListener gestureListener = new View.OnTouchListener() {
+   		 
+   		 private float mPx;
+   		 private float mPy;
+   		 private boolean startDrag = false;  
+			@Override
+			public boolean onTouch(View arg0, MotionEvent event) {
+				// TODO Auto-generated method stub
+				log("On touch called");
+				arg0.cancelLongPress();
+				
+				 arg0.clearFocus();
+				arg0.setClickable(false);
+				arg0.setLongClickable(false);
+				
+				if(!startDrag){
+					mPx = event.getX();
+					mPy = event.getY();
+					startDrag = true;
+				}
+				
+				 if(  (Math.abs(event.getX() - mPx) > DualTouchListListener.REL_SWIPE_MIN_DISTANCE )   && 
+		        		 (Math.abs(event.getY(0) - mPy)  < DualTouchListListener.REL_SWIPE_MAX_OFF_PATH)  ){
+		        	
+		        	Log.d(TAG,"Setting slide mode");
+		        	gestureDetector.onTouchEvent(event); 
+		        	return true;
+		        }
+				
+				 if(event.getAction() == MotionEvent.ACTION_UP){
+					 Log.d(TAG,"Setting slide mode inactive");
+					 startDrag = false;
+				 }
+				 
+				 
+				 arg0.cancelLongPress();
+					arg0.setFocusable(true);
+					arg0.setClickable(true);
+					arg0.setLongClickable(true);
+				
+				return false;
+				
+				
+				
+			}
+			
+   	 };
+		
+
+   	 return gestureListener;
+		
+	}
+
+	@Override
+    public void onStart(){
+    	super.onStart();
+    	log("On start called - registering receiver");
+    	
+    	sReceiver = new openFileManagerBroadcastReceiver().setDispatcher(this);
+    	
+    	IntentFilter filter = new IntentFilter(Constants.UPDATE_INTENT);
+        filter.addAction(Constants.RESOURCE_VIEW_INTENT);
+    	 registerReceiver(sReceiver, filter);
+    	
+    }
+    
+    @Override
+    public void onStop(){
+    	super.onStop();
+
+    	log("On stop called - unregistering receiver");
+    	unregisterReceiver(sReceiver);
+    	
     }
 
     @Override
@@ -258,17 +272,17 @@ Alerts.deleteAlertClickDispatcher, DualTouchListListener.DualTouchListListenerDi
 	public void onBackPressed(){
     	log( "Back button pressed");
     	
+    	mAboutToExit = getSharedPreferences(Constants.OPEN_FILE_MANAGER_PREFERENCES, 0).getBoolean(Constants.ABOUT_TO_EXIT, false);
     	if(mAboutToExit){
     		log("About to Exit");
     		mAboutToExit = false;
     		mFirstView = true;
-    		unregisterReceiver(fileBroadcastReciver);
+    		
     		finish();
     		
     		
     	}
     	else{
-    		mAboutToExit = false;
     		
 	       	File f = new File(mCurrentPath);
 	    	if(f.getParent() != null)Log.d(TAG, f.getParent());
@@ -277,7 +291,7 @@ Alerts.deleteAlertClickDispatcher, DualTouchListListener.DualTouchListListenerDi
 	    	if(f.getParent()== null){
 
 	    		Toast.makeText(this, "Press back once more to exit", 1000).show();
-	    		mAboutToExit = true;
+	    		PreferenceUtils.setExitStatus(this);
 	    		
 	    	}else if(f.getParent().equals("/")){
 	
@@ -294,7 +308,8 @@ Alerts.deleteAlertClickDispatcher, DualTouchListListener.DualTouchListListenerDi
 		
     }
     
-    public void createBroadCast(String path){
+    
+	public void createBroadCast(String path){
     	
     	createBroadCast(new File(path));
     	
@@ -305,43 +320,10 @@ Alerts.deleteAlertClickDispatcher, DualTouchListListener.DualTouchListListenerDi
     	Intent updateintent = new Intent(Constants.UPDATE_INTENT); 	
     	if(path.getParentFile() != null)updateintent.putExtra("PATH",path.getParent());
     	else updateintent.putExtra("PATH","/");
-    	mAboutToExit = false;
+		PreferenceUtils.resetExitStatus(this);
 		sendBroadcast(updateintent);
 
     }
-    
-    @Override
-    public void onListItemClick(ListView l, View v,int position, long id){
-    	log("List item clicked");
-    	
-    	
-    	File f = (File) getListAdapter().getItem(position);
-    	
-    	if(f.isDirectory()){
-			
-			Log.d(TAG, "Sending UI refresh broadcast");
-			
-			Intent updateintent = new Intent(Constants.UPDATE_INTENT);
-			updateintent.putExtra("PATH", f.getPath());
-			openFileManagerActivity.resetExitStatus();
-			sendBroadcast(updateintent);
-			
-		}else{
-			
-			Log.d(TAG, "Sending media broadcast");
-			Intent resource_intent = new Intent(Constants.RESOURCE_VIEW_INTENT);
-			resource_intent.putExtra("RESOURCE", f.toString());
-			sendBroadcast(resource_intent);
-					
-			
-		}
-    	
-    	
-    	
-    }
-    
- 
-    
     
     /**
     * Creates and returns a list adapter for the current list activity
@@ -364,19 +346,41 @@ Alerts.deleteAlertClickDispatcher, DualTouchListListener.DualTouchListListenerDi
     	return adapter;
     }
     
-    private void log(String message){
+
+    
+    @Override
+    public void onListItemClick(ListView l, View v,int position, long id){
+    	log("List item clicked");
     	
-    	if(DEBUG)Log.d(TAG, message);
+    	
+    	File f = (File) getListAdapter().getItem(position);
+    	
+    	if(f.isDirectory()){
+			
+			Log.d(TAG, "Sending UI refresh broadcast");
+			
+			Intent updateintent = new Intent(Constants.UPDATE_INTENT);
+			updateintent.putExtra("PATH", f.getPath());
+			PreferenceUtils.resetExitStatus(this);
+			sendBroadcast(updateintent);
+			
+		}else{
+			
+			Log.d(TAG, "Sending media broadcast");
+			Intent resource_intent = new Intent(Constants.RESOURCE_VIEW_INTENT);
+			resource_intent.putExtra("RESOURCE", f.toString());
+			sendBroadcast(resource_intent);
+					
+			
+		}
+    	
+    	
     	
     }
     
+ 
     
-    public static void resetExitStatus(){
-    	
     
-    	mAboutToExit = false;
-    	
-    }
 	
 	@Override
 	public void onAgreeSelected() {
@@ -386,13 +390,15 @@ Alerts.deleteAlertClickDispatcher, DualTouchListListener.DualTouchListListenerDi
 		edit.putInt(Constants.APP_NAME, Constants.VERSION_LEVEL);
 		edit.commit();
 		
-		mShowGPL = false;
 		
 	}
 	@Override
 	public void onQuitSelected() {
-		mFirstView = true;
-		mShowGPL = true;
+
+		SharedPreferences prefs = getSharedPreferences(Constants.OPEN_FILE_MANAGER_PREFERENCES, 0);
+		SharedPreferences.Editor edit = prefs.edit();
+		edit.putInt(Constants.APP_NAME, -1);
+		edit.commit();
 		finish();
 		// TODO Auto-generated method stub
 		
@@ -411,7 +417,7 @@ Alerts.deleteAlertClickDispatcher, DualTouchListListener.DualTouchListListenerDi
 			// Did not delete file
 			// post a handler
 			Toast.makeText(getApplicationContext(), "Your file has been not deleted",Toast.LENGTH_SHORT).show();
-			mUIRefresher.sendEmptyMessage(Constants.REFRESH_UI);
+			
 			
 		}
 	}
@@ -457,5 +463,84 @@ Alerts.deleteAlertClickDispatcher, DualTouchListListener.DualTouchListListenerDi
 	        Intent settings = new Intent(this, ApplicationSettings.class);
 	        startActivity(settings);
 		}
+
+	@Override
+	public void dispatchPathUpdate(String updatePath) {
+		
+		log("Standard UI refresh");
+		
+		sLastPath.add(mCurrentPath);
+		mCurrentPath = updatePath;
+		
+			 ListAdapter adapter = createAdapter(mCurrentPath); 
+		        if(adapter != null){
+		        	setListAdapter(adapter);
+		        	
+		        	ListView list = (ListView)findViewById(android.R.id.list);
+		        	list.setAdapter(adapter);
+		        }
+		        
+		
+	}
+
+	@Override
+	public void dispatchResourceUpdate(String resourcePath) {
+		
+
+		MimeTypeMap MIME = MimeTypeMap.getSingleton();
+		
+
+		String path = resourcePath;
+		String mimetype = MIME.getMimeTypeFromExtension(MimeTypeMap.getFileExtensionFromUrl(path));
+			if(mimetype != null){
+				Intent resourceintent = new Intent(Intent.ACTION_VIEW);
+	            		resourceintent.setDataAndType(Uri.parse("file://" + path), mimetype );
+	            		try{
+	            			startActivity(resourceintent);
+	            		}
+	            		catch(ActivityNotFoundException e){
+	            			e.printStackTrace();
+	            			mUIRefresher.sendEmptyMessage(Constants.UNKNOWN_FILE_TYPE);
+	            		}
+			}
+			else
+				mUIRefresher.sendEmptyMessage(Constants.UNKNOWN_FILE_TYPE);
+			
+		
+	}
+	
+
+	
+	private void unknown(){
+		
+		Toast.makeText(this, "Unknown file type", Toast.LENGTH_SHORT).show();
+	}
+
+	@Override
+	public void onDestroy(){
+		super.onDestroy();
+		
+		log("Destroying the activity");
+		
+		// Set all static variables to null
+		// for garbage collection
+
+		sLastPath = null;
+		sReceiver = null;
+		
+		// If the activity is destroy but the back 
+		// button is not pressed the exit status
+		// still needs to be set
+		PreferenceUtils.resetExitStatus(this);
+		
+	}
+	
+private void log(String message){
+    	
+    	if(DEBUG)Log.d(TAG, message);
+    	
+    }
+    
+
   
 }

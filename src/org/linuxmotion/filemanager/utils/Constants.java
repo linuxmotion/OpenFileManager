@@ -26,11 +26,8 @@ public class Constants {
 	public static final String UPDATE_INTENT = "org.linuxmotion.intent.UPDATE_UI";
 
 	public static final String RESOURCE_VIEW_INTENT = "org.linuxmotion.intent.HANDLE_VIEW_RESOURCE";
-
-	
 	
 	public static final String SDCARD_DIR = "/sdcard";
-	
 	
 	public static final int REFRESH_UI = 1;
 
@@ -39,6 +36,10 @@ public class Constants {
 	public static final String APP_NAME = "OpenFileManager-Version-Level";
 
 	public static final int VERSION_LEVEL = 0;
+
+	public static final String ABOUT_TO_EXIT = "ApplicationAboutToExit";
+
+	public static final int UNKNOWN_FILE_TYPE = 10;
 	
 	
 	public static MimeTypeMap MIME = MimeTypeMap.getSingleton();
