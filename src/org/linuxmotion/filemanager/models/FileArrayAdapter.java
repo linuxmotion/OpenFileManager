@@ -37,7 +37,7 @@ import android.widget.TextView;
 
 public class FileArrayAdapter extends ArrayAdapter<File> {
 	
-	private static boolean DBG = (true || Constants.FULL_DBG);
+	private static boolean DBG = (false | Constants.FULL_DBG);
 	private static String TAG = "FileArrayAdapter";
 	private File[] mFiles;
 	private Context mContext;

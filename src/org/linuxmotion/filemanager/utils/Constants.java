@@ -35,20 +35,19 @@ public class Constants {
 
 	public static final String APP_NAME = "OpenFileManager-Version-Level";
 
-	public static final int VERSION_LEVEL = 0;
+	public static final int VERSION_LEVEL = 3;
 
 	public static final String ABOUT_TO_EXIT = "ApplicationAboutToExit";
 
 	public static final int UNKNOWN_FILE_TYPE = 10;
-	
+
+	public static final String HIDDEN_FILES_FOLDERS_PREF = "hidden_files_folders_pref";
+
+	public static final String SORT_BY_FOLDERS_FILES_PREF = "sort_by_folders_then_files_pref";
 	
 	public static MimeTypeMap MIME = MimeTypeMap.getSingleton();
 	
-		
-			
-		
-	
-	
+
 
 	
 }

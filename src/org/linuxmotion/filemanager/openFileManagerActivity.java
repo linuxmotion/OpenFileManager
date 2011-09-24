@@ -19,6 +19,7 @@ package org.linuxmotion.filemanager;
 
 
 import java.io.File;
+import java.io.InvalidObjectException;
 import java.util.Vector;
 
 import org.linuxmotion.filemanager.models.DualTouchListListener;
@@ -154,7 +155,7 @@ Alerts.deleteAlertClickDispatcher, DualTouchListListener.DualTouchListListenerDi
 			@Override
 			public boolean onTouch(View arg0, MotionEvent event) {
 				// TODO Auto-generated method stub
-				log("On touch called");
+				//log("On touch called");
 				arg0.cancelLongPress();
 				
 				 arg0.clearFocus();
@@ -209,6 +210,11 @@ Alerts.deleteAlertClickDispatcher, DualTouchListListener.DualTouchListListenerDi
     	IntentFilter filter = new IntentFilter(Constants.UPDATE_INTENT);
         filter.addAction(Constants.RESOURCE_VIEW_INTENT);
     	 registerReceiver(sReceiver, filter);
+    	 
+    	// Always refresh the UI when navigating back
+    	 // Something may have changed, whether it 
+    	 // be a preference or a new file
+    	 refreshPathUI();
     	
     }
     
@@ -247,10 +253,10 @@ Alerts.deleteAlertClickDispatcher, DualTouchListListener.DualTouchListListenerDi
 		switch(menuItemIndex){
 		
 		case 0:{
-			log("Item number is " + menuItemIndex);
+			performClick(f);
 			break;
 		}
-		case 1:{
+		case 2:{
 			mCurrentPath = f.getPath();
 			mAlerts.showDeleteAlertBox(f);
 			
@@ -332,7 +338,7 @@ Alerts.deleteAlertClickDispatcher, DualTouchListListener.DualTouchListListenerDi
     protected FileArrayAdapter createAdapter(String path)
     { 
     	log( "the current path is " + path);
-    	File[] files = FileUtils.getFilesInDirectory(path);
+    	File[] files = FileUtils.getFilesInDirectory(path, this.getApplicationContext());
     	FileArrayAdapter adapter;
     	if(files != null){
     		
@@ -353,9 +359,18 @@ Alerts.deleteAlertClickDispatcher, DualTouchListListener.DualTouchListListenerDi
     	log("List item clicked");
     	
     	
-    	File f = (File) getListAdapter().getItem(position);
     	
-    	if(f.isDirectory()){
+    		File f = (File) getListAdapter().getItem(position);
+    		performClick(f);
+    	
+    	
+    	
+    }
+    
+    
+    private void performClick(File f){
+    	
+ 	if(f.isDirectory()){
 			
 			Log.d(TAG, "Sending UI refresh broadcast");
 			
@@ -375,9 +390,7 @@ Alerts.deleteAlertClickDispatcher, DualTouchListListener.DualTouchListListenerDi
 		}
     	
     	
-    	
     }
-    
  
     
     
@@ -482,11 +495,28 @@ Alerts.deleteAlertClickDispatcher, DualTouchListListener.DualTouchListListenerDi
 		        
 		
 	}
+	
+	private void refreshPathUI() {
+		
+		log("Normal UI refresh");
+		
+				
+			 ListAdapter adapter = createAdapter(mCurrentPath); 
+		        if(adapter != null){
+		        	setListAdapter(adapter);
+		        	
+		        	ListView list = (ListView)findViewById(android.R.id.list);
+		        	list.setAdapter(adapter);
+		        }
+		        
+		
+	}
 
 	@Override
 	public void dispatchResourceUpdate(String resourcePath) {
 		
 
+		
 		MimeTypeMap MIME = MimeTypeMap.getSingleton();
 		
 

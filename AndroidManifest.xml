@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       android:versionName="Lunar lynx" 
-      package="org.linuxmotion.filemanager" android:versionCode="2">
+      package="org.linuxmotion.filemanager" android:versionCode="3">
       
     <uses-sdk android:minSdkVersion="8" />
     <!-- Permission needed for deleting and moving files -->

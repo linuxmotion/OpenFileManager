@@ -16,7 +16,32 @@
 <PreferenceScreen
 	 xmlns:android="http://schemas.android.com/apk/res/android">
 	 
-	 
+	
+ 	<PreferenceCategory
+     android:title="Sorting preferences">
+    
+    		 <CheckBoxPreference
+    		  android:key="@string/hidden_files_folder_pref"
+    		  android:title="@string/hidden_files_folder_pref_title"
+    		  android:summaryOn="@string/hidden_files_folder_pref_sum_on"
+    		  android:summaryOff="@string/hidden_files_folder_pref_sum_off"
+    		  android:defaultValue="true"
+    		  
+    		  />     
+    		  
+    		  <CheckBoxPreference
+    		  android:key="@string/sort_file_folder_pref"
+    		  android:title="@string/sort_file_folder_pref_title"
+    		  android:summaryOn="@string/sort_file_folder_pref_sum_on"
+    		  android:summaryOff="@string/sort_file_folder_pref_sum_off"
+    		  android:defaultValue="true"
+    		  
+    		  />  
+    		       
+                        
+	</PreferenceCategory>
+ 	 
+ 	
 
 </PreferenceScreen>
 

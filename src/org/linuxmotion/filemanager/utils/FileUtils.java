@@ -19,10 +19,17 @@ package org.linuxmotion.filemanager.utils;
 
 import java.io.File;
 
+import org.linuxmotion.filemanager.preferences.PreferenceUtils;
+
+import android.content.Context;
 import android.util.Log;
 
 public class FileUtils {
 	private static String TAG = FileUtils.class.getCanonicalName();
+	
+	private final static boolean DUMP_DEBUG = false;
+
+	private static final boolean DGB = (false | Constants.FULL_DBG);
 	
 	
 	
@@ -32,7 +39,7 @@ public class FileUtils {
 	 * @param directory the director path from which to retrive the files from
 	 * @return
 	 */
-	public static File[] getFilesInDirectory(String directory){
+	public static File[] getFilesInDirectory(String directory, Context context){
 		
 		
 		File temp = new File(directory);
@@ -41,7 +48,7 @@ public class FileUtils {
 			Log.d("FileUtils", "Path exists");
 			if(temp.listFiles() != null){
 				
-				return sortFiles(temp);
+				return sortFiles(temp, context);
 			}
 			else {
 				// If this point is reached then the directory doesnt contain any 
@@ -67,31 +74,45 @@ public class FileUtils {
 	 * @param temp
 	 * @return
 	 */
-	private static File[] sortFiles(File temp) {
+	private static File[] sortFiles(File temp, Context context) {
 		
 		File[] FILES = temp.listFiles();
 		
+		File[] hiddenfiles;
 		
 		
-		SortByFileFolder(FILES);
-		SortHiddenFilesFolders(FILES);
-		//FILES = ShowHideHiddenFilesFolders(FILES);
+		SortByFileFolder(FILES, context);
+		SortHiddenFilesFolders(FILES, context);
+		hiddenfiles = ShowHideHiddenFilesFolders(FILES, context);
 
 		
-		return FILES;
+		return hiddenfiles;
 	}
 
 
+	/**
+	 * 
+	 * @param files the files to sort
+     * @param context To retrieve the sharedPrefreneces
+	 */
 
-	private static File[] ShowHideHiddenFilesFolders(File[] FILES) {
+	private static File[] ShowHideHiddenFilesFolders(File[] files, Context context) {
 		
+		File[] FILES = files;
 	boolean loop = false;
-	boolean hide = true;
+	boolean hide = PreferenceUtils.retreiveShowHideHiddenFilesFoldersPref(context);
 	int length = FILES.length;
+	boolean hide_folders = hide;
+	boolean hide_files = hide;
+	
+	
+	// Set all hidden dir and files to null
 	for(int i = 0; i < length-1; i++){
 		File f = FILES[i];
+		boolean dir = f.isDirectory();
+		boolean hidden = f.isHidden();
 		
-		if(f.isDirectory() && f.getName().startsWith(".") && hide ){
+		if( dir && hidden  && hide_folders){
 			
 			FILES[i] = null;
 			
@@ -99,17 +120,28 @@ public class FileUtils {
 		}
 		
 		
+		
+		if(!dir && hidden && hide_files){
+					
+					FILES[i] = null;
+					
+					
+		}
+		
+		
 	}
 	
-		
+		// Move all null files to the end of the list preserving non null order
 		do{
 			
 			loop = false;
 			for(int i = 0; i < FILES.length-1; i++){
-				
+				File f = FILES[i];
 
-				if(FILES[i] == null){
+				if((FILES[i] == null) &&( FILES[i+1] != null)){
+					// Switch with the next item
 					FILES[i] = FILES[i+1];
+					FILES[i+1] = f;
 					loop = true;
 				}
 			}
@@ -117,6 +149,9 @@ public class FileUtils {
 			
 		}while(loop);
 		
+		
+		// Shrink the new list
+		// Find the first null value
 		int nullstart = 0;
 	
 			for(int i = 0; i < FILES.length-1; i++){
@@ -127,21 +162,40 @@ public class FileUtils {
 					break;
 				}
 			}
-	
-			File[] Files = new File[nullstart];
-			for(int i = 0; i < nullstart; i++){
+			
+			
+			File[] Files = null;
+			// Create a new File[] size - 1 of the null poistion
+			if(nullstart > 0){
+				Files = new File[nullstart-1];
+				for(int i = 0; i < nullstart-1; i++){
+					
+					Files[i] = FILES[i];
+		
+				}
 				
-				Files[i] = FILES[i];
+				if(DUMP_DEBUG)dump(Files);
+				return Files;
 				
 			}
+			else{
+				
+				return FILES;
+				
+			}
+			
+			
 	
-		return Files;
 	}
 
 
-
-	private static void SortByFileFolder(File[] FILES) {
-		
+	/**
+	 * 
+	 * @param files the files to sort
+     * @param context To retrieve the sharedPrefreneces
+	 */
+	private static void SortByFileFolder(File[] file, Context context) {
+		File[] FILES = file;
 
 		boolean loop = false;
 		
@@ -164,12 +218,62 @@ public class FileUtils {
 			}
 		}while(loop);
 		
+		boolean FoldersFirst = PreferenceUtils.retreiveSortbyFoldersFilesPref(context);
+		
+		
+		
+		if(!FoldersFirst){
+			//TODO: reverse the order
+		
+			int filestart = 0;
+			
+			for(int i = 0; i < FILES.length-1; i++){
+				
+
+				if(!FILES[i].isDirectory()){
+					filestart = i;
+					break;
+				}
+			}
+			
+			
+			int o = FILES.length-1;
+			for(int i = 0; i <  filestart; i++){
+				
+				File f = FILES[i];
+				File t = FILES[o];
+				
+					FILES[i] = t;
+					FILES[o] = f;
+					
+				o--;
+				
+				
+			}
+		
+			
+			
+		}
+		
+		if(DUMP_DEBUG)dump(FILES);
+			
+		file = FILES;
+		
 	}
 
 
-
-	private static void SortHiddenFilesFolders(File[] FILES) {
+	// TODO: At some pint this should sort the list non-hidden -> hidden -> non-hidden -> hidden 
+	// the user should then be able to select using a preference
+	/**
+	 * Sort into hidden folders then folders. Form there is sorts into hidden files then non hiden
+	 * files.
+	 * 
+	 * @param files the files to sort
+	 * @param context To retrieve the sharedPrefreneces
+	 */
+	private static void SortHiddenFilesFolders(File[] files, Context context) {
 		
+		File[] FILES = files;
 
 		boolean loop = false;
 		
@@ -182,9 +286,9 @@ public class FileUtils {
 				File f = FILES[i-1];
 				
 				boolean a = t.isDirectory();
-					boolean b = t.getName().startsWith(".");
-						boolean c = f.isDirectory() ;
-							boolean d = f.getName().startsWith(".");
+					boolean b = t.isHidden();
+						boolean c = f.isDirectory();
+							boolean d = f.isHidden();
 				
 				if( a && b && c && !d){
 					
@@ -198,6 +302,10 @@ public class FileUtils {
 				
 			}
 		}while(loop);
+		
+		if(DUMP_DEBUG)dump(FILES);
+		
+		files = FILES;
 		
 	}
 
@@ -223,9 +331,16 @@ public class FileUtils {
 		
 	}
 	
+	private static void dump(File[] f){
+		
+	for(int i = 0; i < f.length-1; i++)
+		log(i + " --- "  + f[i].getName() );
+		
+	}
+	
 	private static void log(String message){
 		
-		Log.d(TAG, message);
+		if(DGB)Log.d(TAG, message);
 		
 	}
 	
