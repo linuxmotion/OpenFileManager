@@ -3,24 +3,22 @@
     <string name="hello">Hello World, ConicalFileBrowserActivity!</string>
     <string name="app_name">openFileManager</string>
     <string name="file_options">File options</string>
+ 
+    <string name="application_settings">Application Settings</string>
     
     
 	
     <string name="hidden_files_folder_pref">hidden_files_folder_pref</string>
+	<string name="hidden_files_folder_pref_title">Show hidden files and folders</string>
+  	<string name="hidden_files_folder_pref_sum_on">Hidden files and folders are not hidden</string>
+	<string name="hidden_files_folder_pref_sum_off">Hidden files and folders are hidden</string>
+   
     <string name="sort_file_folder_pref">sort_file_folder_pref</string>
-    
-    <string name="hidden_files_folder_pref_title">Show hidden files and folders</string>
-    <string name="sort_file_folder_pref_title">Sort files and folder listing by folders first</string>
-    
-    <string name="hidden_files_folder_pref_sum_on">Hidden files and folders are not hidden</string>
+    <string name="sort_file_folder_pref_title">Sort files and folder listing by folders first</string> 
     <string name="sort_file_folder_pref_sum_on">List is sorted folders then files</string>
-
-    <string name="hidden_files_folder_pref_sum_off">List is sorted files then folders</string>
-    <string name="sort_file_folder_pref_sum_off">Hidden files and folders are hidden</string>	
+    <string name="sort_file_folder_pref_sum_off">List is sorted files then folders</string>	
 	
-    <string name="application_settings">Application Settings</string>
-    
-    
+	<!-- -->
     <string name="sort_files_folder_ascen_desen_cat">Sort by name Ascending and descending</string>
     
     <string name="sort_files_folder_ascen_pref">sort_files_folder_asec_pref</string>
