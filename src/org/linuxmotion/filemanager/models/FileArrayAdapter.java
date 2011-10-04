@@ -37,23 +37,21 @@ import android.widget.TextView;
 
 public class FileArrayAdapter extends ArrayAdapter<File> {
 	
-	private static boolean DBG = (false | Constants.FULL_DBG);
+	private static boolean DBG = (true || Constants.FULL_DBG);
 	private static String TAG = "FileArrayAdapter";
 	private File[] mFiles;
 	private Context mContext;
-	private boolean mEmptylist = false;
 	
 	public FileArrayAdapter(Context context, int textViewResourceId, File[] files) {
 		super(context, textViewResourceId, files);
 		
-		this.mFiles = files;
-		this.mContext = context;
+		mFiles = files;
+		mContext = context;
 	
 	}
 	public FileArrayAdapter(Context context, int textViewResourceId, File file) {
 		super(context, textViewResourceId);
 		
-		mEmptylist = true;
 		mFiles = file.listFiles();
 		mContext = context;
 	
@@ -67,18 +65,19 @@ public class FileArrayAdapter extends ArrayAdapter<File> {
                      v = vi.inflate(R.layout.file_list_item, null);
              }
 
-             if(mFiles.length == 1 && mEmptylist){
+             if(mFiles == null){
             	 Log.d(TAG, "The listview is empty");
              }
              else{
-             File it = this.mFiles[position];
-             log(it.toString());
+             File it = mFiles[position];
+             
              if (it != null) {
+            	 log(it.toString());
             	 log("Seting resources");
             	 
                      ImageView iv = (ImageView) v.findViewById(R.id.thumbnail);
                      if (iv != null) {
-                    	 log("Setting image");
+                    	 log("Setting file image");
                     	 //iv.setImageURI(uri)
                     	 if(it.isFile()){
                     		 // If it a pic set it as
@@ -87,18 +86,7 @@ public class FileArrayAdapter extends ArrayAdapter<File> {
                     		 
                     		 String name = it.getName();
                     	                    		 
-                    		 log("Full name: " + name);
-                    		 if(FileUtils.hasExtension(name)){
-                    			 
-                    			 String[] name_extension = name.split("\\.",2);
-                    			 log("Name: "+ name_extension[0] + "\nExtension: " + name_extension[1]  );
-                    		 
-                    		 }
-                    		 else {
-                    			 
-                    			 
-                    			 
-                    		 }
+                    		 log("Full name: " + name);      
                     		 
                     		 String ext = MimeTypeMap.getFileExtensionFromUrl(it.getName());
                     		 setIconType(iv, ext);
@@ -107,8 +95,8 @@ public class FileArrayAdapter extends ArrayAdapter<File> {
                          
                     	 }else{
 
-                			 log("Setting icon image");
-                    		  iv.setBackgroundResource(R.drawable.ic_list_folder);
+                			 log("Setting folder icon image");
+                    		 iv.setBackgroundResource(R.drawable.ic_list_folder);
                     	 }
                      }
                      
@@ -139,11 +127,6 @@ public class FileArrayAdapter extends ArrayAdapter<File> {
 	             		FileExtras.setText(extras);
 	             	}
              }
-             //HMMMMM
-            // onFileClickListener listener = new onFileClickListener(this.mContext, it);
-             
-            // v.setOnClickListener(listener);
-             //v.setOnLongClickListener(listener);
              
              }
              

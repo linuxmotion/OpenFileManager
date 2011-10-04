@@ -29,7 +29,7 @@ public class FileUtils {
 	
 	private final static boolean DUMP_DEBUG = false;
 
-	private static final boolean DGB = (false | Constants.FULL_DBG);
+	private static final boolean DGB = (false || Constants.FULL_DBG);
 	
 	
 	
@@ -83,47 +83,44 @@ public class FileUtils {
 		
 		SortByFileFolder(FILES, context);
 		SortHiddenFilesFolders(FILES, context);
+		sortFilesFoldersLexicographically(FILES, context);
 		hiddenfiles = ShowHideHiddenFilesFolders(FILES, context);
-		sortFilesFoldersLexicographically(hiddenfiles);
-
 		
 		return hiddenfiles;
 	}
 
 
-	private void sortFilesFoldersLexicographically(File[] Files){
+	private static void sortFilesFoldersLexicographically(File[] Files, Context context){
 		
-		Files[] toSort = Files;
+		File[] toSort = Files;
 		int length = Files.length;
 		boolean shouldLoop = false;
-		boolean inAsendingMode = true;// Grab the real value from PrefrenceUtils
+		boolean inAsendingMode = PreferenceUtils.retreiveLexicographicallySmallerFirst(context);// Grab the real value from PrefrenceUtils
 		
 		do{
 		shouldLoop = false;
 		
-			for(int i = 0, i  < length-1; i++ ){
+			for(int i = 0; i  < length-1; i++ ){
 				String one = toSort[i].getName();
 				String two = toSort[i+1].getName();
+				boolean isDir = (toSort[i].isDirectory() && toSort[i+1].isDirectory());
+				boolean isFile = (toSort[i].isFile() && toSort[i+1].isFile());
 				
-				if((one.compareTo(two) > 0 ) && ((toSort[i].isDirectory() && toSort[i+1].isDirectory())
-							|| (toSort[i].isFile() && toSort[i+1].isFile()))
-							&& inAsendingMode){
+				if((one.compareTo(two) > 0 ) && (isDir || isFile)	&& inAsendingMode){
 				// The second string is Lexicographically smaller than 
 				// the first					
-					File temp = toSort[i];
-					Files temp2 = toSort[i+1];
+					File temp1 = toSort[i];
+					File temp2 = toSort[i+1];
 					toSort[i] = temp2;
 					toSort[i+1] = temp1;
 					shouldLoop = true;	
 				}
 				
-				if((one.compareTo(two) < 0 ) && ((toSort[i].isDirectory() && toSort[i+1].isDirectory())
-							|| (toSort[i].isFile() && toSort[i+1].isFile()))
-							&& !inAsendingMode){
+				if((one.compareTo(two) < 0 ) && (isDir || isFile)	&& !inAsendingMode){
 				// The second string is Lexicographically larger than 
 				// the first	
-					File temp = toSort[i];
-					Files temp2 = toSort[i+1];
+					File temp1 = toSort[i];
+					File temp2 = toSort[i+1];
 					toSort[i] = temp2;
 					toSort[i+1] = temp1;
 					shouldLoop = true;	
@@ -131,7 +128,7 @@ public class FileUtils {
 
 			} // END FOR
 		
-		}while(shouldLoop)
+		}while(shouldLoop);
 		
 	}
 
@@ -150,31 +147,29 @@ public class FileUtils {
 	boolean hide_folders = hide;
 	boolean hide_files = hide;
 	
+	if(hide || hide_folders || hide_files ){
 	
-	// Set all hidden dir and files to null
-	for(int i = 0; i < length-1; i++){
-		File f = FILES[i];
-		boolean dir = f.isDirectory();
-		boolean hidden = f.isHidden();
-		
-		if( dir && hidden  && hide_folders){
+		// Set all hidden dir and files to null
+		for(int i = 0; i < length; i++){
+			File f = FILES[i];
+			boolean dir = f.isDirectory();
+			boolean hidden = f.isHidden();
 			
-			FILES[i] = null;
+			if( dir && hidden  && hide_folders){
+				
+				FILES[i] = null;
+				
+				
+			}
+			if(!dir && hidden && hide_files){
+						
+						FILES[i] = null;
+						
+						
+			}
 			
 			
 		}
-		
-		
-		
-		if(!dir && hidden && hide_files){
-					
-					FILES[i] = null;
-					
-					
-		}
-		
-		
-	}
 	
 		// Move all null files to the end of the list preserving non null order
 		do{
@@ -199,7 +194,7 @@ public class FileUtils {
 		// Find the first null value
 		int nullstart = 0;
 	
-			for(int i = 0; i < FILES.length-1; i++){
+			for(int i = 0; i < FILES.length; i++){
 				
 
 				if(FILES[i] == null){
@@ -212,8 +207,8 @@ public class FileUtils {
 			File[] Files = null;
 			// Create a new File[] size - 1 of the null poistion
 			if(nullstart > 0){
-				Files = new File[nullstart-1];
-				for(int i = 0; i < nullstart-1; i++){
+				Files = new File[nullstart];
+				for(int i = 0; i < nullstart; i++){
 					
 					Files[i] = FILES[i];
 		
@@ -229,7 +224,11 @@ public class FileUtils {
 				
 			}
 			
+		}else{
 			
+			return files;
+			
+		}
 	
 	}
 
@@ -272,7 +271,7 @@ public class FileUtils {
 		
 			int filestart = 0;
 			
-			for(int i = 0; i < FILES.length-1; i++){
+			for(int i = 0; i < FILES.length; i++){
 				
 
 				if(!FILES[i].isDirectory()){

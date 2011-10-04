@@ -19,6 +19,9 @@ public class ApplicationSettings extends PreferenceActivity implements OnPrefere
 	// checkbox prefrences
 	CheckBoxPreference mHiddenFilesAndFoldersPreference;
 	CheckBoxPreference mSortbyFileThenFolderPreference;
+
+	CheckBoxPreference mAscendingFileFolderPreference;
+	CheckBoxPreference mDecendingFileFolderPreference;
 	
 	// Show/Hide hidden folders
 	// 
@@ -37,6 +40,12 @@ public class ApplicationSettings extends PreferenceActivity implements OnPrefere
         
         mSortbyFileThenFolderPreference = (CheckBoxPreference) findPreference(getString(R.string.sort_file_folder_pref));
         mSortbyFileThenFolderPreference.setOnPreferenceChangeListener(this);
+        
+        mAscendingFileFolderPreference =  (CheckBoxPreference) findPreference(getString(R.string.sort_files_folder_ascen_pref));
+        mAscendingFileFolderPreference.setOnPreferenceChangeListener(this);
+        
+    	mDecendingFileFolderPreference =  (CheckBoxPreference) findPreference(getString(R.string.sort_files_folder_descen_pref));
+    	mDecendingFileFolderPreference.setOnPreferenceChangeListener(this);
 	}
 
 	@Override
@@ -74,6 +83,36 @@ public class ApplicationSettings extends PreferenceActivity implements OnPrefere
 			
 		}
 		
+	
+		if(arg0.equals(mDecendingFileFolderPreference)){
+			
+			if(mDecendingFileFolderPreference.isChecked()){
+
+				mAscendingFileFolderPreference.setChecked(true);
+				mDecendingFileFolderPreference.setChecked(false);
+				PreferenceUtils.sortLexicographicallySmallerFirst(getApplicationContext(), true);
+				
+			}else{
+				mAscendingFileFolderPreference.setChecked(false);
+				mDecendingFileFolderPreference.setChecked(true);
+				PreferenceUtils.sortLexicographicallySmallerFirst(getApplicationContext(), false);
+			}
+			
+		}
+		if(arg0.equals(mAscendingFileFolderPreference)){
+			
+			
+			if(mAscendingFileFolderPreference.isChecked()){
+				mAscendingFileFolderPreference.setChecked(false);
+				mDecendingFileFolderPreference.setChecked(true);
+				PreferenceUtils.sortLexicographicallySmallerFirst(getApplicationContext(), false);
+			}else{
+				mAscendingFileFolderPreference.setChecked(true);
+				mDecendingFileFolderPreference.setChecked(false);
+				PreferenceUtils.sortLexicographicallySmallerFirst(getApplicationContext(), true);
+			}
+			
+		}
 		// TODO Auto-generated method stub
 		return false;
 	}

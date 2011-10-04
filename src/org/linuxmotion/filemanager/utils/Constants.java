@@ -44,6 +44,8 @@ public class Constants {
 	public static final String HIDDEN_FILES_FOLDERS_PREF = "hidden_files_folders_pref";
 
 	public static final String SORT_BY_FOLDERS_FILES_PREF = "sort_by_folders_then_files_pref";
+
+	public static final String SORT_LEXICOGRAPHICALLY_SMALLER_FIRST_PREF = "sort_lexicographically_smaller_first_pref ";
 	
 	public static MimeTypeMap MIME = MimeTypeMap.getSingleton();
 	

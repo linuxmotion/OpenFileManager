@@ -19,6 +19,19 @@
     <string name="sort_file_folder_pref_sum_off">Hidden files and folders are hidden</string>	
 	
     <string name="application_settings">Application Settings</string>
+    
+    
+    <string name="sort_files_folder_ascen_desen_cat">Sort by name Ascending and descending</string>
+    
+    <string name="sort_files_folder_ascen_pref">sort_files_folder_asec_pref</string>
+    <string name="sort_files_folder_ascen_title">Sort in ascending order</string>
+    <string name="sort_files_folder_ascen_sum_on">Sorting in ascending order</string>
+    <string name="sort_files_folder_ascen_off">Sorting in descending order</string>
+    
+    <string name="sort_files_folder_descen_pref">sort_files_folder_desen_pref</string>
+    <string name="sort_files_folder_descen_title">Sort in descending order</string>
+    <string name="sort_files_folder_descen_sum_on">Sorting in descending order</string>
+    <string name="sort_files_folder_descen_off">Sorting in ascending order</string>
    
 	
 </resources>

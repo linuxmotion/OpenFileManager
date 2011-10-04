@@ -95,6 +95,22 @@ public class PreferenceUtils {
 			
 		}
 
+		public static void sortLexicographicallySmallerFirst(Context context, boolean smallerFirst) {
+			
+			SharedPreferences prefs = context.getSharedPreferences(Constants.OPEN_FILE_MANAGER_PREFERENCES, 0);
+			SharedPreferences.Editor edit = prefs.edit();
+			edit.putBoolean(Constants.SORT_LEXICOGRAPHICALLY_SMALLER_FIRST_PREF, smallerFirst);
+			edit.commit();
+			
+			
+		}
+
+		public static boolean retreiveLexicographicallySmallerFirst(Context context) {
+			SharedPreferences prefs = context.getSharedPreferences(Constants.OPEN_FILE_MANAGER_PREFERENCES, 0);
+			return prefs.getBoolean(Constants.SORT_LEXICOGRAPHICALLY_SMALLER_FIRST_PREF, true);
+				
+		}
+
 
 	    /************************/
 

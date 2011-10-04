@@ -41,6 +41,27 @@
                         
 	</PreferenceCategory>
  	 
+ 	 <PreferenceCategory
+     android:title="@string/sort_files_folder_ascen_desen_cat">
+     <CheckBoxPreference
+    		  android:key="@string/sort_files_folder_ascen_pref"
+    		   android:title="@string/sort_files_folder_ascen_title"
+    		  android:summaryOn="@string/sort_files_folder_ascen_sum_on"
+    		  android:summaryOff="@string/sort_files_folder_ascen_off"
+    		  android:defaultValue="true"
+    		  
+    		  />     
+    		  
+    		  <CheckBoxPreference
+    		  android:key="@string/sort_files_folder_descen_pref"
+    		  android:title="@string/sort_files_folder_descen_title"
+    		  android:summaryOn="@string/sort_files_folder_descen_sum_on"
+    		  android:summaryOff="@string/sort_files_folder_descen_off"
+    		  android:defaultValue="false"
+    		  
+    		  />  
+     
+     </PreferenceCategory>
  	
 
 </PreferenceScreen>
