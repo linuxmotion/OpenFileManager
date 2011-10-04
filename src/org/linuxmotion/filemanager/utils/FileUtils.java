@@ -84,11 +84,56 @@ public class FileUtils {
 		SortByFileFolder(FILES, context);
 		SortHiddenFilesFolders(FILES, context);
 		hiddenfiles = ShowHideHiddenFilesFolders(FILES, context);
+		sortFilesFoldersLexicographically(hiddenfiles);
 
 		
 		return hiddenfiles;
 	}
 
+
+	private void sortFilesFoldersLexicographically(File[] Files){
+		
+		Files[] toSort = Files;
+		int length = Files.length;
+		boolean shouldLoop = false;
+		boolean inAsendingMode = true;// Grab the real value from PrefrenceUtils
+		
+		do{
+		shouldLoop = false;
+		
+			for(int i = 0, i  < length-1; i++ ){
+				String one = toSort[i].getName();
+				String two = toSort[i+1].getName();
+				
+				if((one.compareTo(two) > 0 ) && ((toSort[i].isDirectory() && toSort[i+1].isDirectory())
+							|| (toSort[i].isFile() && toSort[i+1].isFile()))
+							&& inAsendingMode){
+				// The second string is Lexicographically smaller than 
+				// the first					
+					File temp = toSort[i];
+					Files temp2 = toSort[i+1];
+					toSort[i] = temp2;
+					toSort[i+1] = temp1;
+					shouldLoop = true;	
+				}
+				
+				if((one.compareTo(two) < 0 ) && ((toSort[i].isDirectory() && toSort[i+1].isDirectory())
+							|| (toSort[i].isFile() && toSort[i+1].isFile()))
+							&& !inAsendingMode){
+				// The second string is Lexicographically larger than 
+				// the first	
+					File temp = toSort[i];
+					Files temp2 = toSort[i+1];
+					toSort[i] = temp2;
+					toSort[i+1] = temp1;
+					shouldLoop = true;	
+				}
+
+			} // END FOR
+		
+		}while(shouldLoop)
+		
+	}
 
 	/**
 	 * 
