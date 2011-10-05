@@ -36,6 +36,7 @@ import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -48,9 +49,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewStub;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -61,19 +65,23 @@ Alerts.deleteAlertClickDispatcher, DualTouchListListener.DualTouchListListenerDi
 	private static String TAG = openFileManagerActivity.class.getSimpleName();
 	private static boolean DEBUG = (true | Constants.FULL_DBG);
 
-	
+	/*Standard variable components*/	
 	private String mCurrentPath;
 	private static Vector<String> sLastPath;
 
 	private boolean mFirstView = true;
 	private boolean mShowGPL = true;
 	private boolean mAboutToExit = false;
+	private boolean mStubIsInflated = false; 
 	
+	/*Standard UI components*/
+	LinearLayout mInflatedStub;
+	private ListView mList;
+	
+	/*Custom components*/
 	private static openFileManagerBroadcastReceiver sReceiver;
-	
 	private Alerts mAlerts;
 
-	private ListView mList;
 	
 	public final Handler mUIRefresher = new Handler(){
 		
@@ -91,9 +99,7 @@ Alerts.deleteAlertClickDispatcher, DualTouchListListener.DualTouchListListenerDi
 			
 			
 		}
-			
-		
-		
+
 	};
 	
 	
@@ -135,12 +141,7 @@ Alerts.deleteAlertClickDispatcher, DualTouchListListener.DualTouchListListenerDi
         	mList.setOnTouchListener(gestureListener);           	
         	registerForContextMenu(mList);
         }
-        
-        
-        
-        
-        
-       
+         
     }
     
     private View.OnTouchListener setupTouchListeners(final GestureDetector gestureDetector) {
@@ -241,7 +242,6 @@ Alerts.deleteAlertClickDispatcher, DualTouchListListener.DualTouchListListenerDi
       }
     }
 
-	
     @Override
     public boolean onContextItemSelected(MenuItem item) {
     	
@@ -270,10 +270,7 @@ Alerts.deleteAlertClickDispatcher, DualTouchListListener.DualTouchListListenerDi
 		}
 		return true;
     }
-    
-   
-    
-    
+ 
     @Override
 	public void onBackPressed(){
     	log( "Back button pressed");
@@ -313,8 +310,7 @@ Alerts.deleteAlertClickDispatcher, DualTouchListListener.DualTouchListListenerDi
     	}
 		
     }
-    
-    
+       
 	public void createBroadCast(String path){
     	
     	createBroadCast(new File(path));
@@ -352,8 +348,6 @@ Alerts.deleteAlertClickDispatcher, DualTouchListListener.DualTouchListListenerDi
     	return adapter;
     }
     
-
-    
     @Override
     public void onListItemClick(ListView l, View v,int position, long id){
     	log("List item clicked");
@@ -366,7 +360,6 @@ Alerts.deleteAlertClickDispatcher, DualTouchListListener.DualTouchListListenerDi
     	
     	
     }
-    
     
     private void performClick(File f){
     	
@@ -392,9 +385,6 @@ Alerts.deleteAlertClickDispatcher, DualTouchListListener.DualTouchListListenerDi
     	
     }
  
-    
-    
-	
 	@Override
 	public void onAgreeSelected() {
 		
@@ -405,6 +395,7 @@ Alerts.deleteAlertClickDispatcher, DualTouchListListener.DualTouchListListenerDi
 		
 		
 	}
+	
 	@Override
 	public void onQuitSelected() {
 
@@ -416,6 +407,7 @@ Alerts.deleteAlertClickDispatcher, DualTouchListListener.DualTouchListListenerDi
 		// TODO Auto-generated method stub
 		
 	}
+	
 	@Override
 	public void onSelectedDelete(File f) {
 		
@@ -491,11 +483,41 @@ Alerts.deleteAlertClickDispatcher, DualTouchListListener.DualTouchListListenerDi
 		        	
 		        	ListView list = (ListView)findViewById(android.R.id.list);
 		        	list.setAdapter(adapter);
+		        	if(adapter.isEmpty() && !mStubIsInflated){
+		        		ViewStub Stub = (ViewStub) findViewById(R.id.stub);
+		        		mInflatedStub = (LinearLayout) Stub.inflate();
+		        		handleEmptyListBG();
+		        		mStubIsInflated = true;
+		        		
+		        	}
+		        	else if(adapter.isEmpty() && mStubIsInflated && (mInflatedStub.getVisibility() == View.GONE)){
+		        		mInflatedStub.setVisibility(View.VISIBLE);
+		        		 handleEmptyListBG();
+		        		
+		        	}
+		        	else if(mStubIsInflated && (mInflatedStub.getVisibility() == View.VISIBLE)){
+		        		mInflatedStub.setVisibility(View.GONE);
+		        	}
+		        
 		        }
 		        
 		
 	}
 	
+	private void handleEmptyListBG() {
+
+		ImageView EmptyBG = (ImageView) mInflatedStub.findViewById(R.id.Empty_List_Image_View);
+		Configuration config = getResources().getConfiguration();
+		if(config.orientation == Configuration.ORIENTATION_PORTRAIT){
+			EmptyBG.setBackgroundResource(R.drawable.list_bg_empty_port);
+		}else{
+
+			EmptyBG.setBackgroundResource(R.drawable.list_bg_empty_land);
+			
+		}
+		
+	}
+
 	private void refreshPathUI() {
 		
 		log("Normal UI refresh");
@@ -507,6 +529,7 @@ Alerts.deleteAlertClickDispatcher, DualTouchListListener.DualTouchListListenerDi
 		        	
 		        	ListView list = (ListView)findViewById(android.R.id.list);
 		        	list.setAdapter(adapter);
+		        	
 		        }
 		        
 		
@@ -546,6 +569,17 @@ Alerts.deleteAlertClickDispatcher, DualTouchListListener.DualTouchListListenerDi
 		Toast.makeText(this, "Unknown file type", Toast.LENGTH_SHORT).show();
 	}
 
+	
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+    	super.onConfigurationChanged(newConfig);
+
+    	if(mStubIsInflated && (mInflatedStub.getVisibility() == View.VISIBLE)){
+    		 handleEmptyListBG();    		
+    	}
+
+    }
+
 	@Override
 	public void onDestroy(){
 		super.onDestroy();
@@ -565,7 +599,9 @@ Alerts.deleteAlertClickDispatcher, DualTouchListListener.DualTouchListListenerDi
 		
 	}
 	
-private void log(String message){
+	
+	
+	private void log(String message){
     	
     	if(DEBUG)Log.d(TAG, message);
     	

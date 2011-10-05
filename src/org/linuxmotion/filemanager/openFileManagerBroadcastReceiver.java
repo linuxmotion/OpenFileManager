@@ -25,10 +25,6 @@ public class openFileManagerBroadcastReceiver extends BroadcastReceiver {
 			
 		}
 
-		
-		
-		
-		// TODO Auto-generated method stub
 
 	}
 

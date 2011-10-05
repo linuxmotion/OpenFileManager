@@ -18,6 +18,7 @@
 package org.linuxmotion.filemanager.models;
 
 import java.io.File;
+import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -25,7 +26,12 @@ import org.linuxmotion.filemanager.R;
 import org.linuxmotion.filemanager.utils.Constants;
 import org.linuxmotion.filemanager.utils.FileUtils;
 
+import android.content.ContentResolver;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -77,9 +83,10 @@ public class FileArrayAdapter extends ArrayAdapter<File> {
             	 
                      ImageView iv = (ImageView) v.findViewById(R.id.thumbnail);
                      if (iv != null) {
-                    	 log("Setting file image");
-                    	 //iv.setImageURI(uri)
+                    	 
+                    
                     	 if(it.isFile()){
+                    		 log("Setting file image");
                     		 // If it a pic set it as
                     		 // a pic, else set it as 
                     		 // a blnk doc file icon
@@ -87,9 +94,19 @@ public class FileArrayAdapter extends ArrayAdapter<File> {
                     		 String name = it.getName();
                     	                    		 
                     		 log("Full name: " + name);      
+                    		 int lastdot = name.lastIndexOf(".");
+                    		 String s = name.substring(lastdot+1);
                     		 
                     		 String ext = MimeTypeMap.getFileExtensionFromUrl(it.getName());
-                    		 setIconType(iv, ext);
+                    		 if(ext.equals("")){
+                    			 // Fallback case where manual retrieval of the last dot is needed
+                    			 // Though this shouldn't happen it does
+                    			 setIconType(iv,it, s);
+                    			 
+                    		 }else{              
+                    			 setIconType(iv, it, ext);
+                    		 
+                    		 }
                     		 
                     		
                          
@@ -133,12 +150,45 @@ public class FileArrayAdapter extends ArrayAdapter<File> {
              return v;
      }
 	 
-	private void setIconType(ImageView iv, String ext) {
+	private void setIconType(ImageView iv, File path, String extension) {
 		// set the image type by the icon.
 		// Creat a maper that map the  extension to a file type
 		// video, document, picture, or music
+	
+		
+		ExtendedMimeTypeMap m = ExtendedMimeTypeMap.getSingleton();
+		String mime = m.getMimeTypeFromExtension(extension);
+		
+	if(mime != null && mime.contains("image")){
+		iv.setBackgroundResource(R.drawable.ic_menu_gallery);
+		
+	}else if(mime != null &&  mime.contains("audio")){
+		
+		iv.setBackgroundResource(R.drawable.ic_list_menu_audio);
+		
+	}else if(mime != null &&  mime.contains("text") || extension.equals("js")){
+		
+		iv.setBackgroundResource(R.drawable.ic_menu_compose);
+		
+	}else if(mime != null &&  mime.contains("video")){
+		
+		iv.setBackgroundResource(R.drawable.ic_list_menu_video);
+		
+	}else if(extension.equals("zip") || extension.equals("apk")){
+		
+		iv.setBackgroundResource(R.drawable.ic_list_menu_application_zip);
+		
+	}else{
 		
 		iv.setBackgroundResource(R.drawable.icon);
+		
+	}
+			
+			
+		
+		
+		
+		
 		return;
 		
 	}
