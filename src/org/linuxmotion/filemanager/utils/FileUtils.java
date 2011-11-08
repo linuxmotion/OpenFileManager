@@ -97,10 +97,14 @@ public class FileUtils {
 		boolean shouldLoop = false;
 		boolean inAsendingMode = PreferenceUtils.retreiveLexicographicallySmallerFirst(context);// Grab the real value from PrefrenceUtils
 		
+		int while_counter = 0;
+		int for_counter = 0;
 		do{
+		while_counter++;
 		shouldLoop = false;
 		
 			for(int i = 0; i  < length-1; i++ ){
+				for_counter++;
 				String one = toSort[i].getName();
 				String two = toSort[i+1].getName();
 				boolean isDir = (toSort[i].isDirectory() && toSort[i+1].isDirectory());
@@ -129,6 +133,8 @@ public class FileUtils {
 			} // END FOR
 		
 		}while(shouldLoop);
+		log("The total number of while loops is:" + while_counter);
+		log("The total number of for loops is:" + for_counter);
 		
 	}
 
