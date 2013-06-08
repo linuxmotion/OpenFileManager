@@ -1,4 +1,7 @@
 bin
 gen
 default.properties
-gen
+build
+out
+*.iml
+libs
