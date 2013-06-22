@@ -1,37 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <string name="hello">Hello World, ConicalFileBrowserActivity!</string>
     <string name="open">Open</string>
+    <string name="open_as">Open as</string>
+    <string name="delete">Delete</string>
+    <string name="share">Share</string>
     <string name="closed">Closed</string>
     <string name="app_name">openFileManager</string>
     <string name="file_options">File options</string>
- 
     <string name="application_settings">Application Settings</string>
-    
-    
-	
     <string name="hidden_files_folder_pref">hidden_files_folder_pref</string>
-	<string name="hidden_files_folder_pref_title">Show hidden files and folders</string>
-  	<string name="hidden_files_folder_pref_sum_on">Hidden files and folders are not hidden</string>
-	<string name="hidden_files_folder_pref_sum_off">Hidden files and folders are hidden</string>
-   
+    <string name="hidden_files_folder_pref_title">Show hidden files and folders</string>
+    <string name="hidden_files_folder_pref_sum_on">Hidden files and folders are not hidden</string>
+    <string name="hidden_files_folder_pref_sum_off">Hidden files and folders are hidden</string>
     <string name="sort_file_folder_pref">sort_file_folder_pref</string>
-    <string name="sort_file_folder_pref_title">Sort files and folder listing by folders first</string> 
+    <string name="sort_file_folder_pref_title">Sort files and folder listing by folders first</string>
     <string name="sort_file_folder_pref_sum_on">List is sorted folders then files</string>
-    <string name="sort_file_folder_pref_sum_off">List is sorted files then folders</string>	
-	
-	<!-- -->
+    <string name="sort_file_folder_pref_sum_off">List is sorted files then folders</string>
+
+    <!--  -->
     <string name="sort_files_folder_ascen_desen_cat">Sort by name Ascending and descending</string>
-    
     <string name="sort_files_folder_ascen_pref">sort_files_folder_asec_pref</string>
     <string name="sort_files_folder_ascen_title">Sort in ascending order</string>
     <string name="sort_files_folder_ascen_sum_on">Sorting in ascending order</string>
     <string name="sort_files_folder_ascen_off">Sorting in descending order</string>
-    
     <string name="sort_files_folder_descen_pref">sort_files_folder_desen_pref</string>
     <string name="sort_files_folder_descen_title">Sort in descending order</string>
     <string name="sort_files_folder_descen_sum_on">Sorting in descending order</string>
     <string name="sort_files_folder_descen_off">Sorting in ascending order</string>
-   
-	
+    <string name="title_activity_main">MainActivity</string>
+    <string name="action_settings">Settings</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="title_activity_open_file_manager">Open File Manager</string>
+
 </resources>

@@ -21,9 +21,7 @@ import android.content.Context;
 import android.os.Debug;
 import android.util.Log;
 
-import org.linuxmotion.asyncloaders.LogWrapper;
 import org.linuxmotion.filemanager.preferences.PreferenceUtils;
-import org.linuxmotion.filemanager.utils.MergeSort.ThreadedMergesort;
 
 import java.io.File;
 public class FileUtils {
@@ -68,26 +66,21 @@ public class FileUtils {
      * files by different parameters. Although each function
      * only serves one task, each time it is accumulated
      *
-     * @param temp
+     * @param toSort
      * @return
      */
-    public static File[] sortFiles(File[] temp, Context context) throws RuntimeException {
+    public static File[] sortFiles(File[] toSort, Context context) {
 
 
-        Debug.startMethodTracing();
+        //Debug.startMethodTracing();
 
-        File[] FILES = temp;
-
-        File[] hiddenfiles;
-
-
-        SortHiddenFilesFolders(FILES, context);
+        SortHiddenFilesFolders(toSort, context);
         Mergesort sorter = new Mergesort();
-        sorter.Sort(FILES, context);
-        SortByFileFolder(FILES, context);
-        hiddenfiles = ShowHideHiddenFilesFolders(FILES, context);
+        sorter.Sort(toSort, context);
+        SortByFileFolder(toSort, context);
+        File[] hiddenfiles = ShowHideHiddenFilesFolders(toSort, context);
 
-        Debug.stopMethodTracing();
+       // Debug.stopMethodTracing();
         return hiddenfiles;
     }
 
@@ -151,55 +144,6 @@ public class FileUtils {
             }
 
         }
-    }
-
-
-    private static void sortFilesFoldersLexicographically(File[] Files, Context context) {
-
-        File[] toSort = Files;
-        int length = Files.length;
-        boolean shouldLoop = false;
-        boolean inAsendingMode = PreferenceUtils.retreiveLexicographicallySmallerFirst(context);// Grab the real value from PrefrenceUtils
-
-        int while_counter = 0;
-        int for_counter = 0;
-        do {
-            while_counter++;
-            shouldLoop = false;
-
-            for (int i = 0; i < length - 1; i++) {
-                for_counter++;
-                String one = toSort[i].getName();
-                String two = toSort[i + 1].getName();
-                boolean isDir = (toSort[i].isDirectory() && toSort[i + 1].isDirectory());
-                boolean isFile = (toSort[i].isFile() && toSort[i + 1].isFile());
-
-                if ((one.compareTo(two) > 0) && (isDir || isFile) && inAsendingMode) {
-                    // The second string is Lexicographically smaller than
-                    // the first
-                    File temp1 = toSort[i];
-                    File temp2 = toSort[i + 1];
-                    toSort[i] = temp2;
-                    toSort[i + 1] = temp1;
-                    shouldLoop = true;
-                }
-
-                if ((one.compareTo(two) < 0) && (isDir || isFile) && !inAsendingMode) {
-                    // The second string is Lexicographically larger than
-                    // the first
-                    File temp1 = toSort[i];
-                    File temp2 = toSort[i + 1];
-                    toSort[i] = temp2;
-                    toSort[i + 1] = temp1;
-                    shouldLoop = true;
-                }
-
-            } // END FOR
-
-        } while (shouldLoop);
-        log("The total number of while loops is:" + while_counter);
-        log("The total number of for loops is:" + for_counter);
-
     }
 
     /**

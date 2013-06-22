@@ -40,7 +40,7 @@ import java.util.Date;
 
 public class FileArrayAdapter extends ArrayAdapter<File> {
 
-    private static boolean DBG = (true || Constants.FULL_DBG);
+    private static boolean DBG = false;// (true || Constants.FULL_DBG);
     private static String TAG = "FileArrayAdapter";
     ImageLoader mImageLoader;
     Bitmap mFolderBG;
@@ -140,13 +140,30 @@ public class FileArrayAdapter extends ArrayAdapter<File> {
         return mFileList.get(pos);
 
     }
-
+private class ViewHolder{
+    public ImageView mThumbnail;
+    public TextView mFilePath;
+    public TextView mFileMain;
+    public TextView mFileExtras;
+    public TextView mFileExtrasTwo;
+}
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        ViewHolder Holder = new ViewHolder();
         View v = convertView;
         if (v == null) {
             LayoutInflater vi = (LayoutInflater) this.mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             v = vi.inflate(R.layout.file_list_item, parent, false);
+            Holder.mThumbnail = (ImageView) v.findViewById(R.id.thumbnail);
+            Holder.mFilePath = (TextView) v.findViewById(R.id.file_path);
+            Holder.mFileMain = (TextView) v.findViewById(R.id.file_main);
+            Holder.mFileExtras = (TextView) v.findViewById(R.id.file_extras);
+            Holder.mFileExtrasTwo = (TextView) v.findViewById(R.id.file_extras_two);
+            v.setTag(Holder);
+
+        }else{
+
+            Holder = (ViewHolder) v.getTag();
         }
 
         if (mFiles == null) {
@@ -159,8 +176,8 @@ public class FileArrayAdapter extends ArrayAdapter<File> {
                 log("Setting resources");
 
 
-                ImageView iv = (ImageView) v.findViewById(R.id.thumbnail);
-                if (iv != null) {
+
+                if (Holder.mThumbnail != null) {
 
 
                     if (it.isFile()) {
@@ -179,29 +196,29 @@ public class FileArrayAdapter extends ArrayAdapter<File> {
                         if (ext.equals("")) {
                             // Fallback case where manual retrieval of the last dot is needed
                             // Though this shouldn't happen it does
-                            setIconType(iv, it, s);
+                            setIconType(Holder.mThumbnail, it, s);
 
                         } else {
-                            setIconType(iv, it, ext);
+                            setIconType(Holder.mThumbnail, it, ext);
 
                         }
 
 
                     } else {
                         log("Setting folder background");
-                        iv.setImageBitmap(mFolderBG);
+                        Holder.mThumbnail.setImageBitmap(mFolderBG);
                     }
                 }
 
 
-                TextView FilePath = (TextView) v.findViewById(R.id.file_path);
-                if (FilePath != null) {
+
+                if (Holder.mFilePath != null) {
                     log("Setting text");
-                    FilePath.setText(it.getName());
+                    Holder.mFilePath.setText(it.getName());
                 }
 
                 {
-                    TextView FileMain = (TextView) v.findViewById(R.id.file_main);
+
                     String extras;
                     long size = it.length() / 1000000;
                     if (size == 0) {
@@ -211,22 +228,21 @@ public class FileArrayAdapter extends ArrayAdapter<File> {
 
                         extras = Long.toString(size) + "Mb";
                     }
-                    FileMain.setText(extras);
+                    Holder.mFileMain.setText(extras);
 
                 }
 
                 Date d = new Date(it.lastModified());
                 {
-                    TextView FileExtras = (TextView) v.findViewById(R.id.file_extras);
+
                     SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
                     String dateString = sdf.format(d);
-                    FileExtras.setText(dateString);
+                    Holder.mFileExtras.setText(dateString);
                 }
                 {
-                        TextView FileExtrasTwo = (TextView) v.findViewById(R.id.file_extras_two);
                         SimpleDateFormat sdf = new SimpleDateFormat("hh:mm:ss");
                         String dateString = sdf.format(d);
-                        FileExtrasTwo.setText(dateString);
+                    Holder.mFileExtrasTwo.setText(dateString);
 
                 }
 
