@@ -11,27 +11,27 @@ public class NavigationHistory {
     private int mLocation;
 
 
-    public NavigationHistory(){
+    public NavigationHistory() {
         mHistory = new Vector<String>();
         mLocation = 0;
 
     }
 
-    public boolean addToHistory(String path){
+    public boolean addToHistory(String path) {
         return mHistory.add(path);
     }
 
-    public boolean resetHistoryTop(int location){
+    public boolean resetHistoryTop(int location) {
         // never set a negative location
-        if(location < 0)
+        if (location < 0)
             return false;
 
-        mHistory.setSize(location+1);
+        mHistory.setSize(location + 1);
 
         return true;
     }
 
-    public String getBackNavigation(){
+    public String getBackNavigation() {
 
         return mHistory.get(mLocation - 1);
 

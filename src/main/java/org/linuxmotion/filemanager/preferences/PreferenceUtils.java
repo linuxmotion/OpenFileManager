@@ -8,7 +8,7 @@ import org.linuxmotion.filemanager.utils.Constants;
 public class PreferenceUtils {
 
 	/*
-	 * 
+     *
 	 * Prefernces releted to exiting the application
 	 * 
 	 */

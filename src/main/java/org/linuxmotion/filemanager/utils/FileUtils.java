@@ -18,12 +18,12 @@
 package org.linuxmotion.filemanager.utils;
 
 import android.content.Context;
-import android.os.Debug;
 import android.util.Log;
 
 import org.linuxmotion.filemanager.preferences.PreferenceUtils;
 
 import java.io.File;
+
 public class FileUtils {
     private static String TAG = FileUtils.class.getSimpleName();
 
@@ -80,7 +80,7 @@ public class FileUtils {
         SortByFileFolder(toSort, context);
         File[] hiddenfiles = ShowHideHiddenFilesFolders(toSort, context);
 
-       // Debug.stopMethodTracing();
+        // Debug.stopMethodTracing();
         return hiddenfiles;
     }
 

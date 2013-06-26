@@ -16,8 +16,7 @@ import org.linuxmotion.filemanager.R;
 public class DrawerListAdapter extends BaseArrayAdapter<String> {
 
 
-
-    public DrawerListAdapter(Context context, String[] objects){
+    public DrawerListAdapter(Context context, String[] objects) {
         super(context, 0, objects);
 
     }
@@ -45,13 +44,11 @@ public class DrawerListAdapter extends BaseArrayAdapter<String> {
         Holder.mName.setText(getArrayList().get(position));
 
 
-
-
-            return convertView;
+        return convertView;
     }
 
 
-    private class DrawerListHolder{
+    private class DrawerListHolder {
 
         ImageView mThumbnail;
         TextView mName;

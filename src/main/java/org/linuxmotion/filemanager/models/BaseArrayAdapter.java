@@ -8,7 +8,7 @@ import java.util.ArrayList;
 /**
  * Created by john on 6/26/13.
  */
-public class BaseArrayAdapter<T>  extends ArrayAdapter<T> {
+public class BaseArrayAdapter<T> extends ArrayAdapter<T> {
 
     private static boolean DBG = false;// (true || Constants.FULL_DBG);
     private static String TAG = "FileArrayAdapter";
@@ -27,6 +27,7 @@ public class BaseArrayAdapter<T>  extends ArrayAdapter<T> {
 
 
     }
+
     @Override
     public void clear() {
         //super.clear();
@@ -69,11 +70,9 @@ public class BaseArrayAdapter<T>  extends ArrayAdapter<T> {
 
     }
 
-    protected ArrayList<T> getArrayList(){
+    protected ArrayList<T> getArrayList() {
         return mArrayList;
     }
-
-
 
 
 }

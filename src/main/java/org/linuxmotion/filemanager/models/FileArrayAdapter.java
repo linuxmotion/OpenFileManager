@@ -71,13 +71,14 @@ public class FileArrayAdapter extends BaseArrayAdapter<File> {
         mUnknownBG = BitmapHelper.decodeSampledBitmapFromResource(context.getResources(), 50, 50, R.drawable.icon);
     }
 
-private class ViewHolder{
-    public ImageView mThumbnail;
-    public TextView mFilePath;
-    public TextView mFileMain;
-    public TextView mFileExtras;
-    public TextView mFileExtrasTwo;
-}
+    private class ViewHolder {
+        public ImageView mThumbnail;
+        public TextView mFilePath;
+        public TextView mFileMain;
+        public TextView mFileExtras;
+        public TextView mFileExtrasTwo;
+    }
+
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder Holder = new ViewHolder();
@@ -92,7 +93,7 @@ private class ViewHolder{
             Holder.mFileExtrasTwo = (TextView) v.findViewById(R.id.file_extras_two);
             v.setTag(Holder);
 
-        }else{
+        } else {
 
             Holder = (ViewHolder) v.getTag();
         }
@@ -104,22 +105,21 @@ private class ViewHolder{
 
             if (it != null) {
                 LogWrapper.Logi(TAG, it.toString());
-                 LogWrapper.Logi(TAG, "Setting resources");
-
+                LogWrapper.Logi(TAG, "Setting resources");
 
 
                 if (Holder.mThumbnail != null) {
 
 
                     if (it.isFile()) {
-                         LogWrapper.Logi(TAG, "Setting file image");
+                        LogWrapper.Logi(TAG, "Setting file image");
                         // If it a pic set it as
                         // a pic, else set it as
                         // a blnk doc file icon
 
                         String name = it.getName();
 
-                         LogWrapper.Logi(TAG, "Full name: " + name);
+                        LogWrapper.Logi(TAG, "Full name: " + name);
                         int lastdot = name.lastIndexOf(".");
                         String s = name.substring(lastdot + 1);
 
@@ -136,15 +136,14 @@ private class ViewHolder{
 
 
                     } else {
-                         LogWrapper.Logi(TAG, "Setting folder background");
+                        LogWrapper.Logi(TAG, "Setting folder background");
                         Holder.mThumbnail.setImageBitmap(mFolderBG);
                     }
                 }
 
 
-
                 if (Holder.mFilePath != null) {
-                     LogWrapper.Logi(TAG, "Setting text");
+                    LogWrapper.Logi(TAG, "Setting text");
                     Holder.mFilePath.setText(it.getName());
                 }
 
@@ -171,8 +170,8 @@ private class ViewHolder{
                     Holder.mFileExtras.setText(dateString);
                 }
                 {
-                        SimpleDateFormat sdf = new SimpleDateFormat("hh:mm:ss");
-                        String dateString = sdf.format(d);
+                    SimpleDateFormat sdf = new SimpleDateFormat("hh:mm:ss");
+                    String dateString = sdf.format(d);
                     Holder.mFileExtrasTwo.setText(dateString);
 
                 }

@@ -5,10 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
-import org.linuxmotion.filemanager.R;
-
 public class openFileManagerBroadcastReceiver extends BroadcastReceiver {
-
 
 
     openFileManagerReceiverDispatcher mOpenFileManagerReceiverDispatcher;
@@ -20,7 +17,7 @@ public class openFileManagerBroadcastReceiver extends BroadcastReceiver {
 
 
         if (extras.containsKey("PATH")) {
-            mOpenFileManagerReceiverDispatcher.dispatchPathUpdate(extras.getString("PATH"),extras.getInt("ACTION"));
+            mOpenFileManagerReceiverDispatcher.dispatchPathUpdate(extras.getString("PATH"), extras.getInt("ACTION"));
 
 
         } else if (extras.containsKey("RESOURCE")) {
@@ -34,8 +31,9 @@ public class openFileManagerBroadcastReceiver extends BroadcastReceiver {
 
     public interface openFileManagerReceiverDispatcher {
 
-        void dispatchPathUpdate(String updatePath, int action );
-         void dispatchResourceUpdate(String resourcePath);
+        void dispatchPathUpdate(String updatePath, int action);
+
+        void dispatchResourceUpdate(String resourcePath);
 
 
     }
