@@ -297,7 +297,13 @@ public class OpenFileManagerActivity extends ListActivity implements  Alerts.GPL
             case 1:{
                 mCurrentPath = Constants.SDCARD_DIR;
             }break;
-
+            /*
+            case 2:{
+                This would be the favorites
+                entries, i think, the number might
+                be different
+            }break;
+            */
         }
 
         // Tell the UI to update
@@ -407,7 +413,7 @@ public class OpenFileManagerActivity extends ListActivity implements  Alerts.GPL
     protected FileArrayAdapter createAdapter(String path) {
 
         // Instatitate a adapter object
-        return new FileArrayAdapter(this.getBaseContext(), R.layout.simple_text_view, new File(path));
+        return new FileArrayAdapter(getBaseContext(), new File(path));
 
     }
 
@@ -824,10 +830,8 @@ public class OpenFileManagerActivity extends ListActivity implements  Alerts.GPL
 
                 log("No files to sort");
             }
-            // Manually update the list
-            list.updateList();
-            // notify the adapter that the data has change
-            //list.notifyDataSetChanged();
+            // No longer need to Manually update the list
+            // BaseArrayAdapter<T> takes care of that
 
         }
 

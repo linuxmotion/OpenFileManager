@@ -24,71 +24,43 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.MimeTypeMap;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.linuxmotion.asyncloaders.BitmapHelper;
 import org.linuxmotion.asyncloaders.ImageLoader;
+import org.linuxmotion.asyncloaders.LogWrapper;
 import org.linuxmotion.filemanager.R;
-import org.linuxmotion.filemanager.utils.Constants;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 
-public class FileArrayAdapter extends ArrayAdapter<File> {
+public class FileArrayAdapter extends BaseArrayAdapter<File> {
 
     private static boolean DBG = false;// (true || Constants.FULL_DBG);
     private static String TAG = "FileArrayAdapter";
     ImageLoader mImageLoader;
     Bitmap mFolderBG;
-    private File[] mFiles;
-    private ArrayList<File> mFileList = new ArrayList<File>();
-    private Context mContext;
     private Bitmap mAudioBG;
     private Bitmap mTextBG;
     private Bitmap mVideoBG;
     private Bitmap mZipBG;
-    private Bitmap mUnkownBG;
+    private Bitmap mUnknownBG;
 
-    public FileArrayAdapter(Context context, int textViewResourceId, File[] files) {
-        super(context, textViewResourceId, files);
+    public FileArrayAdapter(Context context, File[] files) {
+        super(context, 0, files);
 
         mImageLoader = new ImageLoader(context, R.drawable.ic_menu_gallery);
-        mFiles = files;
-        mContext = context;
-        mFileList.clear();
-        if (mFiles != null && mFiles.length > 0) {
-            for (File f : mFiles) {
-                mFileList.add(f);
-            }
-        }
 
         setupBGImages(context);
 
     }
 
-    public FileArrayAdapter(Context context, int textViewResourceId, File file) {
-        super(context, textViewResourceId);
-        mImageLoader = new ImageLoader(context, R.drawable.ic_menu_gallery);
-        mFiles = file.listFiles();
-        mContext = context;
-        mFileList.clear();
-        if (mFiles != null && mFiles.length > 0) {
-            for (File f : mFiles) {
-                mFileList.add(f);
-            }
-        }
-        setupBGImages(context);
+    public FileArrayAdapter(Context context, File file) {
+        this(context, file.listFiles());
     }
 
-    private static void log(String message) {
-
-        if (DBG) Log.d(TAG, message);
-
-    }
 
     void setupBGImages(Context context) {
         mFolderBG = BitmapHelper.decodeSampledBitmapFromResource(context.getResources(), 50, 50, R.drawable.ic_list_folder);
@@ -96,50 +68,9 @@ public class FileArrayAdapter extends ArrayAdapter<File> {
         mTextBG = BitmapHelper.decodeSampledBitmapFromResource(context.getResources(), 50, 50, R.drawable.ic_menu_compose);
         mVideoBG = BitmapHelper.decodeSampledBitmapFromResource(context.getResources(), 50, 50, R.drawable.ic_list_menu_video);
         mZipBG = BitmapHelper.decodeSampledBitmapFromResource(context.getResources(), 50, 50, R.drawable.ic_list_menu_application_zip);
-        mUnkownBG = BitmapHelper.decodeSampledBitmapFromResource(context.getResources(), 50, 50, R.drawable.icon);
+        mUnknownBG = BitmapHelper.decodeSampledBitmapFromResource(context.getResources(), 50, 50, R.drawable.icon);
     }
 
-    @Override
-    public void clear() {
-        super.clear();
-        if (mFileList != null) {
-            mFileList.clear();
-        }
-    }
-
-    @Override
-    public void add(File f) {
-        mFileList.add(f);
-
-    }
-
-    public void updateList() {
-        mFiles = new File[mFileList.size()];
-        for (int i = 0; i < mFileList.size(); i++) {
-            mFiles[i] = mFileList.get(i);
-        }
-    }
-
-    @Override
-    public long getItemId(int pos) {
-
-        return pos;
-
-    }
-
-    @Override
-    public int getCount() {
-
-        return (mFileList.size());
-
-    }
-
-    @Override
-    public File getItem(int pos) {
-
-        return mFileList.get(pos);
-
-    }
 private class ViewHolder{
     public ImageView mThumbnail;
     public TextView mFilePath;
@@ -152,7 +83,7 @@ private class ViewHolder{
         ViewHolder Holder = new ViewHolder();
         View v = convertView;
         if (v == null) {
-            LayoutInflater vi = (LayoutInflater) this.mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            LayoutInflater vi = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             v = vi.inflate(R.layout.file_list_item, parent, false);
             Holder.mThumbnail = (ImageView) v.findViewById(R.id.thumbnail);
             Holder.mFilePath = (TextView) v.findViewById(R.id.file_path);
@@ -166,14 +97,14 @@ private class ViewHolder{
             Holder = (ViewHolder) v.getTag();
         }
 
-        if (mFiles == null) {
+        if (getArrayList().isEmpty()) {
             Log.d(TAG, "The listview is empty");
         } else {
-            File it = mFiles[position];
+            File it = getArrayList().get(position);
 
             if (it != null) {
-                log(it.toString());
-                log("Setting resources");
+                LogWrapper.Logi(TAG, it.toString());
+                 LogWrapper.Logi(TAG, "Setting resources");
 
 
 
@@ -181,14 +112,14 @@ private class ViewHolder{
 
 
                     if (it.isFile()) {
-                        log("Setting file image");
+                         LogWrapper.Logi(TAG, "Setting file image");
                         // If it a pic set it as
                         // a pic, else set it as
                         // a blnk doc file icon
 
                         String name = it.getName();
 
-                        log("Full name: " + name);
+                         LogWrapper.Logi(TAG, "Full name: " + name);
                         int lastdot = name.lastIndexOf(".");
                         String s = name.substring(lastdot + 1);
 
@@ -205,7 +136,7 @@ private class ViewHolder{
 
 
                     } else {
-                        log("Setting folder background");
+                         LogWrapper.Logi(TAG, "Setting folder background");
                         Holder.mThumbnail.setImageBitmap(mFolderBG);
                     }
                 }
@@ -213,7 +144,7 @@ private class ViewHolder{
 
 
                 if (Holder.mFilePath != null) {
-                    log("Setting text");
+                     LogWrapper.Logi(TAG, "Setting text");
                     Holder.mFilePath.setText(it.getName());
                 }
 
@@ -287,7 +218,7 @@ private class ViewHolder{
         } else {
 
             //iv.setBackgroundResource(R.drawable.icon);
-            iv.setImageBitmap(mUnkownBG);
+            iv.setImageBitmap(mUnknownBG);
 
         }
 
