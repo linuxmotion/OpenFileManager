@@ -385,7 +385,17 @@ public class OpenFileManagerActivity extends ListActivity implements  Alerts.GPL
     @Override
     public void onBackPressed() {
         log("Back button pressed");
-        sendBroadcast(prepareBroadcast(null, Constants.UPDATE_INTENT, new MenuAction(MenuAction.ACTION_UP)));
+
+        // Check to see if the drawer is open
+        if(mDrawerLayout.isDrawerOpen(mDrawerList)){
+            // if it was we need to close it
+            mDrawerLayout.closeDrawer(mDrawerList);
+        }else{
+            // If it was closed though we should
+            // navigate up
+            sendBroadcast(prepareBroadcast(null, Constants.UPDATE_INTENT, new MenuAction(MenuAction.ACTION_UP)));
+        }
+
 
     }
 
@@ -409,7 +419,6 @@ public class OpenFileManagerActivity extends ListActivity implements  Alerts.GPL
             File f = (File) getListAdapter().getItem(position);
             performClick(f);
         }else{
-
             mList.setItemChecked(position, !mList.isItemChecked(position));
         }
 
@@ -422,13 +431,9 @@ public class OpenFileManagerActivity extends ListActivity implements  Alerts.GPL
             Log.d(TAG, "Sending UI refresh broadcast [dir=" + f.toString() + "]");
             PreferenceUtils.resetExitStatus(this);
             sendBroadcast(prepareBroadcast(f.getPath(), Constants.UPDATE_INTENT, new MenuAction(MenuAction.ACTION_FORWARD)));
-
         } else {
-
             Log.d(TAG, "Sending media broadcast");
             sendBroadcast(prepareBroadcast(f.toString(), Constants.RESOURCE_VIEW_INTENT, null));
-
-
         }
 
 
