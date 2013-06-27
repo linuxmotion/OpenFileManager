@@ -31,6 +31,7 @@ import org.linuxmotion.asyncloaders.BitmapHelper;
 import org.linuxmotion.asyncloaders.ImageLoader;
 import org.linuxmotion.asyncloaders.LogWrapper;
 import org.linuxmotion.filemanager.R;
+import org.linuxmotion.filemanager.models.baseadapters.BaseArrayAdapter;
 
 import java.io.File;
 import java.text.SimpleDateFormat;

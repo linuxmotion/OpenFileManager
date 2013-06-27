@@ -53,7 +53,12 @@ public class OpenFileManagerActivity extends ListActivity implements Alerts.GPLA
 
 
         mDualPane = false;
-        //setContentView(R.layout.main);
+
+
+        //setContentView(R.layout.layout_slidingmenu);
+
+        //if(true)return;
+
         if (mDualPane) {
 
 
@@ -64,9 +69,10 @@ public class OpenFileManagerActivity extends ListActivity implements Alerts.GPLA
             ft.commit();
 
         }
-
-
         setupEULA(this);
+
+
+
 
     }
 
@@ -83,7 +89,6 @@ public class OpenFileManagerActivity extends ListActivity implements Alerts.GPLA
     @Override
     public void onStop() {
         super.onStop();
-
 
     }
 
@@ -110,24 +115,6 @@ public class OpenFileManagerActivity extends ListActivity implements Alerts.GPLA
 
 
     }
-
-/*
-    @Override
-    public void onListItemClick(ListView l, View v, int position, long id) {
-        LogWrapper.Logv(TAG,"List item clicked. position = ["+position+"]");
-
-        if(mActionMode == null){
-            File f = (File) getListAdapter().getItem(position);
-            performClick(f);
-        }else{
-            mList.setItemChecked(position, !mList.isItemChecked(position));
-        }
-
-    }
-*/
-
-
-
 
 /*
     @Override
@@ -177,7 +164,7 @@ public class OpenFileManagerActivity extends ListActivity implements Alerts.GPLA
         SharedPreferences.Editor edit = prefs.edit();
         edit.putInt(Constants.APP_NAME, Constants.VERSION_LEVEL);
         edit.commit();
-
+        mShowGPL = false;
 
     }
 

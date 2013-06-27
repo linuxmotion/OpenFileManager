@@ -128,21 +128,27 @@ public class Alerts {
     //////////////////////////////
 
 
-    protected void deleteAlertBox(File file) {
+    protected void deleteAlertBox(File[] file) {
 
 
         Builder delete = new AlertDialog.Builder(this.mContext);
         delete.setTitle("Warning");
-        delete.setMessage("Are you sure you want to delete the file");
+        delete.setMessage("Are you sure you want to delete the file(s)");
         delete.setCancelable(false);
 
-        FileDeleteDialogClickListener deletedialog = new FileDeleteDialogClickListener(this.mContext, file) {
+        FileDeleteDialogClickListener deletedialog = new FileDeleteDialogClickListener(mContext, file) {
 
             @Override
             public void onClick(DialogInterface arg0, int arg1) {
 
-                mDELETEDispatcher.onSelectedDelete(retreiveFile());
+                File[] files = retreiveFiles();
+                if(files != null && files.length > 0){
+                    for (File f : files){
 
+                        mDELETEDispatcher.onSelectedDelete(f);
+                    }
+
+                }
             }
 
         };
@@ -177,7 +183,7 @@ public class Alerts {
 
     }
 
-    public void showDeleteAlertBox(File f) {
+    public void showDeleteAlertBox(File[] f) {
 
         deleteAlertBox(f);
 

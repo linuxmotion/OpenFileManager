@@ -24,20 +24,20 @@ import java.io.File;
 
 public abstract class FileDeleteDialogClickListener implements DialogInterface.OnClickListener {
 
-    private static File mFile;
+    private static File[] mFiles;
     Context mContext;
 
-    public FileDeleteDialogClickListener(Context context, File file) {
+    public FileDeleteDialogClickListener(Context context, File[] files) {
 
-        mFile = file;
+        mFiles = files;
         mContext = context;
 
     }
 
 
-    public File retreiveFile() {
+    public File[] retreiveFiles() {
 
-        return mFile;
+        return mFiles;
 
     }
 

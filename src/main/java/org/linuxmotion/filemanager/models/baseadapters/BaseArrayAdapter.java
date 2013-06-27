@@ -1,4 +1,4 @@
-package org.linuxmotion.filemanager.models;
+package org.linuxmotion.filemanager.models.baseadapters;
 
 import android.content.Context;
 import android.widget.ArrayAdapter;

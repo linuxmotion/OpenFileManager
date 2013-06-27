@@ -9,6 +9,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.linuxmotion.filemanager.R;
+import org.linuxmotion.filemanager.models.baseadapters.BaseArrayAdapter;
 
 /**
  * Created by john on 6/21/13.
