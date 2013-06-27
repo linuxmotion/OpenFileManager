@@ -70,6 +70,7 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
     private static openFileManagerBroadcastReceiver sReceiver;
     private SlidingMenu mSlidingMenu;
     private  Alerts mDeleteAlert;
+    ActionMode mActionMode;
 
     private LinearLayout mInflatedStub;
 
@@ -538,13 +539,27 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
             // mList.setItemsCanFocus(false);
             mList.setMultiChoiceModeListener(new ListView.MultiChoiceModeListener() {
 
+                Boolean mMultiSelected = false;
                 @Override
                 public void onItemCheckedStateChanged(ActionMode mode, int position,
                                                       long id, boolean checked) {
 
 
-                    LogWrapper.Logv(TAG, "onItem state from multi choice");
-
+                    LogWrapper.Logi(TAG, "onItemCheckedStateChanged called");
+                    LogWrapper.Logv(TAG, "Found " + mList.getCheckedItemCount()+ " checked items");
+                    // Is the number of items check more than 1
+                    // is the multislect flag already set
+                    if(mList.getCheckedItemCount() > 1){
+                        mMultiSelected = true;
+                        LogWrapper.Logd(TAG, "Invalidating the actionmode");
+                        mActionMode.invalidate();
+                    }else if(mList.getCheckedItemCount() == 1) {
+                        // Is the number of items check is 1
+                        // reset multislect flag
+                        mMultiSelected = false;
+                        LogWrapper.Logd(TAG, "Invalidating the actionmode");
+                       mActionMode.invalidate();
+                    }
 
 
 
@@ -567,11 +582,13 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
                     }
                 }
 
+
                 @Override
                 public boolean onCreateActionMode(ActionMode mode, Menu menu) {
                     // Inflate the menu for the CAB
                     MenuInflater inflater = mode.getMenuInflater();
                     inflater.inflate(R.menu.menu_context_actions, menu);
+                    mActionMode = mode;
                     return true;
                 }
 
@@ -579,13 +596,23 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
                 public void onDestroyActionMode(ActionMode mode) {
                     // Here you can make any necessary updates to the activity when
                     // the CAB is removed. By default, selected items are deselected/unchecked.
+                    mActionMode = null;
                 }
 
                 @Override
                 public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+                    LogWrapper.Logi(TAG, "onPrepareActionMode called");
+                    menu.clear();
+                    MenuInflater inflater = mActionMode.getMenuInflater();
+                    if (mMultiSelected){
+                        inflater.inflate(R.menu.menu_context_actions_multiple_items, menu);
+                    }else{
+                        inflater.inflate(R.menu.menu_context_actions, menu);
+
+                    }
                     // Here you can perform updates to the CAB due to
                     // an invalidate() request
-                    return false;
+                    return true;
                 }
             });
         }
