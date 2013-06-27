@@ -8,37 +8,40 @@
 
     <!-- The main content view -->
 
-     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             android:id="@+id/content_frame"
-             android:orientation="vertical"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent"
-             android:paddingLeft="8dp"
-             android:paddingRight="8dp">
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                  android:id="@+id/content_frame"
+                  android:orientation="vertical"
+                  android:layout_width="match_parent"
+                  android:layout_height="match_parent"
+                  android:paddingLeft="8dp"
+                  android:paddingRight="8dp">
 
 
-         <ViewStub 	android:id="@+id/stub"
-                    android:inflatedId="@android:id/empty"
-                    android:layout="@layout/empty_array_list_background"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
+        <ViewStub
+                android:id="@+id/stub"
+                android:inflatedId="@android:id/empty"
+                android:layout="@layout/empty_array_list_background"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
 
-         <ListView android:id="@android:id/list"
-                   android:layout_width="match_parent"
-                   android:layout_height="0dip"
-                   android:longClickable="true"
-                   android:choiceMode="singleChoice"
-                   android:layout_weight="1"/>
+        <ListView
+                android:id="@android:id/list"
+                android:layout_width="match_parent"
+                android:layout_height="0dip"
+                android:longClickable="true"
+                android:choiceMode="singleChoice"
+                android:layout_weight="1"/>
 
 
-     </LinearLayout>
+    </LinearLayout>
     <!-- The navigation drawer -->
-    <ListView android:id="@+id/left_drawer"
-              android:layout_width="240dp"
-              android:layout_height="match_parent"
-              android:layout_gravity="start"
-              android:choiceMode="singleChoice"
-              android:dividerHeight="0dp"
-              android:background="#111"/>
+    <ListView
+            android:id="@+id/left_drawer"
+            android:layout_width="240dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:choiceMode="singleChoice"
+            android:dividerHeight="0dp"
+            android:background="#111"/>
 
 </android.support.v4.widget.DrawerLayout>

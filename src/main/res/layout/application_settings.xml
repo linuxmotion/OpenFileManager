@@ -14,55 +14,56 @@
      limitations under the License.
 -->
 <PreferenceScreen
-	 xmlns:android="http://schemas.android.com/apk/res/android">
-	 
-	
- 	<PreferenceCategory
-     android:title="Sorting preferences">
-    
-    		 <CheckBoxPreference
-    		  android:key="@string/hidden_files_folder_pref"
-    		  android:title="@string/hidden_files_folder_pref_title"
-    		  android:summaryOn="@string/hidden_files_folder_pref_sum_on"
-    		  android:summaryOff="@string/hidden_files_folder_pref_sum_off"
-    		  android:defaultValue="true"
-    		  
-    		  />     
-    		  
-    		  <CheckBoxPreference
-    		  android:key="@string/sort_file_folder_pref"
-    		  android:title="@string/sort_file_folder_pref_title"
-    		  android:summaryOn="@string/sort_file_folder_pref_sum_on"
-    		  android:summaryOff="@string/sort_file_folder_pref_sum_off"
-    		  android:defaultValue="true"
-    		  
-    		  />  
-    		       
-                        
-	</PreferenceCategory>
- 	 
- 	 <PreferenceCategory
-     android:title="@string/sort_files_folder_ascen_desen_cat">
-     <CheckBoxPreference
-    		  android:key="@string/sort_files_folder_ascen_pref"
-    		   android:title="@string/sort_files_folder_ascen_title"
-    		  android:summaryOn="@string/sort_files_folder_ascen_sum_on"
-    		  android:summaryOff="@string/sort_files_folder_ascen_off"
-    		  android:defaultValue="true"
-    		  
-    		  />     
-    		  
-    		  <CheckBoxPreference
-    		  android:key="@string/sort_files_folder_descen_pref"
-    		  android:title="@string/sort_files_folder_descen_title"
-    		  android:summaryOn="@string/sort_files_folder_descen_sum_on"
-    		  android:summaryOff="@string/sort_files_folder_descen_off"
-    		  android:defaultValue="false"
-    		  
-    		  />  
-     
-     </PreferenceCategory>
- 	
+        xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <PreferenceCategory
+            android:title="Sorting preferences">
+
+        <CheckBoxPreference
+                android:key="@string/hidden_files_folder_pref"
+                android:title="@string/hidden_files_folder_pref_title"
+                android:summaryOn="@string/hidden_files_folder_pref_sum_on"
+                android:summaryOff="@string/hidden_files_folder_pref_sum_off"
+                android:defaultValue="true"
+
+                />
+
+        <CheckBoxPreference
+                android:key="@string/sort_file_folder_pref"
+                android:title="@string/sort_file_folder_pref_title"
+                android:summaryOn="@string/sort_file_folder_pref_sum_on"
+                android:summaryOff="@string/sort_file_folder_pref_sum_off"
+                android:defaultValue="true"
+
+                />
+
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+            android:title="@string/sort_files_folder_ascen_desen_cat">
+
+        <CheckBoxPreference
+                android:key="@string/sort_files_folder_ascen_pref"
+                android:title="@string/sort_files_folder_ascen_title"
+                android:summaryOn="@string/sort_files_folder_ascen_sum_on"
+                android:summaryOff="@string/sort_files_folder_ascen_off"
+                android:defaultValue="true"
+
+                />
+
+        <CheckBoxPreference
+                android:key="@string/sort_files_folder_descen_pref"
+                android:title="@string/sort_files_folder_descen_title"
+                android:summaryOn="@string/sort_files_folder_descen_sum_on"
+                android:summaryOff="@string/sort_files_folder_descen_off"
+                android:defaultValue="false"
+
+                />
+
+    </PreferenceCategory>
+
 
 </PreferenceScreen>
 
