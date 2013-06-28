@@ -15,8 +15,10 @@
         android:label="@string/app_name" >
         <activity
             android:name="org.linuxmotion.filemanager.OpenFileManagerActivity"
-            android:configChanges="orientation"
-            android:label="@string/app_name" >
+            android:configChanges="orientation|screenSize"
+            android:label="@string/app_name"
+            android:uiOptions="splitActionBarWhenNarrow"
+                >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -22,11 +22,12 @@ import android.app.FragmentTransaction;
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
 
 import org.linuxmotion.asyncloaders.LogWrapper;
-import org.linuxmotion.filemanager.models.SingleViewFragment;
+import org.linuxmotion.filemanager.models.fragments.SingleViewFragment;
 import org.linuxmotion.filemanager.preferences.PreferenceUtils;
 import org.linuxmotion.filemanager.utils.Alerts;
 import org.linuxmotion.filemanager.utils.Constants;
@@ -50,23 +51,21 @@ public class OpenFileManagerActivity extends ListActivity implements Alerts.GPLA
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        LogWrapper.Logi(TAG, "onCreate called");
 
         mDualPane = false;
 
-
-        //setContentView(R.layout.layout_slidingmenu);
-
-        //if(true)return;
 
         if (mDualPane) {
 
 
         } else {
 
-            FragmentTransaction ft = getFragmentManager().beginTransaction();
-            ft.replace(android.R.id.content, new SingleViewFragment());
-            ft.commit();
+            if(savedInstanceState == null){
+                FragmentTransaction ft = getFragmentManager().beginTransaction();
+                ft.replace(android.R.id.content, new SingleViewFragment());
+                ft.commit();
+            }
 
         }
         setupEULA(this);
@@ -79,6 +78,7 @@ public class OpenFileManagerActivity extends ListActivity implements Alerts.GPLA
     @Override
     public void onStart() {
         super.onStart();
+        LogWrapper.Logi(TAG, "onStart called");
 
         // Show GPL usage license
         if (mShowGPL)
@@ -89,13 +89,14 @@ public class OpenFileManagerActivity extends ListActivity implements Alerts.GPLA
     @Override
     public void onStop() {
         super.onStop();
+        LogWrapper.Logi(TAG, "onStop called");
 
     }
 
 
     @Override
     public void onBackPressed() {
-        log("Back button pressed");
+        LogWrapper.Logi(TAG, "onBackPressed called");
 
         if (mDualPane) {
 
@@ -116,23 +117,22 @@ public class OpenFileManagerActivity extends ListActivity implements Alerts.GPLA
 
     }
 
-/*
+
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-
-        if (mStubIsInflated && (mInflatedStub.getVisibility() == View.VISIBLE)) {
-            handleEmptyListBG();
-        }
+        LogWrapper.Logi(TAG, "onConfigurationChanged called");
+       // if (mStubIsInflated && (mInflatedStub.getVisibility() == View.VISIBLE)) {
+       //     handleEmptyListBG();
+       // }
 
     }
-    */
+
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-
-        log("Destroying the activity");
+        LogWrapper.Logi(TAG, "onDestroy called");
 
         // If the activity is destroy but the back
         // button is not pressed the exit status

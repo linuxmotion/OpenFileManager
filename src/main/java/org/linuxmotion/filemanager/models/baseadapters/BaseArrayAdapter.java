@@ -70,7 +70,7 @@ public class BaseArrayAdapter<T> extends ArrayAdapter<T> {
 
     }
 
-    protected ArrayList<T> getArrayList() {
+    public ArrayList<T> getArrayList() {
         return mArrayList;
     }
 

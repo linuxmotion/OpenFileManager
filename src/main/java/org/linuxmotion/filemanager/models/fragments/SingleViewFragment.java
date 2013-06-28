@@ -1,4 +1,4 @@
-package org.linuxmotion.filemanager.models;
+package org.linuxmotion.filemanager.models.fragments;
 
 import android.app.ActionBar;
 import android.app.Activity;
@@ -35,12 +35,17 @@ import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
 import org.linuxmotion.asyncloaders.LogWrapper;
 import org.linuxmotion.filemanager.R;
+import org.linuxmotion.filemanager.models.MenuAction;
+import org.linuxmotion.filemanager.models.adapters.ExpandableDrawerListAdapter;
+import org.linuxmotion.filemanager.models.adapters.FileArrayAdapter;
+import org.linuxmotion.filemanager.models.adapters.ImageArrayAdapter;
 import org.linuxmotion.filemanager.models.baseadapters.ExpandableBaseArrayAdapter;
 import org.linuxmotion.filemanager.openFileManagerBroadcastReceiver;
 import org.linuxmotion.filemanager.preferences.ApplicationSettings;
 import org.linuxmotion.filemanager.preferences.PreferenceUtils;
 import org.linuxmotion.filemanager.utils.Alerts;
 import org.linuxmotion.filemanager.utils.Constants;
+import org.linuxmotion.filemanager.utils.FileUtilAction;
 import org.linuxmotion.filemanager.utils.FileUtils;
 
 import java.io.File;
@@ -61,6 +66,7 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
     private ListView mList;
     private LinearLayout mContentLayout;
     private ExpandableListView mDrawerList;
+    private CutPasteFragment mCutPasteFragment;
     private String mCurrentPath;
     private Vector<String> mLastPath;
     private int mCurrentLocation = 0;
@@ -69,8 +75,9 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
     private boolean mStubIsInflated = false;
     private static openFileManagerBroadcastReceiver sReceiver;
     private SlidingMenu mSlidingMenu;
-    private  Alerts mDeleteAlert;
+    private Alerts mDeleteAlert;
     ActionMode mActionMode;
+    private FileUtilAction mFileAction = new FileUtilAction();
 
     private LinearLayout mInflatedStub;
 
@@ -98,19 +105,21 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
+        LogWrapper.Logi(TAG, "onAttach called");
 
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        LogWrapper.Logi(TAG, "onCreate called");
         setHasOptionsMenu(true);
 
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
+        LogWrapper.Logi(TAG, "onCreateView called");
         View v = inflater.inflate(R.layout.layout_single_main, container, false);
         mContentLayout = (LinearLayout) v.findViewById(R.id.content_frame);
         return v;//super.onCreateView(inflater, container, savedInstanceState);
@@ -119,6 +128,7 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        LogWrapper.Logi(TAG, "onActivityCreated called");
         setupVariables();
         setupMainListView();
         setupActionBar();
@@ -132,7 +142,8 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
     @Override
     public void onStart() {
         super.onStart();
-        LogWrapper.Logv(TAG, "On start called - registering receiver");
+        LogWrapper.Logi(TAG, "onStart called");
+
 
         // Show GPL usage license
 
@@ -140,6 +151,7 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
 
         IntentFilter filter = new IntentFilter(Constants.UPDATE_INTENT);
         filter.addAction(Constants.RESOURCE_VIEW_INTENT);
+        LogWrapper.Logv(TAG, "registering receiver");
         getActivity().registerReceiver(sReceiver, filter);
 
         // Always update the adapter when navigating back
@@ -152,6 +164,7 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
     @Override
     public void onResume() {
         super.onResume();
+        LogWrapper.Logi(TAG, "onResume called");
     }
 
 
@@ -168,11 +181,13 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        LogWrapper.Logi(TAG, "onViewCreated called");
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        LogWrapper.Logi(TAG, "onDestroyView called");
     }
 
 
@@ -194,9 +209,8 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-
+        LogWrapper.Logi(TAG, "onCreateOptionsMenu called");
         //super.onCreateOptionsMenu(menu, inflater);
-        LogWrapper.Logv(TAG, "Creating options menu");
         inflater.inflate(R.menu.action_bar_default, menu);
         //return true;
     }
@@ -236,6 +250,14 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
         return (super.onOptionsItemSelected(item));
     }
 
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        LogWrapper.Logi(TAG, "onConfigurationChanged called");
+        if (mStubIsInflated && (mInflatedStub.getVisibility() == View.VISIBLE)) {
+            handleEmptyListBG();
+        }
+
+    }
 
     @Override
     public void dispatchPathUpdate(String updatePath, int action) {
@@ -441,7 +463,6 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
     public void onSelectedDelete(File f) {
 
 
-
         if (f.delete()) {
 
             Toast.makeText(this.getActivity(), "Your file has been deleted", Toast.LENGTH_SHORT).show();
@@ -529,8 +550,8 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
                 public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                     LogWrapper.Logv(TAG, "List item clicked. position = [" + position + "]");
 
-                        File f = (File) mList.getAdapter().getItem(position);
-                        performClick(f);
+                    File f = (File) mList.getAdapter().getItem(position);
+                    performClick(f);
 
                 }
             });
@@ -540,27 +561,27 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
             mList.setMultiChoiceModeListener(new ListView.MultiChoiceModeListener() {
 
                 Boolean mMultiSelected = false;
+
                 @Override
                 public void onItemCheckedStateChanged(ActionMode mode, int position,
                                                       long id, boolean checked) {
 
 
                     LogWrapper.Logi(TAG, "onItemCheckedStateChanged called");
-                    LogWrapper.Logv(TAG, "Found " + mList.getCheckedItemCount()+ " checked items");
+                    LogWrapper.Logv(TAG, "Found " + mList.getCheckedItemCount() + " checked items");
                     // Is the number of items check more than 1
                     // is the multislect flag already set
-                    if(mList.getCheckedItemCount() > 1){
+                    if (mList.getCheckedItemCount() > 1) {
                         mMultiSelected = true;
                         LogWrapper.Logd(TAG, "Invalidating the actionmode");
                         mActionMode.invalidate();
-                    }else if(mList.getCheckedItemCount() == 1) {
+                    } else if (mList.getCheckedItemCount() == 1) {
                         // Is the number of items check is 1
                         // reset multislect flag
                         mMultiSelected = false;
                         LogWrapper.Logd(TAG, "Invalidating the actionmode");
-                       mActionMode.invalidate();
+                        mActionMode.invalidate();
                     }
-
 
 
                     // Here you can do something when items are selected/de-selected,
@@ -569,17 +590,60 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
 
                 @Override
                 public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-                    LogWrapper.Logv(TAG, "Action item clicked from multi chioce");
+                    LogWrapper.Logv(TAG, "Action item clicked from multi choice");
                     // Respond to clicks on the actions in the CAB
                     switch (item.getItemId()) {
-                        case R.id.menu_delete:
+                        case R.id.menu_delete: {
+                            LogWrapper.Logi(TAG, "Calling menu item DELETE");
                             deleteSelectedItems();
+                            mode.finish(); // Action picked, so close the CAB
+                        }
+                        return true;
+                        case R.id.menu_cut: {
+                            LogWrapper.Logi(TAG, "Calling menu item CUT");
+                            File[] files = getCheckedFiles();
+                            mFileAction.setHeldFiles(files);
+                            mSlidingMenu.setMode(SlidingMenu.LEFT_RIGHT);
+
+                            ((ImageArrayAdapter) mCutPasteFragment.getAdapter()).clear();
+                            ImageArrayAdapter adapter = (ImageArrayAdapter) mCutPasteFragment.getAdapter();
+                            for (File f : files) {
+                                adapter.add(f);
+
+                            }
+                            adapter.notifyDataSetChanged();
 
                             mode.finish(); // Action picked, so close the CAB
-                            return true;
+                        }
+                        return true;
+                        case R.id.menu_share: {
+
+
+                        }
+                        return true;
+                        case R.id.menu_rename: {
+                            // need to show an alert dialog
+                            //mFileAction.renameFiles(getCheckedFiles(), "BatchRename");
+
+
+                        }
+                        case R.id.menu_open_as: {
+                            // need to show an alert dialog
+                            // to manully set the type
+                            // of intent that should be sent
+                            // display to user as
+                            // TEXT
+                            // VIDEO
+                            // PICTURE
+
+
+                        }
+                        return true;
                         default:
                             return false;
                     }
+
+
                 }
 
 
@@ -604,9 +668,9 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
                     LogWrapper.Logi(TAG, "onPrepareActionMode called");
                     menu.clear();
                     MenuInflater inflater = mActionMode.getMenuInflater();
-                    if (mMultiSelected){
+                    if (mMultiSelected) {
                         inflater.inflate(R.menu.menu_context_actions_multiple_items, menu);
-                    }else{
+                    } else {
                         inflater.inflate(R.menu.menu_context_actions, menu);
 
                     }
@@ -620,48 +684,77 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
 
     }
 
-    private void deleteSelectedItems(){
+    private void deleteSelectedItems() {
+
+
+        File[] f = getCheckedFiles();
+        mDeleteAlert.showDeleteAlertBox(f);
+
+    }
+
+    private File[] getCheckedFiles() {
+
         SparseBooleanArray array = mList.getCheckedItemPositions();
-       ArrayList<File> files = new ArrayList<File>();
-
-
-        LogWrapper.Logi(TAG, "Found "+mList.getCheckedItemCount() + " checked items");
+        ArrayList<File> files = new ArrayList<File>();
+        LogWrapper.Logi(TAG, "Found " + mList.getCheckedItemCount() + " checked items");
 
         SparseBooleanArray checked = mList.getCheckedItemPositions();
         int size = checked.size(); // number of name-value pairs in the array
         for (int i = 0; i < size; i++) {
             int key = checked.keyAt(i);
             boolean value = checked.get(key);
-            if (value){
-                files.add ((File)mList.getAdapter().getItem(key));
-                LogWrapper.Logv(TAG, "Found item with key " + key );
+            if (value) {
+                files.add((File) mList.getAdapter().getItem(key));
+                LogWrapper.Logv(TAG, "Found item with key " + key);
             }
 
         }
 
         File[] f = new File[files.size()];
-        LogWrapper.Logv(TAG, "Preparing to delete files");
-        for(int i = 0; i < files.size(); i++){
+        LogWrapper.Logv(TAG, "Preparing the checked files");
+        for (int i = 0; i < files.size(); i++) {
             f[i] = files.get(i);
             LogWrapper.Logv(TAG, "\t--" + f[i].toString());
         }
-
-       mDeleteAlert.showDeleteAlertBox(f);
-
-
-
+        return f;
     }
 
     private void setupSlidingMenu() {
         mSlidingMenu = new SlidingMenu(this.getActivity());
         mSlidingMenu.setMode(SlidingMenu.LEFT);
-        mSlidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
+        mSlidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_MARGIN);
         //mSlidingMenu.setShadowWidthRes(R.dimen.shadow_width);
         //mSlidingMenu.setShadowDrawable(R.drawable.shadow);
-        mSlidingMenu.setBehindOffsetRes(R.dimen.slidingmenu_offset);
+        mSlidingMenu.setBehindWidthRes(R.dimen.slidingmenu_offset);
         mSlidingMenu.setMenu(R.layout.layout_listview);
         mSlidingMenu.setFadeDegree(0.35f);
         mSlidingMenu.attachToActivity(this.getActivity(), SlidingMenu.SLIDING_CONTENT);
+        // Set the menu but don't activate it
+        mSlidingMenu.setSecondaryMenu(R.layout.layout_cut_paste_menu);
+        mCutPasteFragment = (CutPasteFragment) getFragmentManager().findFragmentById(R.id.fragment_cut_paste);
+        mCutPasteFragment.setPasteListener(new CutPasteFragment.onPasteListener() {
+            @Override
+            public void onPaste(File[] files) {
+
+                mFileAction.cutPasteHeldFiles(mFileAction.getHeldFiles(), new File(mCurrentPath));
+                mSlidingMenu.setMode(SlidingMenu.LEFT);
+                mSlidingMenu.showContent();
+                ((ImageArrayAdapter) mCutPasteFragment.getAdapter()).clear();
+                ((ImageArrayAdapter) mCutPasteFragment.getAdapter()).notifyDataSetChanged();
+                updateAdapter(mCurrentPath);
+
+            }
+
+            @Override
+            public void onCancelPaste() {
+                mFileAction.setHeldFiles(new File[]{});
+                mSlidingMenu.setMode(SlidingMenu.LEFT);
+                mSlidingMenu.showContent();
+                ((ImageArrayAdapter) mCutPasteFragment.getAdapter()).clear();
+                ((ImageArrayAdapter) mCutPasteFragment.getAdapter()).notifyDataSetChanged();
+            }
+
+        });
 
 
         // mSlidingMenu.setOnClosedListener(this);
@@ -673,16 +766,16 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
 
 
         String[] groups = {"Home", "SdCard", "Favorites"};
-        String[][] children = { {}, {}, {"Fav 1", "Fav 2"} };
+        String[][] children = {{}, {}, {"Fav 1", "Fav 2"}};
         mDrawerList = (ExpandableListView) mSlidingMenu.findViewById(R.id.left_drawer);
 
-        ArrayList<ArrayList<ExpandableBaseArrayAdapter.Child>> childrenList = new  ArrayList<ArrayList<ExpandableBaseArrayAdapter.Child>>();
+        ArrayList<ArrayList<ExpandableBaseArrayAdapter.Child>> childrenList = new ArrayList<ArrayList<ExpandableBaseArrayAdapter.Child>>();
 
-        for (int i = 0; i < groups.length; i++){
+        for (int i = 0; i < groups.length; i++) {
 
             // Fill the group array
             childrenList.add(new ArrayList<ExpandableBaseArrayAdapter.Child>());
-            for (int j = 0; j < children[i].length; j++){
+            for (int j = 0; j < children[i].length; j++) {
                 // fill the children for the specifed groups
                 childrenList.get(i).add(new ExpandableBaseArrayAdapter.Child(i, j, children[i][j], "/sdcard"));
             }
@@ -692,7 +785,7 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
 
         mDrawerList.setAdapter(new ExpandableDrawerListAdapter(getActivity(), groups, childrenList));
 
-       // mDrawerList.setAdapter(new DrawerListAdapter(this.getActivity(), s));
+        // mDrawerList.setAdapter(new DrawerListAdapter(this.getActivity(), s));
         //mDrawerList.setOnChildClickListener();
         mDrawerList.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
 
@@ -704,17 +797,17 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
 
                 ExpandableDrawerListAdapter adapter = (ExpandableDrawerListAdapter) mDrawerList.getExpandableListAdapter();
 
-                if(adapter.hasChildren(groupPosition)){
-                    if(mDrawerList.isGroupExpanded(groupPosition)){
+                if (adapter.hasChildren(groupPosition)) {
+                    if (mDrawerList.isGroupExpanded(groupPosition)) {
                         mDrawerList.collapseGroup(groupPosition);
 
-                    }else{
+                    } else {
 
                         mDrawerList.expandGroup(groupPosition);
                     }
 
 
-                }else{
+                } else {
                     selectDrawerItem(groupPosition);
                     mSlidingMenu.showContent();
                 }
@@ -724,7 +817,7 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
 
         });
 
-        mDrawerList.setOnChildClickListener(new ExpandableListView.OnChildClickListener(){
+        mDrawerList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
 
 
             @Override
@@ -732,7 +825,7 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
 
 
                 ExpandableDrawerListAdapter adapter = (ExpandableDrawerListAdapter) mDrawerList.getExpandableListAdapter();
-                String childPath = ((ExpandableDrawerListAdapter.Child)adapter.getChild(group, child)).mPath;
+                String childPath = ((ExpandableDrawerListAdapter.Child) adapter.getChild(group, child)).mPath;
                 performClick(new File(childPath));
                 mSlidingMenu.showContent();
 
@@ -740,9 +833,7 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
             }
 
 
-
         });
-
 
 
     }

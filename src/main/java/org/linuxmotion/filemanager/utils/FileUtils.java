@@ -31,7 +31,6 @@ public class FileUtils {
 
     private static final boolean DGB = (true || Constants.FULL_DBG);
 
-
     /**
      * @param directory the director path from which to retrive the files from
      * @return
@@ -59,7 +58,6 @@ public class FileUtils {
         }
     }
 
-
     /**
      * Starts the sorting process. This is a wrapper function that
      * calls all of the sort functions, that individually sort
@@ -83,7 +81,6 @@ public class FileUtils {
         // Debug.stopMethodTracing();
         return hiddenfiles;
     }
-
 
     public static class Mergesort {
         private File[] mData;
@@ -150,7 +147,6 @@ public class FileUtils {
      * @param files   the files to sort
      * @param context To retrieve the sharedPrefreneces
      */
-
     private static File[] ShowHideHiddenFilesFolders(File[] files, Context context) {
 
         log("Show/Hiding hidden files");
@@ -246,7 +242,6 @@ public class FileUtils {
 
     }
 
-
     /**
      * @param file    the files to sort
      * @param context To retrieve the sharedPrefreneces
@@ -315,10 +310,8 @@ public class FileUtils {
 
     }
 
-
     // TODO: At some pint this should sort the list non-hidden -> hidden -> non-hidden -> hidden
     // the user should then be able to select using a preference
-
     /**
      * Sort into hidden folders then folders. Form there is sorts into hidden files then non hiden
      * files.
@@ -361,7 +354,6 @@ public class FileUtils {
         files = FILES;
 
     }
-
 
     public static boolean hasExtension(String filename) {
 

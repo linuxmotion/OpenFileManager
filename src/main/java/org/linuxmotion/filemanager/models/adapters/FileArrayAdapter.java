@@ -15,7 +15,7 @@
  *    along with openFileManager.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.linuxmotion.filemanager.models;
+package org.linuxmotion.filemanager.models.adapters;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -31,6 +31,7 @@ import org.linuxmotion.asyncloaders.BitmapHelper;
 import org.linuxmotion.asyncloaders.ImageLoader;
 import org.linuxmotion.asyncloaders.LogWrapper;
 import org.linuxmotion.filemanager.R;
+import org.linuxmotion.filemanager.models.ExtendedMimeTypeMap;
 import org.linuxmotion.filemanager.models.baseadapters.BaseArrayAdapter;
 
 import java.io.File;
@@ -39,15 +40,14 @@ import java.util.Date;
 
 public class FileArrayAdapter extends BaseArrayAdapter<File> {
 
-    private static boolean DBG = false;// (true || Constants.FULL_DBG);
     private static String TAG = "FileArrayAdapter";
-    ImageLoader mImageLoader;
-    Bitmap mFolderBG;
-    private Bitmap mAudioBG;
-    private Bitmap mTextBG;
-    private Bitmap mVideoBG;
-    private Bitmap mZipBG;
-    private Bitmap mUnknownBG;
+    protected ImageLoader mImageLoader;
+    protected Bitmap mFolderBG;
+    protected Bitmap mAudioBG;
+    protected Bitmap mTextBG;
+    protected Bitmap mVideoBG;
+    protected Bitmap mZipBG;
+    protected Bitmap mUnknownBG;
 
     public FileArrayAdapter(Context context, File[] files) {
         super(context, 0, files);
@@ -105,22 +105,22 @@ public class FileArrayAdapter extends BaseArrayAdapter<File> {
             File it = getArrayList().get(position);
 
             if (it != null) {
-                LogWrapper.Logi(TAG, it.toString());
-                LogWrapper.Logi(TAG, "Setting resources");
+                LogWrapper.Logv(TAG, it.toString());
+                LogWrapper.Logv(TAG, "Setting resources");
 
 
                 if (Holder.mThumbnail != null) {
 
 
                     if (it.isFile()) {
-                        LogWrapper.Logi(TAG, "Setting file image");
+                        LogWrapper.Logv(TAG, "Setting file image");
                         // If it a pic set it as
                         // a pic, else set it as
                         // a blnk doc file icon
 
                         String name = it.getName();
 
-                        LogWrapper.Logi(TAG, "Full name: " + name);
+                        LogWrapper.Logv(TAG, "Full name: " + name);
                         int lastdot = name.lastIndexOf(".");
                         String s = name.substring(lastdot + 1);
 
@@ -137,14 +137,14 @@ public class FileArrayAdapter extends BaseArrayAdapter<File> {
 
 
                     } else {
-                        LogWrapper.Logi(TAG, "Setting folder background");
+                        LogWrapper.Logv(TAG, "Setting folder background");
                         Holder.mThumbnail.setImageBitmap(mFolderBG);
                     }
                 }
 
 
                 if (Holder.mFilePath != null) {
-                    LogWrapper.Logi(TAG, "Setting text");
+                    LogWrapper.Logv(TAG, "Setting text");
                     Holder.mFilePath.setText(it.getName());
                 }
 
@@ -184,7 +184,7 @@ public class FileArrayAdapter extends BaseArrayAdapter<File> {
         return v;
     }
 
-    private void setIconType(ImageView iv, File path, String extension) {
+    protected void setIconType(ImageView iv, File path, String extension) {
         // set the image type by the icon.
         // Creat a maper that map the  extension to a file type
         // video, document, picture, or music
