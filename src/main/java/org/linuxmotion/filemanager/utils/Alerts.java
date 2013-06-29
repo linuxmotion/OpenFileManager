@@ -6,10 +6,17 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.SharedPreferences;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.Switch;
 
+import org.linuxmotion.asyncloaders.LogWrapper;
+import org.linuxmotion.filemanager.R;
 import org.linuxmotion.filemanager.models.FileDeleteDialogClickListener;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  * Wrapper class for showing different alerts.
@@ -18,6 +25,7 @@ import java.io.File;
  */
 public class Alerts {
 
+    private static final String TAG = Alerts.class.getSimpleName();
     private Context mContext;
     private static deleteAlertClickDispatcher mDELETEDispatcher;
     private static GPLAlertClickDispatcher mGPLDispatcher;
@@ -155,6 +163,61 @@ public class Alerts {
 
 
         delete.setPositiveButton("Delete", deletedialog);
+
+        delete.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface arg0, int arg1) {
+                // Do nothing
+
+            }
+
+
+        });
+
+        delete.show();
+    }
+
+    public interface FileAlertBoxListener{
+
+        public void onSelectPositiveButton();
+    }
+    public static void newFileAlertBox(Context context, final String location, final FileAlertBoxListener listener) {
+
+
+        Builder delete = new AlertDialog.Builder(context);
+        delete.setTitle("Create new file or folder");
+        delete.setCancelable(true);
+        View v = ((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.layout_new_file_dialog, null, false);
+        delete.setView(v);
+        final EditText text = (EditText) v.findViewById(R.id.dialog_file_folder_editText);
+        final Switch switcher = (Switch) v.findViewById(R.id.switch_file_folder);
+
+        delete.setPositiveButton("Ok", new DialogInterface.OnClickListener(){
+
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                // Do nothing if no name
+                if (text.getText().toString().equals(""))
+                    return;
+
+                File newFile = new File(location +"/"+ text.getText().toString());
+                if(switcher.isChecked()){
+                    newFile.mkdir();
+                }else {
+                    try {
+                        newFile.createNewFile();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        LogWrapper.Logv(TAG, "Couldn't create a new file or folder");
+                    }
+
+                }
+
+                listener.onSelectPositiveButton();
+
+            }
+        });
 
         delete.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
 

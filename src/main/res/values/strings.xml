@@ -39,5 +39,7 @@
     <string name="string_menu_rename">rename</string>
     <string name="menu_cut">cut</string>
     <string name="menu_rename">rename</string>
+    <string name="dialog_file">File</string>
+    <string name="dialog_folder">Folder</string>
 
 </resources>

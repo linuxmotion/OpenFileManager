@@ -118,6 +118,36 @@ public class PreferenceUtils {
 
     /************************/
 
+    public static boolean getHasCompletedLeftNavigationTutorial(Context context) {
+        SharedPreferences prefs = context.getSharedPreferences(Constants.OPEN_FILE_MANAGER_PREFERENCES, 0);
+        return prefs.getBoolean(Constants.LEFT_NAVIGATION_TUTORIAL_PREF, true);
+
+    }
+
+    public static void putHasCompletedLeftNavigationTutorial(Context context, boolean hasCompleted) {
+
+        SharedPreferences prefs = context.getSharedPreferences(Constants.OPEN_FILE_MANAGER_PREFERENCES, 0);
+        SharedPreferences.Editor edit = prefs.edit();
+        edit.putBoolean(Constants.LEFT_NAVIGATION_TUTORIAL_PREF, hasCompleted);
+        edit.commit();
 
 
+    }
+
+    public static boolean getHasCompletedRightCutPasteTutorial(Context context) {
+        SharedPreferences prefs = context.getSharedPreferences(Constants.OPEN_FILE_MANAGER_PREFERENCES, 0);
+        return prefs.getBoolean(Constants.RIGHT_CUT_PASTE_TUTORIAL_PREF, true);
+
+    }
+
+
+    public static void putHasCompletedRightCutPasteTutorial(Context context, boolean hasCompleted) {
+
+        SharedPreferences prefs = context.getSharedPreferences(Constants.OPEN_FILE_MANAGER_PREFERENCES, 0);
+        SharedPreferences.Editor edit = prefs.edit();
+        edit.putBoolean(Constants.RIGHT_CUT_PASTE_TUTORIAL_PREF, hasCompleted);
+        edit.commit();
+
+
+    }
 }

@@ -47,6 +47,10 @@ public class Constants {
 
     public static final String SORT_LEXICOGRAPHICALLY_SMALLER_FIRST_PREF = "sort_lexicographically_smaller_first_pref ";
 
+    public static final String LEFT_NAVIGATION_TUTORIAL_PREF = "left_navigation_tutorial";
+
+    public static final String RIGHT_CUT_PASTE_TUTORIAL_PREF = "right_cut_paste_tutorial";
+
     public static MimeTypeMap MIME = MimeTypeMap.getSingleton();
 
 

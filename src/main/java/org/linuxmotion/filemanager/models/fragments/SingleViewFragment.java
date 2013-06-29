@@ -252,6 +252,13 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
     private void createNewFileorDirectory() {
 
 
+        Alerts.newFileAlertBox(getActivity(), mCurrentPath, new Alerts.FileAlertBoxListener(){
+            @Override
+            public void onSelectPositiveButton() {
+                updateAdapter(mCurrentPath);
+            }
+        });
+
     }
 
     @Override
@@ -631,6 +638,13 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
                             adapter.notifyDataSetChanged();
 
                             mode.finish(); // Action picked, so close the CAB
+
+                            if(!PreferenceUtils.getHasCompletedRightCutPasteTutorial(getActivity())){
+                                // set showcase view to highlight the menu
+                                mSlidingMenu.showSecondaryMenu();
+                                PreferenceUtils.putHasCompletedRightCutPasteTutorial(getActivity(), true);
+
+                            }
                         }
                         return true;
                         case R.id.menu_share: {
@@ -751,7 +765,13 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
         mSlidingMenu.getSecondaryMenu().setVisibility(View.INVISIBLE);
 
 
-        mSlidingMenu.toggle();
+        if (!PreferenceUtils.getHasCompletedLeftNavigationTutorial(getActivity())){
+
+            mSlidingMenu.toggle();
+            // Show sliding menu
+            PreferenceUtils.putHasCompletedLeftNavigationTutorial(getActivity(), true);
+        }
+
         mCutPasteFragment = (CutPasteFragment) getFragmentManager().findFragmentById(R.id.fragment_cut_paste);
         mCutPasteFragment.setPasteListener(new CutPasteFragment.onPasteListener() {
             @Override
