@@ -15,7 +15,8 @@
     <string name="hidden_files_folder_pref_sum_on">Hidden files and folders are not hidden</string>
     <string name="hidden_files_folder_pref_sum_off">Hidden files and folders are hidden</string>
     <string name="sort_file_folder_pref">sort_file_folder_pref</string>
-    <string name="sort_file_folder_pref_title">Sort files and folder listing by folders first</string>
+    <string name="sort_file_folder_pref_title">Sort files and folder listing by folders first
+    </string>
     <string name="sort_file_folder_pref_sum_on">List is sorted folders then files</string>
     <string name="sort_file_folder_pref_sum_off">List is sorted files then folders</string>
 
@@ -36,5 +37,7 @@
     <string name="string_menu_cut">cut</string>
     <string name="string_menu_paste">paste</string>
     <string name="string_menu_rename">rename</string>
+    <string name="menu_cut">cut</string>
+    <string name="menu_rename">rename</string>
 
 </resources>

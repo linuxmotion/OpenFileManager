@@ -17,7 +17,16 @@ public class FileUtilAction {
     public boolean setHeldFiles(File[] toCut){
 
 
-
+        //Check to see if there are files
+        // to cut, if there are non
+        // clear the files, and exit
+        if(toCut == null){
+            // clear the olf files
+            mHeldArrayFile.clear();
+            return false;
+        }
+        // Clear the old files
+        mHeldArrayFile.clear();
 
         for (File f : toCut)
             mHeldArrayFile.add(f);

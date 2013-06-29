@@ -23,7 +23,7 @@ import java.util.HashMap;
 public abstract class ExpandableBaseArrayAdapter<T>  implements ExpandableListAdapter {
 
     private static boolean DBG = false;// (true || Constants.FULL_DBG);
-    private static String TAG = "FileArrayAdapter";
+    private static String TAG = ExpandableBaseArrayAdapter.class.getSimpleName();
     public static long SINGLE_ID_CONST = 100L;
     public static long COMBINED_ID_CONST = 100L;
 

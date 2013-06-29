@@ -40,7 +40,7 @@ import java.util.Date;
 
 public class FileArrayAdapter extends BaseArrayAdapter<File> {
 
-    private static String TAG = "FileArrayAdapter";
+    private static String TAG = FileArrayAdapter.class.getSimpleName();
     protected ImageLoader mImageLoader;
     protected Bitmap mFolderBG;
     protected Bitmap mAudioBG;
@@ -64,7 +64,7 @@ public class FileArrayAdapter extends BaseArrayAdapter<File> {
 
 
     void setupBGImages(Context context) {
-        mFolderBG = BitmapHelper.decodeSampledBitmapFromResource(context.getResources(), 50, 50, R.drawable.ic_list_folder);
+        mFolderBG = BitmapHelper.decodeSampledBitmapFromResource(context.getResources(), 50, 50, R.drawable.ic_list_folder_halo_dark);
         mAudioBG = BitmapHelper.decodeSampledBitmapFromResource(context.getResources(), 50, 50, R.drawable.ic_list_menu_audio);
         mTextBG = BitmapHelper.decodeSampledBitmapFromResource(context.getResources(), 50, 50, R.drawable.ic_menu_compose);
         mVideoBG = BitmapHelper.decodeSampledBitmapFromResource(context.getResources(), 50, 50, R.drawable.ic_list_menu_video);

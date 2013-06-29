@@ -78,6 +78,7 @@ public class CutPasteFragment extends Fragment {
         if (mPasteListener == null)
             throw new RuntimeException("Class must implement PasteListener()");
 
+        LogWrapper.Logv(TAG, "canceling selected paste operation");
         mPasteListener.onCancelPaste();
     }
 

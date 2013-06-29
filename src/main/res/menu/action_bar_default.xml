@@ -1,20 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/menu_left"
-          android:icon="@drawable/left_arrow_scaled"
-          android:title="Back"
-          android:showAsAction="always" />
-    <item android:id="@+id/menu_up"
-          android:icon="@drawable/up_arrow_scaled"
-          android:title="Up"
-          android:showAsAction="ifRoom" />
-    <item android:id="@+id/menu_forward"
-          android:icon="@drawable/right_arrow_scaled"
-          android:title="forward"
-          android:showAsAction="ifRoom" />
-    <item android:id="@+id/menu_settings"
-          android:icon="@drawable/ic_menu_manage"
-          android:title="Settings"
-          android:showAsAction="never"/>
+    <item
+            android:id="@+id/menu_left"
+            android:icon="@drawable/ic_menu_navigation_back"
+            android:title="Back"
+            android:showAsAction="always"/>
+    <item
+            android:id="@+id/menu_forward"
+            android:icon="@drawable/ic_menu_navigation_forward"
+            android:title="forward"
+            android:showAsAction="ifRoom"/>
+    <item
+            android:id="@+id/menu_new_content"
+            android:icon="@drawable/ic_menu_content_new"
+            android:title="forward"
+            android:showAsAction="ifRoom"/>
+    <item
+            android:id="@+id/menu_settings"
+            android:icon="@drawable/ic_menu_action_settings"
+            android:title="Settings"
+            android:showAsAction="ifRoom"/>
 </menu>

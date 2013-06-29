@@ -4,7 +4,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
 
-    >
+        >
 
     <RelativeLayout
             android:orientation="horizontal"
@@ -21,6 +21,7 @@
                 android:id="@+id/button_grid_select_ok"
                 android:minWidth="100dp"
                 android:layout_marginRight="5dp"/>
+
         <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -53,8 +54,6 @@
         </GridView>
 
     </LinearLayout>
-
-
 
 
 </RelativeLayout>

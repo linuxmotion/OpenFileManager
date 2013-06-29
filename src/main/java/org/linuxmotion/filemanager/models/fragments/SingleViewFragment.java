@@ -234,10 +234,9 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
                 sendBroadcast(prepareBroadcast(null, Constants.UPDATE_INTENT, new MenuAction(MenuAction.ACTION_BACK)));
             }
             break;
-            case R.id.menu_up: {
-                onBackPressed();
-                // same as
-                // sendBroadcast(prepareBroadcast(null, Constants.UPDATE_INTENT, new MenuAction(MenuAction.ACTION_UP)));
+
+            case R.id.menu_new_content :{
+                    createNewFileorDirectory();
             }
             break;
             case R.id.menu_forward: {
@@ -248,6 +247,11 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
         }
 
         return (super.onOptionsItemSelected(item));
+    }
+
+    private void createNewFileorDirectory() {
+
+
     }
 
     @Override
@@ -602,15 +606,28 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
                         case R.id.menu_cut: {
                             LogWrapper.Logi(TAG, "Calling menu item CUT");
                             File[] files = getCheckedFiles();
-                            mFileAction.setHeldFiles(files);
-                            mSlidingMenu.setMode(SlidingMenu.LEFT_RIGHT);
+                            // See if there are files held from a prevois
+                            // cut operation that was not finished
+                            if (mFileAction.getHeldFiles().length > 0){
+                                // if it has not been finished, add to the
+                                // cut selection
+                                mFileAction.appendToHeldFiles(files);
+                            }else{
+                                mFileAction.setHeldFiles(files);
+                            }
 
+                            mSlidingMenu.setMode(SlidingMenu.LEFT_RIGHT);
+                            // Refresh the entire adapter
                             ((ImageArrayAdapter) mCutPasteFragment.getAdapter()).clear();
                             ImageArrayAdapter adapter = (ImageArrayAdapter) mCutPasteFragment.getAdapter();
+                            // get the entire list of held files
+                            // includes the appended files if any
+                            files = mFileAction.getHeldFiles();
                             for (File f : files) {
                                 adapter.add(f);
 
                             }
+                            // Notify the adapter that it has changed
                             adapter.notifyDataSetChanged();
 
                             mode.finish(); // Action picked, so close the CAB
@@ -731,6 +748,10 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
         mSlidingMenu.attachToActivity(this.getActivity(), SlidingMenu.SLIDING_CONTENT);
         // Set the menu but don't activate it
         mSlidingMenu.setSecondaryMenu(R.layout.layout_cut_paste_menu);
+        mSlidingMenu.getSecondaryMenu().setVisibility(View.INVISIBLE);
+
+
+        mSlidingMenu.toggle();
         mCutPasteFragment = (CutPasteFragment) getFragmentManager().findFragmentById(R.id.fragment_cut_paste);
         mCutPasteFragment.setPasteListener(new CutPasteFragment.onPasteListener() {
             @Override
@@ -739,6 +760,7 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
                 mFileAction.cutPasteHeldFiles(mFileAction.getHeldFiles(), new File(mCurrentPath));
                 mSlidingMenu.setMode(SlidingMenu.LEFT);
                 mSlidingMenu.showContent();
+                mFileAction.setHeldFiles(null);
                 ((ImageArrayAdapter) mCutPasteFragment.getAdapter()).clear();
                 ((ImageArrayAdapter) mCutPasteFragment.getAdapter()).notifyDataSetChanged();
                 updateAdapter(mCurrentPath);
@@ -747,7 +769,7 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
 
             @Override
             public void onCancelPaste() {
-                mFileAction.setHeldFiles(new File[]{});
+                mFileAction.setHeldFiles(null);
                 mSlidingMenu.setMode(SlidingMenu.LEFT);
                 mSlidingMenu.showContent();
                 ((ImageArrayAdapter) mCutPasteFragment.getAdapter()).clear();
