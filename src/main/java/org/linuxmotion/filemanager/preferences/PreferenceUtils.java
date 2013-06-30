@@ -120,7 +120,7 @@ public class PreferenceUtils {
 
     public static boolean getHasCompletedLeftNavigationTutorial(Context context) {
         SharedPreferences prefs = context.getSharedPreferences(Constants.OPEN_FILE_MANAGER_PREFERENCES, 0);
-        return prefs.getBoolean(Constants.LEFT_NAVIGATION_TUTORIAL_PREF, true);
+        return prefs.getBoolean(Constants.LEFT_NAVIGATION_TUTORIAL_PREF, false);
 
     }
 
@@ -136,7 +136,7 @@ public class PreferenceUtils {
 
     public static boolean getHasCompletedRightCutPasteTutorial(Context context) {
         SharedPreferences prefs = context.getSharedPreferences(Constants.OPEN_FILE_MANAGER_PREFERENCES, 0);
-        return prefs.getBoolean(Constants.RIGHT_CUT_PASTE_TUTORIAL_PREF, true);
+        return prefs.getBoolean(Constants.RIGHT_CUT_PASTE_TUTORIAL_PREF, false);
 
     }
 
