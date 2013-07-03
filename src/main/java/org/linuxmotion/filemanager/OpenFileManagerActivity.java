@@ -45,7 +45,7 @@ import org.linuxmotion.filemanager.utils.Constants;
 import java.io.File;
 
 
-public class OpenFileManagerActivity extends ListActivity implements Alerts.GPLAlertClickDispatcher {
+public class OpenFileManagerActivity extends ListActivity implements Alerts.GPLAlertClickDispatcher, SingleViewFragment.OnMenuCutInterface, CutPasteFragment.onPasteListener, SideNavigationFragment.GroupClickCallback, SideNavigationFragment.ChildClickCallback, SideNavigationFragment.OnFavoritesCallback, SingleViewFragment.OnMenuFavoriteInterface {
 
     private static final String TAG = OpenFileManagerActivity.class.getSimpleName();
     private static final boolean DEBUG = (true || Constants.FULL_DBG);
@@ -83,40 +83,13 @@ public class OpenFileManagerActivity extends ListActivity implements Alerts.GPLA
                 ft.replace(android.R.id.content, mSingleView);
                 ft.commit();
 
-                mSingleView.setOnMenuCutInterface(new SingleViewFragment.OnMenuCutInterface() {
-                    @Override
-                    public void OnCutCallback(File[] files) {
-                        mSlidingMenu.setMode(SlidingMenu.LEFT_RIGHT);
-                        // Refresh the entire adapter
-                        ((ImageArrayAdapter) mCutPasteFragment.getAdapter()).clear();
-                        ImageArrayAdapter adapter = (ImageArrayAdapter) mCutPasteFragment.getAdapter();
-                        // get the entire list of held files
-                        // includes the appended files if any
-                        //files = mFileAction.getHeldFiles();
-                        for (File f : files) {
-                            adapter.add(f);
+                mSingleView.setOnMenuCutInterface(this);
+                mSingleView.setOnMenuFavoriteInterface(this);
 
-                        }
-                        // Notify the adapter that it has changed
-                        adapter.notifyDataSetChanged();
-                    }
-
-                    @Override
-                    public void OnFirstTimeCallback() {
-                        mSlidingMenu.showSecondaryMenu();
-                    }
-                });
-                mSingleView.setOnMenuFavoriteInterface(new SingleViewFragment.OnMenuFavoriteInterface() {
-                    @Override
-                    public void OnMenuFavoriteCallback(ExpandableBaseArrayAdapter.Child child) {
-                        mSideNavigationFragment.AddFavorite(child);
-                    }
-                });
             }
 
             setupSlidingMenu();
             setupFragments();
-
 
         }
         setupEULA(this);
@@ -131,9 +104,6 @@ public class OpenFileManagerActivity extends ListActivity implements Alerts.GPLA
     public void onStart() {
         super.onStart();
         LogWrapper.Logi(TAG, "onStart called");
-
-        if (!mAttached)
-            mSlidingMenu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
 
 
         // Show GPL usage license
@@ -158,24 +128,19 @@ public class OpenFileManagerActivity extends ListActivity implements Alerts.GPLA
 
 
         } else {
-            Fragment frag = getFragmentManager().findFragmentById(android.R.id.content);
+
             // Is the menu showing
             if (mSlidingMenu.isMenuShowing()) {
                 // if a menu is open it need to closed.
                 mSlidingMenu.showContent();
+                return;
             } else {
-                // Else tell the fragment to go up
-                if (frag instanceof SingleViewFragment) {
-                    ((SingleViewFragment) frag).onBackPressed();
-                    return;
-                }
+
+                mSingleView.onBackPressed();
+                return;
+
             }
-            // either the menu should be closed
-            // or the main fragment goes up
-            // if neither of those choices occur
-            // then something went seroisly wrong
-            LogWrapper.Loge(TAG, "Instance of SingleViewFragment was not found");
-            throw new RuntimeException("Instance of SingleViewFragment was not found");
+
 
         }
 
@@ -291,8 +256,8 @@ public class OpenFileManagerActivity extends ListActivity implements Alerts.GPLA
 
     private void setupSlidingMenu() {
 
-        mSlidingMenu = new SlidingMenu(this);
-        mSlidingMenu.setMode(SlidingMenu.LEFT);
+        mSlidingMenu = new SlidingMenu(this, SlidingMenu.LEFT);
+        //mSlidingMenu.setMode(SlidingMenu.LEFT);
         mSlidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_MARGIN);
         //mSlidingMenu.setShadowWidthRes(R.dimen.shadow_width);
         //mSlidingMenu.setShadowDrawable(R.drawable.shadow);
@@ -319,65 +284,123 @@ public class OpenFileManagerActivity extends ListActivity implements Alerts.GPLA
 
     private void setupFragments() {
         mCutPasteFragment = (CutPasteFragment) getFragmentManager().findFragmentById(R.id.fragment_cut_paste);
-
-        mCutPasteFragment.setPasteListener(new CutPasteFragment.onPasteListener() {
-            @Override
-            public void onPaste(File[] files) {
-
-                mSingleView.pasteCutItems();
-                mSlidingMenu.setMode(SlidingMenu.LEFT);
-                mSlidingMenu.showContent();
-                ((ImageArrayAdapter) mCutPasteFragment.getAdapter()).clear();
-                ((ImageArrayAdapter) mCutPasteFragment.getAdapter()).notifyDataSetChanged();
-                mSingleView.updateAdapter(mSingleView.getCurrentPath());
-
-
-            }
-
-
-            @Override
-            public void onCancelPaste() {
-                mSingleView.pasteSelectionCanceled();
-                mSlidingMenu.setMode(SlidingMenu.LEFT);
-                mSlidingMenu.showContent();
-                ((ImageArrayAdapter) mCutPasteFragment.getAdapter()).clear();
-                ((ImageArrayAdapter) mCutPasteFragment.getAdapter()).notifyDataSetChanged();
-            }
-
-        });
-
-
+        mCutPasteFragment.setPasteListener(this);
         mSideNavigationFragment = (SideNavigationFragment) getFragmentManager().findFragmentById(R.id.fragment_side_navigation);
-        mSideNavigationFragment.setChildCallback(new SideNavigationFragment.ChildClickCallback() {
-            @Override
-            public boolean OnChildClick(String childFilePath, int groupPosition, int childInGroup) {
-                mSingleView.performClick(new File(childFilePath));
-                mSlidingMenu.showContent();
-                return true;
-            }
-        });
-        mSideNavigationFragment.setGroupCallback(new SideNavigationFragment.GroupClickCallback() {
-            @Override
-            public boolean OnGroupClick(int groupPosition) {
-
-                mSingleView.selectDrawerItem(groupPosition);
-                mSlidingMenu.showContent();
-                return true;
-            }
-        });
-
-        mSideNavigationFragment.setOnFavoriteAddedCallback(new SideNavigationFragment.OnFavoritesCallback() {
-            @Override
-            public void OnFavoriteAdded(String path) {
-
-            }
-
-            @Override
-            public void OnFavoriteRemoved(int group, int child) {
-
-            }
-        });
+        mSideNavigationFragment.setChildCallback(this);
+        mSideNavigationFragment.setGroupCallback(this);
+        mSideNavigationFragment.setOnFavoriteAddedCallback(this);
 
     }
 
+    @Override
+    public void OnCutCallback(File[] files) {
+
+        if (mDualPane) {
+
+            return;
+        } else {
+            mSlidingMenu.setMode(SlidingMenu.LEFT_RIGHT);
+        }
+        // Refresh the entire adapter
+        ((ImageArrayAdapter) mCutPasteFragment.getAdapter()).clear();
+        ImageArrayAdapter adapter = (ImageArrayAdapter) mCutPasteFragment.getAdapter();
+        // get the entire list of held files
+        // includes the appended files if any
+        //files = mFileAction.getHeldFiles();
+        for (File f : files) {
+            adapter.add(f);
+
+        }
+        // Notify the adapter that it has changed
+        adapter.notifyDataSetChanged();
+
+    }
+
+    @Override
+    public void OnFirstTimeCallback() {
+        if (mDualPane) {
+
+            return;
+        }
+        mSlidingMenu.showSecondaryMenu();
+    }
+
+    @Override
+    public void onPaste(File[] files) {
+        if (mDualPane) {
+
+            return;
+        } else {
+            mSlidingMenu.setMode(SlidingMenu.LEFT);
+            mSlidingMenu.showContent();
+        }
+        mSingleView.pasteCutItems();
+        ((ImageArrayAdapter) mCutPasteFragment.getAdapter()).clear();
+        ((ImageArrayAdapter) mCutPasteFragment.getAdapter()).notifyDataSetChanged();
+        mSingleView.updateAdapter(mSingleView.getCurrentPath());
+    }
+
+
+    @Override
+    public void onCancelPaste() {
+        if (mDualPane) {
+
+            return;
+        } else {
+            mSlidingMenu.setMode(SlidingMenu.LEFT);
+            mSlidingMenu.showContent();
+        }
+        mSingleView.pasteSelectionCanceled();
+
+        ((ImageArrayAdapter) mCutPasteFragment.getAdapter()).clear();
+        ((ImageArrayAdapter) mCutPasteFragment.getAdapter()).notifyDataSetChanged();
+    }
+
+    @Override
+    public boolean OnGroupClick(int groupPosition) {
+        if (mDualPane) {
+
+            return false;
+        } else {
+            mSingleView.selectDrawerItem(groupPosition);
+            mSlidingMenu.showContent();
+            return true;
+        }
+
+    }
+
+    @Override
+    public boolean OnChildClick(String childFilePath, int groupPosition, int childInGroup) {
+        if (mDualPane) {
+
+            return false;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public void OnFavoriteAdded(String path) {
+        if (mDualPane) {
+
+            return;
+        } else {
+
+        }
+    }
+
+    @Override
+    public void OnFavoriteRemoved(int group, int child) {
+        if (mDualPane) {
+
+            return;
+        } else {
+
+        }
+    }
+
+    @Override
+    public void OnMenuFavoriteCallback(ExpandableBaseArrayAdapter.Child child) {
+        mSideNavigationFragment.AddFavorite(child);
+    }
 }
