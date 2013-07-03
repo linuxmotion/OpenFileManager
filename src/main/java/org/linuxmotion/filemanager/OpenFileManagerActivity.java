@@ -25,7 +25,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -60,6 +59,7 @@ public class OpenFileManagerActivity extends ListActivity implements Alerts.GPLA
     private boolean mDualPane;
     private SlidingMenu mSlidingMenu;
     private boolean mAttached = false;
+
     /**
      * Called when the activity is first created.
      */
@@ -75,10 +75,9 @@ public class OpenFileManagerActivity extends ListActivity implements Alerts.GPLA
         if (mDualPane) {
 
 
-        }
-        else {
+        } else {
 
-            if(savedInstanceState == null){
+            if (savedInstanceState == null) {
                 mSingleView = new SingleViewFragment();
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
                 ft.replace(android.R.id.content, mSingleView);
@@ -95,7 +94,7 @@ public class OpenFileManagerActivity extends ListActivity implements Alerts.GPLA
                         // includes the appended files if any
                         //files = mFileAction.getHeldFiles();
                         for (File f : files) {
-                           adapter.add(f);
+                            adapter.add(f);
 
                         }
                         // Notify the adapter that it has changed
@@ -119,16 +118,11 @@ public class OpenFileManagerActivity extends ListActivity implements Alerts.GPLA
             setupFragments();
 
 
-
-
         }
         setupEULA(this);
 
         //always setup the action bar
         setupActionBar();
-
-
-
 
 
     }
@@ -138,9 +132,8 @@ public class OpenFileManagerActivity extends ListActivity implements Alerts.GPLA
         super.onStart();
         LogWrapper.Logi(TAG, "onStart called");
 
-        if(!mAttached)
+        if (!mAttached)
             mSlidingMenu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
-
 
 
         // Show GPL usage license
@@ -194,13 +187,11 @@ public class OpenFileManagerActivity extends ListActivity implements Alerts.GPLA
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         LogWrapper.Logi(TAG, "onConfigurationChanged called");
-       // if (mStubIsInflated && (mInflatedStub.getVisibility() == View.VISIBLE)) {
-       //     handleEmptyListBG();
-       // }
+        // if (mStubIsInflated && (mInflatedStub.getVisibility() == View.VISIBLE)) {
+        //     handleEmptyListBG();
+        // }
 
     }
-
-
 
 
     @Override
@@ -222,7 +213,7 @@ public class OpenFileManagerActivity extends ListActivity implements Alerts.GPLA
             }
             break;
 
-            case R.id.menu_new_content :{
+            case R.id.menu_new_content: {
                 mSingleView.createNewFileorDirectory();
             }
             break;
@@ -298,8 +289,6 @@ public class OpenFileManagerActivity extends ListActivity implements Alerts.GPLA
     }
 
 
-
-
     private void setupSlidingMenu() {
 
         mSlidingMenu = new SlidingMenu(this);
@@ -315,13 +304,12 @@ public class OpenFileManagerActivity extends ListActivity implements Alerts.GPLA
         mSlidingMenu.getSecondaryMenu().setVisibility(View.INVISIBLE);
 
 
-        if (!PreferenceUtils.getHasCompletedLeftNavigationTutorial(this)){
+        if (!PreferenceUtils.getHasCompletedLeftNavigationTutorial(this)) {
 
             mSlidingMenu.toggle();
             // Show sliding menu
             PreferenceUtils.putHasCompletedLeftNavigationTutorial(this, true);
         }
-
 
 
         // mSlidingMenu.setOnClosedListener(this);

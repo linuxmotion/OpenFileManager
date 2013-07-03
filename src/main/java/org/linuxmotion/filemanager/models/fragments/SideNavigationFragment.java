@@ -78,7 +78,7 @@ public class SideNavigationFragment extends Fragment {
             public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
                 LogWrapper.Logv(TAG, "Drawer item clicked");
 
-                if(mGroupCallback == null){
+                if (mGroupCallback == null) {
                     throw new NullPointerException("Class must implement interface GroupClickCallback");
                 }
 
@@ -110,7 +110,7 @@ public class SideNavigationFragment extends Fragment {
 
             @Override
             public boolean onChildClick(ExpandableListView expandableListView, View view, int group, int child, long id) {
-                if(mChildCallback == null)
+                if (mChildCallback == null)
                     throw new NullPointerException("Class must implement interface ChildClickCallback");
 
                 ExpandableDrawerListAdapter adapter = (ExpandableDrawerListAdapter) mDrawerList.getExpandableListAdapter();
@@ -151,47 +151,49 @@ public class SideNavigationFragment extends Fragment {
 
     }
 
-    public void setGroupCallback(GroupClickCallback groupCallback){
+    public void setGroupCallback(GroupClickCallback groupCallback) {
         mGroupCallback = groupCallback;
 
     }
-    public void setChildCallback(ChildClickCallback childCallback){
-        mChildCallback= childCallback;
+
+    public void setChildCallback(ChildClickCallback childCallback) {
+        mChildCallback = childCallback;
 
     }
 
-    public void setOnFavoriteAddedCallback(OnFavoritesCallback callback){
+    public void setOnFavoriteAddedCallback(OnFavoritesCallback callback) {
         mOnFavoriteAdded = callback;
     }
 
-    public interface GroupClickCallback{
+    public interface GroupClickCallback {
         public boolean OnGroupClick(int groupPosition);
     }
 
-    public interface ChildClickCallback{
+    public interface ChildClickCallback {
         public boolean OnChildClick(String childFilePath, int groupPosition, int childInGroup);
     }
 
-    public interface OnFavoritesCallback{
+    public interface OnFavoritesCallback {
 
         public void OnFavoriteAdded(String path);
+
         public void OnFavoriteRemoved(int group, int child);
     }
 
-    public void AddFavorite(ExpandableBaseArrayAdapter.Child child){
+    public void AddFavorite(ExpandableBaseArrayAdapter.Child child) {
 
         //ExpandableDrawerListAdapter.Child child = new ExpandableBaseArrayAdapter.Child(FAVORITE_INDEX, 0, favoritePath, favoritePath);
 
-        ExpandableDrawerListAdapter adapter = (ExpandableDrawerListAdapter)mDrawerList.getExpandableListAdapter();
+        ExpandableDrawerListAdapter adapter = (ExpandableDrawerListAdapter) mDrawerList.getExpandableListAdapter();
 
-        if(!adapter.addChild(ExpandableDrawerListAdapter.FAVORITE_INDEX,child)){
+        if (!adapter.addChild(ExpandableDrawerListAdapter.FAVORITE_INDEX, child)) {
             LogWrapper.Loge(TAG, "The child could not be added the favorites list");
             return;
         }
         adapter.notifyDataSetChanged();
 
 
-        if(mOnFavoriteAdded == null){
+        if (mOnFavoriteAdded == null) {
             throw new NullPointerException("Class must implement OnFavoritesCallback");
         }
         mOnFavoriteAdded.OnFavoriteAdded(child.mPath);
@@ -199,19 +201,17 @@ public class SideNavigationFragment extends Fragment {
     }
 
 
-    private void removeFavorite(int group, int child){
+    private void removeFavorite(int group, int child) {
         //mDrawerList.getAdapter().
-        ExpandableBaseArrayAdapter adapter = (ExpandableBaseArrayAdapter)mDrawerList.getExpandableListAdapter();
+        ExpandableBaseArrayAdapter adapter = (ExpandableBaseArrayAdapter) mDrawerList.getExpandableListAdapter();
         adapter.removeChild(group, child);
         adapter.notifyDataSetChanged();
 
-        if(mOnFavoriteAdded == null){
+        if (mOnFavoriteAdded == null) {
             throw new NullPointerException("Class must implement OnFavoritesCallback");
         }
-        mOnFavoriteAdded.OnFavoriteRemoved(group,child);
+        mOnFavoriteAdded.OnFavoriteRemoved(group, child);
     }
-
-
 
 
 }

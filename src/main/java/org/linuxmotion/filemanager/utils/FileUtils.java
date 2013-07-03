@@ -312,6 +312,7 @@ public class FileUtils {
 
     // TODO: At some pint this should sort the list non-hidden -> hidden -> non-hidden -> hidden
     // the user should then be able to select using a preference
+
     /**
      * Sort into hidden folders then folders. Form there is sorts into hidden files then non hiden
      * files.

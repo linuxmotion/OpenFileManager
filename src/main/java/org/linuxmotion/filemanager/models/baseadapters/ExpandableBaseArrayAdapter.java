@@ -15,7 +15,7 @@ import java.util.ArrayList;
 /**
  * Created by john on 6/26/13.
  */
-public abstract class ExpandableBaseArrayAdapter<T>  implements ExpandableListAdapter {
+public abstract class ExpandableBaseArrayAdapter<T> implements ExpandableListAdapter {
 
     private static boolean DBG = false;// (true || Constants.FULL_DBG);
     private static String TAG = ExpandableBaseArrayAdapter.class.getSimpleName();
@@ -27,13 +27,13 @@ public abstract class ExpandableBaseArrayAdapter<T>  implements ExpandableListAd
     protected WeakReference<Context> mWeakContextReference;
     private final DataSetObservable mDataSetObservable = new DataSetObservable();
 
-    public static class Child{
+    public static class Child {
         public long mGroup;
         public long mChild;
         public String mTitle;
         public String mPath;
 
-        public Child(long group, long child, String title, String path ){
+        public Child(long group, long child, String title, String path) {
             mGroup = group;
             mChild = child;
             mPath = path;
@@ -44,10 +44,8 @@ public abstract class ExpandableBaseArrayAdapter<T>  implements ExpandableListAd
     }
 
 
-
-    public ExpandableBaseArrayAdapter(Context context,  T[] groups, ArrayList<ArrayList<Child>> children ) {
+    public ExpandableBaseArrayAdapter(Context context, T[] groups, ArrayList<ArrayList<Child>> children) {
         mWeakContextReference = new WeakReference<Context>(context);
-
 
 
         mGroupList.clear();
@@ -76,7 +74,6 @@ public abstract class ExpandableBaseArrayAdapter<T>  implements ExpandableListAd
     }
 
 
-
     @Override
     public void onGroupCollapsed(int i) {
 
@@ -86,9 +83,10 @@ public abstract class ExpandableBaseArrayAdapter<T>  implements ExpandableListAd
     public void onGroupExpanded(int i) {
 
     }
+
     @Override
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
-        return  null;
+        return null;
     }
 
     @Override
@@ -118,22 +116,22 @@ public abstract class ExpandableBaseArrayAdapter<T>  implements ExpandableListAd
 
     @Override
     public boolean isEmpty() {
-       return mGroupList.size() == 0 ? false : true;
+        return mGroupList.size() == 0 ? false : true;
 
     }
 
     @Override
     public long getCombinedGroupId(long groupId) {
         //String id = mCombinedID.get(new ID(groupId, -1));
-       // long l = Long.getLong(id);
+        // long l = Long.getLong(id);
 
         return groupId * COMBINED_ID_CONST;
-       // return l;
+        // return l;
     }
 
     @Override
     public long getCombinedChildId(long groupId, long childId) {
-        return groupId * COMBINED_ID_CONST+ childId;
+        return groupId * COMBINED_ID_CONST + childId;
 
     }
 
@@ -157,7 +155,7 @@ public abstract class ExpandableBaseArrayAdapter<T>  implements ExpandableListAd
 
     @Override
     public long getGroupId(int group) {
-        return group * SINGLE_ID_CONST ;
+        return group * SINGLE_ID_CONST;
     }
 
     @Override
@@ -188,10 +186,10 @@ public abstract class ExpandableBaseArrayAdapter<T>  implements ExpandableListAd
     }
 
 
-    public boolean hasChildren(int group){
+    public boolean hasChildren(int group) {
 
-        LogWrapper.Logv(TAG,"Child list for group " + group+ " is size " +mChildList.get(group).size());
-        if(mChildList.get(group).size() > 0)
+        LogWrapper.Logv(TAG, "Child list for group " + group + " is size " + mChildList.get(group).size());
+        if (mChildList.get(group).size() > 0)
             return true;
 
         return false;
@@ -218,7 +216,7 @@ public abstract class ExpandableBaseArrayAdapter<T>  implements ExpandableListAd
         int newSize = mChildList.get(group).size();
         // Rest the child indexes
         // Do i actually need this index?
-        for(int i = 0; i < newSize; i++){
+        for (int i = 0; i < newSize; i++) {
 
             mChildList.get(group).get(i).mChild = i;
 
@@ -227,7 +225,7 @@ public abstract class ExpandableBaseArrayAdapter<T>  implements ExpandableListAd
     }
 
     public void clear() {
-        if (mGroupList!= null) {
+        if (mGroupList != null) {
             mGroupList.clear();
         }
     }
@@ -237,6 +235,7 @@ public abstract class ExpandableBaseArrayAdapter<T>  implements ExpandableListAd
         mGroupList.add(newGroup);
 
     }
+
     /*
         Call down for base implementation
      */
@@ -255,6 +254,7 @@ public abstract class ExpandableBaseArrayAdapter<T>  implements ExpandableListAd
         mGroupList.remove(removeGroup);
 
     }
+
     public void removeGroup(int groupPos) {
         mGroupList.remove(groupPos);
 
@@ -269,11 +269,9 @@ public abstract class ExpandableBaseArrayAdapter<T>  implements ExpandableListAd
     }
 */
 
-    public Context getContext(){
+    public Context getContext() {
         return mWeakContextReference.get();
     }
-
-
 
 
 }

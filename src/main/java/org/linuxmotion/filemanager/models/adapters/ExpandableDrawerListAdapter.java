@@ -24,14 +24,16 @@ public class ExpandableDrawerListAdapter extends ExpandableBaseArrayAdapter<Stri
 
     public static final int ITEM_NEW = 10;
 
-    public ExpandableDrawerListAdapter(Context context, String[] objects){
+    public ExpandableDrawerListAdapter(Context context, String[] objects) {
         super(context, objects, null);
 
     }
-    public ExpandableDrawerListAdapter(Context context, String[] objects,ArrayList<ArrayList<Child>> children){
+
+    public ExpandableDrawerListAdapter(Context context, String[] objects, ArrayList<ArrayList<Child>> children) {
         super(context, objects, children);
 
     }
+
     @Override
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
 
@@ -51,29 +53,23 @@ public class ExpandableDrawerListAdapter extends ExpandableBaseArrayAdapter<Stri
         }
 
 
-        if(hasChildren(groupPosition)){
-            Holder.mThumbnail.setImageResource(R.drawable.ic_drawer);
-        }else{
-            Holder.mThumbnail.setImageResource(R.drawable.ic_thumb_home);
-        }
-
         Holder.mThumbnail.setVisibility(View.VISIBLE);
-        Holder.mName.setText(((String)getGroup(groupPosition)));
+        Holder.mName.setText(((String) getGroup(groupPosition)));
 
-        switch (groupPosition){
-            case HOME_INDEX:{
-
-            }break;
-            case SCDARD_INDEX:{
-
-            }break;
-            case FAVORITE_INDEX:{
-
-
+        switch (groupPosition) {
+            case HOME_INDEX: {
+                Holder.mThumbnail.setImageResource(R.drawable.ic_thumb_home);
+            }
+            break;
+            case SCDARD_INDEX: {
+                Holder.mThumbnail.setImageResource(R.drawable.ic_thumb_home);
+            }
+            break;
+            case FAVORITE_INDEX: {
+                Holder.mThumbnail.setImageResource(R.drawable.ic_drawer_scaled);
             }
             break;
         }
-
 
 
         return convertView;
@@ -86,7 +82,7 @@ public class ExpandableDrawerListAdapter extends ExpandableBaseArrayAdapter<Stri
         DrawerListHolder Holder = new DrawerListHolder();
         if (view == null) {
             LayoutInflater vi = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            view = vi.inflate(R.layout.drawer_list_item,viewGroup, false);
+            view = vi.inflate(R.layout.drawer_list_item, viewGroup, false);
             Holder.mName = (TextView) view.findViewById(R.id.list_drawer_main_name);
             Holder.mThumbnail = (ImageView) view.findViewById(R.id.list_drawer_thumbnail);
             Holder.mThumbnailExtra = (TextView) view.findViewById(R.id.list_drawer_thumbnail_extra);
@@ -98,13 +94,12 @@ public class ExpandableDrawerListAdapter extends ExpandableBaseArrayAdapter<Stri
 
         }
 
-            //Holder.mThumbnail.setImageResource(R.drawable.ic_thumb_home);
+        //Holder.mThumbnail.setImageResource(R.drawable.ic_thumb_home);
 
 
         Holder.mThumbnail.setVisibility(View.INVISIBLE);
-        String txt = ((Child)getChild(group, child)).mTitle;
+        String txt = ((Child) getChild(group, child)).mTitle;
         Holder.mName.setText(txt);
-
 
 
         return view;
@@ -120,7 +115,7 @@ public class ExpandableDrawerListAdapter extends ExpandableBaseArrayAdapter<Stri
 
     }
 
-    private class DrawerListHolder{
+    private class DrawerListHolder {
 
         ImageView mThumbnail;
         TextView mName;

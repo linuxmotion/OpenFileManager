@@ -150,8 +150,8 @@ public class Alerts {
             public void onClick(DialogInterface arg0, int arg1) {
 
                 File[] files = retreiveFiles();
-                if(files != null && files.length > 0){
-                    for (File f : files){
+                if (files != null && files.length > 0) {
+                    for (File f : files) {
 
                         mDELETEDispatcher.onSelectedDelete(f);
                     }
@@ -178,10 +178,11 @@ public class Alerts {
         delete.show();
     }
 
-    public interface FileAlertBoxListener{
+    public interface FileAlertBoxListener {
 
         public void onSelectPositiveButton();
     }
+
     public static void newFileAlertBox(Context context, final String location, final FileAlertBoxListener listener) {
 
 
@@ -193,7 +194,7 @@ public class Alerts {
         final EditText text = (EditText) v.findViewById(R.id.dialog_file_folder_editText);
         final Switch switcher = (Switch) v.findViewById(R.id.switch_file_folder);
 
-        delete.setPositiveButton("Ok", new DialogInterface.OnClickListener(){
+        delete.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
 
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
@@ -201,10 +202,10 @@ public class Alerts {
                 if (text.getText().toString().equals(""))
                     return;
 
-                File newFile = new File(location +"/"+ text.getText().toString());
-                if(switcher.isChecked()){
+                File newFile = new File(location + "/" + text.getText().toString());
+                if (switcher.isChecked()) {
                     newFile.mkdir();
-                }else {
+                } else {
                     try {
                         newFile.createNewFile();
                     } catch (IOException e) {

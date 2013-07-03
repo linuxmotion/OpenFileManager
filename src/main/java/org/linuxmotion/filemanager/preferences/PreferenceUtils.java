@@ -32,10 +32,10 @@ public class PreferenceUtils {
         edit.commit();
 
     }
-	    
+
 	    
 	   /*
-	    * 
+        *
 	    * File and folder sorting preferences
 	    * 
 	    */
@@ -116,7 +116,9 @@ public class PreferenceUtils {
     }
 
 
-    /************************/
+    /**
+     * ********************
+     */
 
     public static boolean getHasCompletedLeftNavigationTutorial(Context context) {
         SharedPreferences prefs = context.getSharedPreferences(Constants.OPEN_FILE_MANAGER_PREFERENCES, 0);

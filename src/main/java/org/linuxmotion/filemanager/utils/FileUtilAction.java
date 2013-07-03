@@ -14,13 +14,13 @@ public class FileUtilAction {
 
     private ArrayList<File> mHeldArrayFile = new ArrayList<File>();
 
-    public boolean setHeldFiles(File[] toCut){
+    public boolean setHeldFiles(File[] toCut) {
 
 
         //Check to see if there are files
         // to cut, if there are non
         // clear the files, and exit
-        if(toCut == null){
+        if (toCut == null) {
             // clear the olf files
             mHeldArrayFile.clear();
             return false;
@@ -37,16 +37,18 @@ public class FileUtilAction {
 
 
     }
-    public boolean appendToHeldFiles(File[] toCut){
 
-        for (File f : toCut){
+    public boolean appendToHeldFiles(File[] toCut) {
+
+        for (File f : toCut) {
             mHeldArrayFile.add(f);
         }
         return true;
 
 
     }
-    public File[] getHeldFiles(){
+
+    public File[] getHeldFiles() {
         File[] files = new File[mHeldArrayFile.size()];
         for (int i = 0; i < mHeldArrayFile.size(); i++)
             files[i] = mHeldArrayFile.get(i);
@@ -54,22 +56,21 @@ public class FileUtilAction {
     }
 
 
-    public static boolean cutPasteHeldFiles(File[] toCut, File location){
+    public static boolean cutPasteHeldFiles(File[] toCut, File location) {
 
         boolean success = false;
         if (toCut == null || toCut.length == 0)
-            return  false;
+            return false;
 
         LogWrapper.Logv(TAG, "Cutting " + toCut.length + " files to location " + location);
-        for(File f : toCut){
-            File tmp = new File(location +"/" + f.getName());
-            LogWrapper.Logv(TAG, "New file = "+ tmp);
-            if(f.renameTo(tmp)){
+        for (File f : toCut) {
+            File tmp = new File(location + "/" + f.getName());
+            LogWrapper.Logv(TAG, "New file = " + tmp);
+            if (f.renameTo(tmp)) {
                 //f.delete();
                 LogWrapper.Logd(TAG, "Successfully pasted file to" + tmp);
                 success = true;
-            }
-            else {
+            } else {
                 LogWrapper.Logd(TAG, "Unsuccessfully pasted file to" + tmp);
 
             }
@@ -81,7 +82,7 @@ public class FileUtilAction {
 
     }
 
-    public boolean shareFiles(File[] toShare){
+    public boolean shareFiles(File[] toShare) {
 
 
         return false;
@@ -89,17 +90,17 @@ public class FileUtilAction {
 
     }
 
-    public boolean renameFiles(File[] toRename, String fileName){
+    public boolean renameFiles(File[] toRename, String fileName) {
 
         int i = 0;
         boolean success = false;
 
-        if(toRename.length == 1){
+        if (toRename.length == 1) {
             File tmp = new File(toRename[0].getPath() + fileName);
             success = toRename[0].renameTo(tmp);
         }
 
-        for (File f : toRename){
+        for (File f : toRename) {
 
             File tmp = new File(f.getPath() + fileName + 0);
             success = f.renameTo(tmp);
@@ -109,8 +110,6 @@ public class FileUtilAction {
 
 
     }
-
-
 
 
 }

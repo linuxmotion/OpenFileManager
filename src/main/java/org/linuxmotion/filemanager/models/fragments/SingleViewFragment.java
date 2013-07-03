@@ -24,24 +24,19 @@ import android.view.ViewGroup;
 import android.view.ViewStub;
 import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
-import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
-
 import org.linuxmotion.asyncloaders.LogWrapper;
 import org.linuxmotion.filemanager.R;
 import org.linuxmotion.filemanager.models.MenuAction;
 import org.linuxmotion.filemanager.models.adapters.ExpandableDrawerListAdapter;
 import org.linuxmotion.filemanager.models.adapters.FileArrayAdapter;
-import org.linuxmotion.filemanager.models.adapters.ImageArrayAdapter;
 import org.linuxmotion.filemanager.models.baseadapters.ExpandableBaseArrayAdapter;
 import org.linuxmotion.filemanager.openFileManagerBroadcastReceiver;
-import org.linuxmotion.filemanager.preferences.ApplicationSettings;
 import org.linuxmotion.filemanager.preferences.PreferenceUtils;
 import org.linuxmotion.filemanager.utils.Alerts;
 import org.linuxmotion.filemanager.utils.Constants;
@@ -65,7 +60,6 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
 
     private ListView mList;
     private LinearLayout mContentLayout;
-
 
 
     private String mCurrentPath;
@@ -198,9 +192,8 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
         LogWrapper.Logv(TAG, "Back button pressed");
 
 
-            // navigate up
-            sendBroadcast(prepareBroadcast(null, Constants.UPDATE_INTENT, new MenuAction(MenuAction.ACTION_UP)));
-
+        // navigate up
+        sendBroadcast(prepareBroadcast(null, Constants.UPDATE_INTENT, new MenuAction(MenuAction.ACTION_UP)));
 
 
     }
@@ -214,12 +207,10 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
     }
 
 
-
-
     public void createNewFileorDirectory() {
 
 
-        Alerts.newFileAlertBox(getActivity(), mCurrentPath, new Alerts.FileAlertBoxListener(){
+        Alerts.newFileAlertBox(getActivity(), mCurrentPath, new Alerts.FileAlertBoxListener() {
             @Override
             public void onSelectPositiveButton() {
                 updateAdapter(mCurrentPath);
@@ -237,11 +228,11 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
 
     }
 
-    public void pasteSelectionCanceled(){
+    public void pasteSelectionCanceled() {
         mFileAction.setHeldFiles(null);
     }
 
-    public void pasteCutItems(){
+    public void pasteCutItems() {
 
         mFileAction.cutPasteHeldFiles(mFileAction.getHeldFiles(), new File(mCurrentPath));
         mFileAction.setHeldFiles(null);
@@ -523,23 +514,24 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
         mDeleteAlert.setDeleteDispatcher(this);
     }
 
-    
 
-    public interface OnMenuCutInterface{
+    public interface OnMenuCutInterface {
         public void OnCutCallback(File[] files);
+
         public void OnFirstTimeCallback();
     }
 
-    public void setOnMenuCutInterface(OnMenuCutInterface listener){
+    public void setOnMenuCutInterface(OnMenuCutInterface listener) {
         mOnMenuCutInterface = listener;
     }
 
 
-    public interface OnMenuFavoriteInterface{
+    public interface OnMenuFavoriteInterface {
         public void OnMenuFavoriteCallback(ExpandableBaseArrayAdapter.Child child);
 
     }
-    public void setOnMenuFavoriteInterface(OnMenuFavoriteInterface listener){
+
+    public void setOnMenuFavoriteInterface(OnMenuFavoriteInterface listener) {
         mOnMenuFavoriteInterface = listener;
     }
 
@@ -611,23 +603,21 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
                             File[] files = getCheckedFiles();
                             // See if there are files held from a prevois
                             // cut operation that was not finished
-                            if (mFileAction.getHeldFiles().length > 0){
+                            if (mFileAction.getHeldFiles().length > 0) {
                                 // if it has not been finished, add to the
                                 // cut selection
                                 mFileAction.appendToHeldFiles(files);
-                            }else{
+                            } else {
                                 mFileAction.setHeldFiles(files);
                             }
-
 
 
                             mOnMenuCutInterface.OnCutCallback(files);
 
 
-
                             mode.finish(); // Action picked, so close the CAB
 
-                            if(!PreferenceUtils.getHasCompletedRightCutPasteTutorial(getActivity())){
+                            if (!PreferenceUtils.getHasCompletedRightCutPasteTutorial(getActivity())) {
                                 // set showcase view to highlight the menu
                                 mOnMenuCutInterface.OnFirstTimeCallback();
                                 PreferenceUtils.putHasCompletedRightCutPasteTutorial(getActivity(), true);
@@ -645,7 +635,8 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
                             //mFileAction.renameFiles(getCheckedFiles(), "BatchRename");
 
 
-                        }return true;
+                        }
+                        return true;
                         case R.id.menu_open_as: {
                             // need to show an alert dialog
                             // to manully set the type
@@ -656,16 +647,16 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
                             // PICTURE
 
 
-                        }return  true;
+                        }
+                        return true;
                         case R.id.menu_favorite: {
-
 
 
                             File[] files = getCheckedFiles();
 
-                            for( int i = 0; i < files.length; i++){
+                            for (int i = 0; i < files.length; i++) {
                                 ExpandableBaseArrayAdapter.Child child = new ExpandableBaseArrayAdapter.Child(ExpandableDrawerListAdapter.
-                                        FAVORITE_INDEX,ExpandableDrawerListAdapter.ITEM_NEW,
+                                        FAVORITE_INDEX, ExpandableDrawerListAdapter.ITEM_NEW,
                                         files[i].getName(),
                                         files[i].toString());
 
@@ -758,7 +749,7 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
     }
 
 
-   public void selectDrawerItem(int position) {
+    public void selectDrawerItem(int position) {
 
         LogWrapper.Logv(TAG, "Selecting drawer position" + position);
         switch (position) {
@@ -787,7 +778,6 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
     }
 
 
-
     public static Intent prepareBroadcast(String f, String type, MenuAction action) {
 
         Intent intent = new Intent(Constants.RESOURCE_VIEW_INTENT);
@@ -808,7 +798,7 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
     }
 
 
-   public void performClick(File f) {
+    public void performClick(File f) {
 
         if (f.isDirectory()) {
 
