@@ -376,6 +376,17 @@ public class FileUtils {
 
     }
 
+    /*
+     * Get the extension of a file.
+     */
+    public static String getExtension(File f) {
+
+        String s = f.getName();
+        int i = s.lastIndexOf('.');
+         return s.substring(i + 1).toLowerCase();
+
+    }
+
     private static void dump(File[] f) {
 
         for (int i = 0; i < f.length - 1; i++)

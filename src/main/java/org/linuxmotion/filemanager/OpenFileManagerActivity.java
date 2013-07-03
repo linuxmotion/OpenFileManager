@@ -45,7 +45,10 @@ import org.linuxmotion.filemanager.utils.Constants;
 import java.io.File;
 
 
-public class OpenFileManagerActivity extends ListActivity implements Alerts.GPLAlertClickDispatcher, SingleViewFragment.OnMenuCutInterface, CutPasteFragment.onPasteListener, SideNavigationFragment.GroupClickCallback, SideNavigationFragment.ChildClickCallback, SideNavigationFragment.OnFavoritesCallback, SingleViewFragment.OnMenuFavoriteInterface {
+public class OpenFileManagerActivity extends ListActivity implements Alerts.GPLAlertClickDispatcher,
+        SingleViewFragment.ContextualActionBarMenu, CutPasteFragment.onPasteListener,
+        SideNavigationFragment.GroupClickCallback, SideNavigationFragment.ChildClickCallback,
+        SideNavigationFragment.OnFavoritesCallback  {
 
     private static final String TAG = OpenFileManagerActivity.class.getSimpleName();
     private static final boolean DEBUG = (true || Constants.FULL_DBG);
@@ -83,8 +86,7 @@ public class OpenFileManagerActivity extends ListActivity implements Alerts.GPLA
                 ft.replace(android.R.id.content, mSingleView);
                 ft.commit();
 
-                mSingleView.setOnMenuCutInterface(this);
-                mSingleView.setOnMenuFavoriteInterface(this);
+                mSingleView.setContextualActionBarMenuInterface(this);
 
             }
 
@@ -174,7 +176,8 @@ public class OpenFileManagerActivity extends ListActivity implements Alerts.GPLA
                 launchSettingMenu();
                 break;
             case R.id.menu_left: {
-                sendBroadcast(SingleViewFragment.prepareBroadcast(null, Constants.UPDATE_INTENT, new MenuAction(MenuAction.ACTION_BACK)));
+                sendBroadcast(SingleViewFragment.prepareBroadcast(null, Constants.UPDATE_INTENT,
+                        new MenuAction(MenuAction.ACTION_BACK)));
             }
             break;
 
@@ -183,7 +186,8 @@ public class OpenFileManagerActivity extends ListActivity implements Alerts.GPLA
             }
             break;
             case R.id.menu_forward: {
-                sendBroadcast(SingleViewFragment.prepareBroadcast(null, Constants.UPDATE_INTENT, new MenuAction(MenuAction.ACTION_FORWARD)));
+                sendBroadcast(SingleViewFragment.prepareBroadcast(null, Constants.UPDATE_INTENT,
+                        new MenuAction(MenuAction.ACTION_FORWARD)));
             }
             break;
 
@@ -283,9 +287,11 @@ public class OpenFileManagerActivity extends ListActivity implements Alerts.GPLA
 
 
     private void setupFragments() {
-        mCutPasteFragment = (CutPasteFragment) getFragmentManager().findFragmentById(R.id.fragment_cut_paste);
+        mCutPasteFragment =
+                (CutPasteFragment) getFragmentManager().findFragmentById(R.id.fragment_cut_paste);
         mCutPasteFragment.setPasteListener(this);
-        mSideNavigationFragment = (SideNavigationFragment) getFragmentManager().findFragmentById(R.id.fragment_side_navigation);
+        mSideNavigationFragment = (SideNavigationFragment)
+                getFragmentManager().findFragmentById(R.id.fragment_side_navigation);
         mSideNavigationFragment.setChildCallback(this);
         mSideNavigationFragment.setGroupCallback(this);
         mSideNavigationFragment.setOnFavoriteAddedCallback(this);
@@ -317,7 +323,7 @@ public class OpenFileManagerActivity extends ListActivity implements Alerts.GPLA
     }
 
     @Override
-    public void OnFirstTimeCallback() {
+    public void OnFirstTimeCutCallback() {
         if (mDualPane) {
 
             return;

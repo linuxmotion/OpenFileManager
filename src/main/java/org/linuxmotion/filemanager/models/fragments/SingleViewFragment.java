@@ -28,6 +28,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.ShareActionProvider;
 import android.widget.Toast;
 
 import org.linuxmotion.asyncloaders.LogWrapper;
@@ -69,6 +70,7 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
     private boolean mAboutToExit = false;
     private boolean mStubIsInflated = false;
     private static openFileManagerBroadcastReceiver sReceiver;
+    private ShareActionProvider mShareActionProvider;
 
 
     private Alerts mDeleteAlert;
@@ -97,8 +99,7 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
         }
 
     };
-    private OnMenuFavoriteInterface mOnMenuFavoriteInterface;
-    private OnMenuCutInterface mOnMenuCutInterface;
+    private ContextualActionBarMenu mContextualActionBarMenu;
 
 
     @Override
@@ -515,26 +516,19 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
     }
 
 
-    public interface OnMenuCutInterface {
+
+
+
+    public void setContextualActionBarMenuInterface(ContextualActionBarMenu listener) {
+        mContextualActionBarMenu = listener;
+    }
+
+    public interface ContextualActionBarMenu{
         public void OnCutCallback(File[] files);
-
-        public void OnFirstTimeCallback();
-    }
-
-    public void setOnMenuCutInterface(OnMenuCutInterface listener) {
-        mOnMenuCutInterface = listener;
-    }
-
-
-    public interface OnMenuFavoriteInterface {
+        public void OnFirstTimeCutCallback();
         public void OnMenuFavoriteCallback(ExpandableBaseArrayAdapter.Child child);
 
     }
-
-    public void setOnMenuFavoriteInterface(OnMenuFavoriteInterface listener) {
-        mOnMenuFavoriteInterface = listener;
-    }
-
     private void setupMainListView() {
         ListAdapter adapter = createAdapter(mCurrentPath);
 
@@ -560,6 +554,7 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
             mList.setMultiChoiceModeListener(new ListView.MultiChoiceModeListener() {
 
                 Boolean mMultiSelected = false;
+
 
                 @Override
                 public void onItemCheckedStateChanged(ActionMode mode, int position,
@@ -612,21 +607,53 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
                             }
 
 
-                            mOnMenuCutInterface.OnCutCallback(files);
+                            mContextualActionBarMenu.OnCutCallback(files);
 
 
                             mode.finish(); // Action picked, so close the CAB
 
                             if (!PreferenceUtils.getHasCompletedRightCutPasteTutorial(getActivity())) {
                                 // set showcase view to highlight the menu
-                                mOnMenuCutInterface.OnFirstTimeCallback();
+                                mContextualActionBarMenu.OnFirstTimeCutCallback();
                                 PreferenceUtils.putHasCompletedRightCutPasteTutorial(getActivity(), true);
 
                             }
                         }
                         return true;
                         case R.id.menu_share: {
+                            LogWrapper.Logi(TAG, "Action item SHARE selected");
+                            Intent shareIntent;
+                            ArrayList<Uri> files = new ArrayList<Uri>();
+                            File[] checkedFiles = getCheckedFiles();
 
+                            if(checkedFiles.length == 1){
+                                shareIntent = new Intent(Intent.ACTION_SEND);
+                                for(File f : checkedFiles)
+                                    shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(f));
+
+                            }else {
+                                shareIntent = new Intent(Intent.ACTION_SEND_MULTIPLE);
+                                if(!determineDataType(shareIntent, checkedFiles)){
+                                    LogWrapper.Logd(TAG, "Thee were mulitple data types in the list");
+                                    return true;
+                                }
+
+                                for(File f : checkedFiles){
+
+                                    files.add(Uri.fromFile(f));
+                                }
+
+                                shareIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, files);
+                            }
+
+
+
+                                if (mShareActionProvider != null) {
+                                    mShareActionProvider.setShareIntent(shareIntent);
+                                }
+
+                            //mShareActionProvider
+                            mShareActionProvider.onPerformDefaultAction();
 
                         }
                         return true;
@@ -661,7 +688,7 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
                                         files[i].toString());
 
 
-                                mOnMenuFavoriteInterface.OnMenuFavoriteCallback(child);
+                                mContextualActionBarMenu.OnMenuFavoriteCallback(child);
                                 //mSideNavigationFragment.AddFavorite(child);
                             }
 
@@ -681,6 +708,8 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
                     // Inflate the menu for the CAB
                     MenuInflater inflater = mode.getMenuInflater();
                     inflater.inflate(R.menu.menu_context_actions, menu);
+                    MenuItem item = menu.findItem(R.id.menu_share);
+                    mShareActionProvider = (ShareActionProvider) item.getActionProvider();
                     mActionMode = mode;
                     return true;
                 }
@@ -698,9 +727,20 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
                     menu.clear();
                     MenuInflater inflater = mActionMode.getMenuInflater();
                     if (mMultiSelected) {
-                        inflater.inflate(R.menu.menu_context_actions_multiple_items, menu);
+
+
+                        if(determineDataType(
+                                new Intent(), getCheckedFiles())){
+                            inflater.inflate(R.menu.menu_context_actions_multiple_items_share, menu);
+
+                        }else {
+                            inflater.inflate(R.menu.menu_context_actions_multiple_items, menu);
+                        }
+
+
                     } else {
                         inflater.inflate(R.menu.menu_context_actions, menu);
+
 
                     }
                     // Here you can perform updates to the CAB due to
@@ -711,6 +751,26 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
         }
 
 
+    }
+
+    private boolean determineDataType(Intent shareIntent, File[] checkedFiles) {
+
+
+        for(File f : checkedFiles){
+            String ext = FileUtils.getExtension(f);
+            LogWrapper.Logv(TAG, "Found ext "+ ext);
+            String type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(ext);
+            LogWrapper.Logv(TAG, "Found type "+ type);
+            if ((shareIntent.getType() == null))
+                shareIntent.setType(type);
+            else if( shareIntent.getType().equals(type)){
+                shareIntent.setType(type);
+            }
+            else
+                return false; // there were two different type in the checked fiels
+
+        }
+        return true;
     }
 
     private void deleteSelectedItems() {

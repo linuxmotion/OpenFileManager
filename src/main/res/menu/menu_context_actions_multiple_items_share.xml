@@ -5,7 +5,12 @@
             android:title="@string/menu_cut"
             android:icon="@drawable/ic_menu_content_cut"
             android:showAsAction="always"/>
-
+    <item
+            android:id="@+id/menu_share"
+            android:title="@string/share"
+            android:icon="@drawable/ic_menu_social_share"
+            android:actionProviderClass="android.widget.ShareActionProvider"
+            android:showAsAction="never"/>
     <item
             android:id="@+id/menu_rename"
             android:title="@string/menu_rename"
