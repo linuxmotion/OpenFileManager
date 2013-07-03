@@ -65,8 +65,8 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
 
     private ListView mList;
     private LinearLayout mContentLayout;
-    private ExpandableListView mDrawerList;
     private CutPasteFragment mCutPasteFragment;
+    private SideNavigationFragment mSideNavigationFragment;
     private String mCurrentPath;
     private Vector<String> mLastPath;
     private int mCurrentLocation = 0;
@@ -102,6 +102,7 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
 
     };
 
+
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -133,8 +134,7 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
         setupMainListView();
         setupActionBar();
         setupSlidingMenu();
-        setupDrawerListView();
-
+        setupFragments();
 
     }
 
@@ -757,7 +757,7 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
         //mSlidingMenu.setShadowWidthRes(R.dimen.shadow_width);
         //mSlidingMenu.setShadowDrawable(R.drawable.shadow);
         mSlidingMenu.setBehindWidthRes(R.dimen.slidingmenu_offset);
-        mSlidingMenu.setMenu(R.layout.layout_listview);
+        mSlidingMenu.setMenu(R.layout.layout_side_navigation);
         mSlidingMenu.setFadeDegree(0.35f);
         mSlidingMenu.attachToActivity(this.getActivity(), SlidingMenu.SLIDING_CONTENT);
         // Set the menu but don't activate it
@@ -772,6 +772,13 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
             PreferenceUtils.putHasCompletedLeftNavigationTutorial(getActivity(), true);
         }
 
+
+
+        // mSlidingMenu.setOnClosedListener(this);
+        // mSlidingMenu.setOnOpenedListener(this);
+    }
+
+    private void setupFragments() {
         mCutPasteFragment = (CutPasteFragment) getFragmentManager().findFragmentById(R.id.fragment_cut_paste);
         mCutPasteFragment.setPasteListener(new CutPasteFragment.onPasteListener() {
             @Override
@@ -798,85 +805,23 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
 
         });
 
-
-        // mSlidingMenu.setOnClosedListener(this);
-        // mSlidingMenu.setOnOpenedListener(this);
-    }
-
-
-    private void setupDrawerListView() {
-
-
-        String[] groups = {"Home", "SdCard", "Favorites"};
-        String[][] children = {{}, {}, {"Fav 1", "Fav 2"}};
-        mDrawerList = (ExpandableListView) mSlidingMenu.findViewById(R.id.left_drawer);
-
-        ArrayList<ArrayList<ExpandableBaseArrayAdapter.Child>> childrenList = new ArrayList<ArrayList<ExpandableBaseArrayAdapter.Child>>();
-
-        for (int i = 0; i < groups.length; i++) {
-
-            // Fill the group array
-            childrenList.add(new ArrayList<ExpandableBaseArrayAdapter.Child>());
-            for (int j = 0; j < children[i].length; j++) {
-                // fill the children for the specifed groups
-                childrenList.get(i).add(new ExpandableBaseArrayAdapter.Child(i, j, children[i][j], "/sdcard"));
-            }
-
-        }
-
-
-        mDrawerList.setAdapter(new ExpandableDrawerListAdapter(getActivity(), groups, childrenList));
-
-        // mDrawerList.setAdapter(new DrawerListAdapter(this.getActivity(), s));
-        //mDrawerList.setOnChildClickListener();
-        mDrawerList.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
-
-
+        mSideNavigationFragment = (SideNavigationFragment) getFragmentManager().findFragmentById(R.id.fragment_side_navigation);
+        mSideNavigationFragment.setChildCallback(new SideNavigationFragment.ChildClickCallback() {
             @Override
-            public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
-                LogWrapper.Logv(TAG, "Drawer item clicked");
-
-
-                ExpandableDrawerListAdapter adapter = (ExpandableDrawerListAdapter) mDrawerList.getExpandableListAdapter();
-
-                if (adapter.hasChildren(groupPosition)) {
-                    if (mDrawerList.isGroupExpanded(groupPosition)) {
-                        mDrawerList.collapseGroup(groupPosition);
-
-                    } else {
-
-                        mDrawerList.expandGroup(groupPosition);
-                    }
-
-
-                } else {
-                    selectDrawerItem(groupPosition);
-                    mSlidingMenu.showContent();
-                }
-
-                return true;
-            }
-
-        });
-
-        mDrawerList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
-
-
-            @Override
-            public boolean onChildClick(ExpandableListView expandableListView, View view, int group, int child, long id) {
-
-
-                ExpandableDrawerListAdapter adapter = (ExpandableDrawerListAdapter) mDrawerList.getExpandableListAdapter();
-                String childPath = ((ExpandableDrawerListAdapter.Child) adapter.getChild(group, child)).mPath;
-                performClick(new File(childPath));
+            public boolean OnChildClick(String childFilePath, int groupPosition, int childInGroup) {
+                performClick(new File(childFilePath));
                 mSlidingMenu.showContent();
-
                 return true;
             }
-
-
         });
-
+        mSideNavigationFragment.setGroupCallback(new SideNavigationFragment.GroupClickCallback() {
+            @Override
+            public boolean OnGroupClick(int groupPosition) {
+                selectDrawerItem(groupPosition);
+                mSlidingMenu.showContent();
+                return true;
+            }
+        });
 
     }
 

@@ -32,18 +32,6 @@ public abstract class ExpandableBaseArrayAdapter<T>  implements ExpandableListAd
     protected WeakReference<Context> mWeakContextReference;
     protected DataSetObserver mDataSetObserver;
 
-
-    class ID{
-
-        public long mGroup;
-        public long mChild;
-        ID(long group, long child ){
-            mGroup = group;
-            mChild = child;
-        }
-
-    }
-
     public static class Child{
         public long mGroup;
         public long mChild;
@@ -208,14 +196,26 @@ public abstract class ExpandableBaseArrayAdapter<T>  implements ExpandableListAd
         mGroupList.remove(group);
 
     }
+    */
+
     public void removeChild(int group, Object child) {
         //super.remove(object);
         mChildList.get(group).remove(child);
 
     }
+
+
     public void removeChild(int group, int child) {
         //super.remove(object);
         mChildList.get(group).remove(child);
+        int newSize = mChildList.get(group).size();
+        // Rest the child indexes
+        // Do i actually need this index?
+        for(int i = 0; i < newSize; i++){
+
+            mChildList.get(group).get(i).mChild = i;
+
+        }
 
     }
 
@@ -226,12 +226,28 @@ public abstract class ExpandableBaseArrayAdapter<T>  implements ExpandableListAd
         }
     }
 
-    //@Override
-    public void add(T item) {
-        mGroupList.add(item);
+
+    public void addGroup(T newGroup) {
+        mGroupList.add(newGroup);
+
+    }
+    public void addChild(int group, Child newChild) {
+        //mChildList.get(group).size()
+        newChild.mChild = mChildList.get(group).size();
+        mChildList.get(group).add(newChild);
 
     }
 
+    public void removeGroup(T removeGroup) {
+        mGroupList.remove(removeGroup);
+
+    }
+    public void removeGroup(int groupPos) {
+        mGroupList.remove(groupPos);
+
+    }
+
+    /*
     //@Override
     public long getItemId(int pos) {
 
