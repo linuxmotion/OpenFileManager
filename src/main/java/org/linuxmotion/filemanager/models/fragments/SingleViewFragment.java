@@ -67,6 +67,9 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
     private LinearLayout mContentLayout;
     private CutPasteFragment mCutPasteFragment;
     private SideNavigationFragment mSideNavigationFragment;
+
+
+
     private String mCurrentPath;
     private Vector<String> mLastPath;
     private int mCurrentLocation = 0;
@@ -196,7 +199,7 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
 
         // Check to see if the drawer is open
         if (mSlidingMenu.isMenuShowing()) {
-            // if it was we need to close it
+            // if a menu is open it need to closed.
             mSlidingMenu.showContent();
         } else {
             // If it was closed though we should
@@ -657,7 +660,7 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
                             //mFileAction.renameFiles(getCheckedFiles(), "BatchRename");
 
 
-                        }
+                        }return true;
                         case R.id.menu_open_as: {
                             // need to show an alert dialog
                             // to manully set the type
@@ -666,6 +669,20 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
                             // TEXT
                             // VIDEO
                             // PICTURE
+
+
+                        }return  true;
+                        case R.id.menu_favorite: {
+                            File[] files = getCheckedFiles();
+
+                            for( int i = 0; i < files.length; i++){
+                                ExpandableBaseArrayAdapter.Child child = new ExpandableBaseArrayAdapter.Child(ExpandableDrawerListAdapter.
+                                        FAVORITE_INDEX,ExpandableDrawerListAdapter.ITEM_NEW,
+                                        files[i].getName(),
+                                        files[i].toString());
+
+                                mSideNavigationFragment.AddFavorite(child);
+                            }
 
 
                         }
@@ -794,6 +811,7 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
 
             }
 
+
             @Override
             public void onCancelPaste() {
                 mFileAction.setHeldFiles(null);
@@ -804,6 +822,7 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
             }
 
         });
+
 
         mSideNavigationFragment = (SideNavigationFragment) getFragmentManager().findFragmentById(R.id.fragment_side_navigation);
         mSideNavigationFragment.setChildCallback(new SideNavigationFragment.ChildClickCallback() {
@@ -820,6 +839,18 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
                 selectDrawerItem(groupPosition);
                 mSlidingMenu.showContent();
                 return true;
+            }
+        });
+
+        mSideNavigationFragment.setOnFavoriteAddedCallback(new SideNavigationFragment.OnFavoritesCallback() {
+            @Override
+            public void OnFavoriteAdded(String path) {
+
+            }
+
+            @Override
+            public void OnFavoriteRemoved(int group, int child) {
+
             }
         });
 
@@ -962,6 +993,10 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
         }
 
 
+    }
+
+    public String getCurrentPath() {
+        return mCurrentPath;
     }
 
 }

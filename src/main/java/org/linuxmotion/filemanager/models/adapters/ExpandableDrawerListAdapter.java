@@ -17,8 +17,12 @@ import java.util.ArrayList;
  * Created by john on 6/21/13.
  */
 public class ExpandableDrawerListAdapter extends ExpandableBaseArrayAdapter<String> {
+    public static final int HOME_INDEX = 0;
+    public static final int SCDARD_INDEX = 1;
+    public static final int FAVORITE_INDEX = 2;
 
 
+    public static final int ITEM_NEW = 10;
 
     public ExpandableDrawerListAdapter(Context context, String[] objects){
         super(context, objects, null);
@@ -56,6 +60,19 @@ public class ExpandableDrawerListAdapter extends ExpandableBaseArrayAdapter<Stri
         Holder.mThumbnail.setVisibility(View.VISIBLE);
         Holder.mName.setText(((String)getGroup(groupPosition)));
 
+        switch (groupPosition){
+            case HOME_INDEX:{
+
+            }break;
+            case SCDARD_INDEX:{
+
+            }break;
+            case FAVORITE_INDEX:{
+
+
+            }
+            break;
+        }
 
 
 
@@ -93,6 +110,15 @@ public class ExpandableDrawerListAdapter extends ExpandableBaseArrayAdapter<Stri
         return view;
     }
 
+    @Override
+    public boolean addChild(int group, Child newChild) {
+        if (group != newChild.mGroup)
+            return false;
+
+        return super.addChild(group, newChild);
+
+
+    }
 
     private class DrawerListHolder{
 

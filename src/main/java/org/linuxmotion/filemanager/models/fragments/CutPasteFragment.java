@@ -76,7 +76,7 @@ public class CutPasteFragment extends Fragment {
     private void cancelPasteSelection() {
 
         if (mPasteListener == null)
-            throw new RuntimeException("Class must implement PasteListener()");
+            throw new NullPointerException("Class must implement PasteListener()");
 
         LogWrapper.Logv(TAG, "canceling selected paste operation");
         mPasteListener.onCancelPaste();
@@ -84,8 +84,9 @@ public class CutPasteFragment extends Fragment {
 
     private void pasteSelection() {
         if (mPasteListener == null)
-            throw new RuntimeException("Class must implement PasteListener()");
+            throw new NullPointerException("Class must implement PasteListener()");
         ImageArrayAdapter adapter = ((ImageArrayAdapter) mGridView.getAdapter());
+
         File[] files = new File[adapter.getCount()];//
         for (int i = 0; i < adapter.getCount(); i++) {
             files[i] = adapter.getItem(i);

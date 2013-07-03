@@ -28,5 +28,10 @@
             android:title="@string/delete"
             android:icon="@drawable/ic_menu_content_discard"
             android:showAsAction="always"/>
+    <item
+            android:id="@+id/menu_favorite"
+            android:title="@string/menu_favorite"
+            android:icon="@drawable/ic_menu_rating_not_important"
+            android:showAsAction="ifRoom"/>
 
 </menu>

@@ -1,21 +1,16 @@
 package org.linuxmotion.filemanager.models.baseadapters;
 
 import android.content.Context;
+import android.database.DataSetObservable;
 import android.database.DataSetObserver;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ExpandableListAdapter;
 
-import org.linuxmotion.asyncloaders.AeSimpleSHA1;
 import org.linuxmotion.asyncloaders.LogWrapper;
 
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  * Created by john on 6/26/13.
@@ -30,13 +25,14 @@ public abstract class ExpandableBaseArrayAdapter<T>  implements ExpandableListAd
     protected ArrayList<T> mGroupList = new ArrayList<T>();
     protected ArrayList<ArrayList<Child>> mChildList = new ArrayList<ArrayList<Child>>();
     protected WeakReference<Context> mWeakContextReference;
-    protected DataSetObserver mDataSetObserver;
+    private final DataSetObservable mDataSetObservable = new DataSetObservable();
 
     public static class Child{
         public long mGroup;
         public long mChild;
         public String mTitle;
         public String mPath;
+
         public Child(long group, long child, String title, String path ){
             mGroup = group;
             mChild = child;
@@ -172,12 +168,23 @@ public abstract class ExpandableBaseArrayAdapter<T>  implements ExpandableListAd
 
     @Override
     public void unregisterDataSetObserver(DataSetObserver dataSetObserver) {
-        mDataSetObserver = null;
+        mDataSetObservable.unregisterObserver(dataSetObserver);
     }
 
     @Override
     public void registerDataSetObserver(DataSetObserver dataSetObserver) {
-        mDataSetObserver = dataSetObserver;
+
+        mDataSetObservable.registerObserver(dataSetObserver);
+    }
+
+
+    public void notifyDataSetInvalidated() {
+        mDataSetObservable.notifyInvalidated();
+
+    }
+
+    public void notifyDataSetChanged() {
+        mDataSetObservable.notifyChanged();
     }
 
 
@@ -220,7 +227,6 @@ public abstract class ExpandableBaseArrayAdapter<T>  implements ExpandableListAd
     }
 
     public void clear() {
-        //super.clear();
         if (mGroupList!= null) {
             mGroupList.clear();
         }
@@ -231,10 +237,17 @@ public abstract class ExpandableBaseArrayAdapter<T>  implements ExpandableListAd
         mGroupList.add(newGroup);
 
     }
-    public void addChild(int group, Child newChild) {
-        //mChildList.get(group).size()
+    /*
+        Call down for base implementation
+     */
+    public boolean addChild(int group, Child newChild) {
+
+        // in the future might want be able to
+        /// directly exchange a favorite for a another
         newChild.mChild = mChildList.get(group).size();
+
         mChildList.get(group).add(newChild);
+        return true;
 
     }
 

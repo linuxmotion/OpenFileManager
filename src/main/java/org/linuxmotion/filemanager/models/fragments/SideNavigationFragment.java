@@ -26,8 +26,9 @@ public class SideNavigationFragment extends Fragment {
     private ExpandableListView mDrawerList;
     private GroupClickCallback mGroupCallback;
     private ChildClickCallback mChildCallback;
-    private static final int FAVORITE_INDEX = 2;
-    private FavoritesCallback mOnFavoriteAdded;
+
+    private OnFavoritesCallback mOnFavoriteAdded = null;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -77,8 +78,9 @@ public class SideNavigationFragment extends Fragment {
             public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
                 LogWrapper.Logv(TAG, "Drawer item clicked");
 
-                if(mGroupCallback == null)
-                    throw new RuntimeException("Class must implement interface GroupClickCallback");
+                if(mGroupCallback == null){
+                    throw new NullPointerException("Class must implement interface GroupClickCallback");
+                }
 
 
                 ExpandableDrawerListAdapter adapter = (ExpandableDrawerListAdapter) mDrawerList.getExpandableListAdapter();
@@ -109,7 +111,7 @@ public class SideNavigationFragment extends Fragment {
             @Override
             public boolean onChildClick(ExpandableListView expandableListView, View view, int group, int child, long id) {
                 if(mChildCallback == null)
-                    throw new RuntimeException("Class must implement interface ChildClickCallback");
+                    throw new NullPointerException("Class must implement interface ChildClickCallback");
 
                 ExpandableDrawerListAdapter adapter = (ExpandableDrawerListAdapter) mDrawerList.getExpandableListAdapter();
                 String childPath = ((ExpandableDrawerListAdapter.Child) adapter.getChild(group, child)).mPath;
@@ -158,6 +160,10 @@ public class SideNavigationFragment extends Fragment {
 
     }
 
+    public void setOnFavoriteAddedCallback(OnFavoritesCallback callback){
+        mOnFavoriteAdded = callback;
+    }
+
     public interface GroupClickCallback{
         public boolean OnGroupClick(int groupPosition);
     }
@@ -166,29 +172,45 @@ public class SideNavigationFragment extends Fragment {
         public boolean OnChildClick(String childFilePath, int groupPosition, int childInGroup);
     }
 
-    public interface FavoritesCallback{
+    public interface OnFavoritesCallback{
 
         public void OnFavoriteAdded(String path);
         public void OnFavoriteRemoved(int group, int child);
     }
 
-    public void AddFavorite(String favoritePath){
+    public void AddFavorite(ExpandableBaseArrayAdapter.Child child){
 
-        ExpandableDrawerListAdapter.Child child = new ExpandableBaseArrayAdapter.Child(FAVORITE_INDEX, 0, favoritePath, favoritePath);
-        ((ExpandableDrawerListAdapter)mDrawerList.getAdapter()).addChild(FAVORITE_INDEX, child);
+        //ExpandableDrawerListAdapter.Child child = new ExpandableBaseArrayAdapter.Child(FAVORITE_INDEX, 0, favoritePath, favoritePath);
+
+        ExpandableDrawerListAdapter adapter = (ExpandableDrawerListAdapter)mDrawerList.getExpandableListAdapter();
+
+        if(!adapter.addChild(ExpandableDrawerListAdapter.FAVORITE_INDEX,child)){
+            LogWrapper.Loge(TAG, "The child could not be added the favorites list");
+            return;
+        }
+        adapter.notifyDataSetChanged();
 
 
-        mOnFavoriteAdded.OnFavoriteAdded(favoritePath);
+        if(mOnFavoriteAdded == null){
+            throw new NullPointerException("Class must implement OnFavoritesCallback");
+        }
+        mOnFavoriteAdded.OnFavoriteAdded(child.mPath);
 
     }
 
 
     private void removeFavorite(int group, int child){
         //mDrawerList.getAdapter().
-        ((ExpandableBaseArrayAdapter)mDrawerList.getAdapter()).removeChild(group, child);
+        ExpandableBaseArrayAdapter adapter = (ExpandableBaseArrayAdapter)mDrawerList.getExpandableListAdapter();
+        adapter.removeChild(group, child);
+        adapter.notifyDataSetChanged();
 
+        if(mOnFavoriteAdded == null){
+            throw new NullPointerException("Class must implement OnFavoritesCallback");
+        }
         mOnFavoriteAdded.OnFavoriteRemoved(group,child);
     }
+
 
 
 
