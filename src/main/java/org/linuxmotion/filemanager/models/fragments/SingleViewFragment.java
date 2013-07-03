@@ -65,8 +65,6 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
 
     private ListView mList;
     private LinearLayout mContentLayout;
-    private CutPasteFragment mCutPasteFragment;
-    private SideNavigationFragment mSideNavigationFragment;
 
 
 
@@ -77,7 +75,8 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
     private boolean mAboutToExit = false;
     private boolean mStubIsInflated = false;
     private static openFileManagerBroadcastReceiver sReceiver;
-    private SlidingMenu mSlidingMenu;
+
+
     private Alerts mDeleteAlert;
     ActionMode mActionMode;
     private FileUtilAction mFileAction = new FileUtilAction();
@@ -104,6 +103,8 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
         }
 
     };
+    private OnMenuFavoriteInterface mOnMenuFavoriteInterface;
+    private OnMenuCutInterface mOnMenuCutInterface;
 
 
     @Override
@@ -135,9 +136,8 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
         LogWrapper.Logi(TAG, "onActivityCreated called");
         setupVariables();
         setupMainListView();
-        setupActionBar();
-        setupSlidingMenu();
-        setupFragments();
+        //setupActionBar();
+
 
     }
 
@@ -197,15 +197,10 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
     public void onBackPressed() {
         LogWrapper.Logv(TAG, "Back button pressed");
 
-        // Check to see if the drawer is open
-        if (mSlidingMenu.isMenuShowing()) {
-            // if a menu is open it need to closed.
-            mSlidingMenu.showContent();
-        } else {
-            // If it was closed though we should
+
             // navigate up
             sendBroadcast(prepareBroadcast(null, Constants.UPDATE_INTENT, new MenuAction(MenuAction.ACTION_UP)));
-        }
+
 
 
     }
@@ -219,40 +214,9 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
     }
 
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
 
-        LogWrapper.Logv(TAG, "Item " + item.getItemId());
-        switch (item.getItemId()) {
 
-            case android.R.id.home: {
-
-                mSlidingMenu.toggle();
-            }
-            break;
-            case R.id.menu_settings:
-                launchSettingMenu();
-                break;
-            case R.id.menu_left: {
-                sendBroadcast(prepareBroadcast(null, Constants.UPDATE_INTENT, new MenuAction(MenuAction.ACTION_BACK)));
-            }
-            break;
-
-            case R.id.menu_new_content :{
-                    createNewFileorDirectory();
-            }
-            break;
-            case R.id.menu_forward: {
-                sendBroadcast(prepareBroadcast(null, Constants.UPDATE_INTENT, new MenuAction(MenuAction.ACTION_FORWARD)));
-            }
-            break;
-
-        }
-
-        return (super.onOptionsItemSelected(item));
-    }
-
-    private void createNewFileorDirectory() {
+    public void createNewFileorDirectory() {
 
 
         Alerts.newFileAlertBox(getActivity(), mCurrentPath, new Alerts.FileAlertBoxListener(){
@@ -271,6 +235,16 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
             handleEmptyListBG();
         }
 
+    }
+
+    public void pasteSelectionCanceled(){
+        mFileAction.setHeldFiles(null);
+    }
+
+    public void pasteCutItems(){
+
+        mFileAction.cutPasteHeldFiles(mFileAction.getHeldFiles(), new File(mCurrentPath));
+        mFileAction.setHeldFiles(null);
     }
 
     @Override
@@ -460,7 +434,7 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
 
     }
 
-    private void updateAdapter(String path) {
+    public void updateAdapter(String path) {
 
         if (path == null) {
             LogWrapper.Logd(TAG, "Couldnt find a path to update with");
@@ -549,6 +523,25 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
         mDeleteAlert.setDeleteDispatcher(this);
     }
 
+    
+
+    public interface OnMenuCutInterface{
+        public void OnCutCallback(File[] files);
+        public void OnFirstTimeCallback();
+    }
+
+    public void setOnMenuCutInterface(OnMenuCutInterface listener){
+        mOnMenuCutInterface = listener;
+    }
+
+
+    public interface OnMenuFavoriteInterface{
+        public void OnMenuFavoriteCallback(ExpandableBaseArrayAdapter.Child child);
+
+    }
+    public void setOnMenuFavoriteInterface(OnMenuFavoriteInterface listener){
+        mOnMenuFavoriteInterface = listener;
+    }
 
     private void setupMainListView() {
         ListAdapter adapter = createAdapter(mCurrentPath);
@@ -626,25 +619,17 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
                                 mFileAction.setHeldFiles(files);
                             }
 
-                            mSlidingMenu.setMode(SlidingMenu.LEFT_RIGHT);
-                            // Refresh the entire adapter
-                            ((ImageArrayAdapter) mCutPasteFragment.getAdapter()).clear();
-                            ImageArrayAdapter adapter = (ImageArrayAdapter) mCutPasteFragment.getAdapter();
-                            // get the entire list of held files
-                            // includes the appended files if any
-                            files = mFileAction.getHeldFiles();
-                            for (File f : files) {
-                                adapter.add(f);
 
-                            }
-                            // Notify the adapter that it has changed
-                            adapter.notifyDataSetChanged();
+
+                            mOnMenuCutInterface.OnCutCallback(files);
+
+
 
                             mode.finish(); // Action picked, so close the CAB
 
                             if(!PreferenceUtils.getHasCompletedRightCutPasteTutorial(getActivity())){
                                 // set showcase view to highlight the menu
-                                mSlidingMenu.showSecondaryMenu();
+                                mOnMenuCutInterface.OnFirstTimeCallback();
                                 PreferenceUtils.putHasCompletedRightCutPasteTutorial(getActivity(), true);
 
                             }
@@ -673,6 +658,9 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
 
                         }return  true;
                         case R.id.menu_favorite: {
+
+
+
                             File[] files = getCheckedFiles();
 
                             for( int i = 0; i < files.length; i++){
@@ -681,7 +669,9 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
                                         files[i].getName(),
                                         files[i].toString());
 
-                                mSideNavigationFragment.AddFavorite(child);
+
+                                mOnMenuFavoriteInterface.OnMenuFavoriteCallback(child);
+                                //mSideNavigationFragment.AddFavorite(child);
                             }
 
 
@@ -767,97 +757,8 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
         return f;
     }
 
-    private void setupSlidingMenu() {
-        mSlidingMenu = new SlidingMenu(this.getActivity());
-        mSlidingMenu.setMode(SlidingMenu.LEFT);
-        mSlidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_MARGIN);
-        //mSlidingMenu.setShadowWidthRes(R.dimen.shadow_width);
-        //mSlidingMenu.setShadowDrawable(R.drawable.shadow);
-        mSlidingMenu.setBehindWidthRes(R.dimen.slidingmenu_offset);
-        mSlidingMenu.setMenu(R.layout.layout_side_navigation);
-        mSlidingMenu.setFadeDegree(0.35f);
-        mSlidingMenu.attachToActivity(this.getActivity(), SlidingMenu.SLIDING_CONTENT);
-        // Set the menu but don't activate it
-        mSlidingMenu.setSecondaryMenu(R.layout.layout_cut_paste_menu);
-        mSlidingMenu.getSecondaryMenu().setVisibility(View.INVISIBLE);
 
-
-        if (!PreferenceUtils.getHasCompletedLeftNavigationTutorial(getActivity())){
-
-            mSlidingMenu.toggle();
-            // Show sliding menu
-            PreferenceUtils.putHasCompletedLeftNavigationTutorial(getActivity(), true);
-        }
-
-
-
-        // mSlidingMenu.setOnClosedListener(this);
-        // mSlidingMenu.setOnOpenedListener(this);
-    }
-
-    private void setupFragments() {
-        mCutPasteFragment = (CutPasteFragment) getFragmentManager().findFragmentById(R.id.fragment_cut_paste);
-        mCutPasteFragment.setPasteListener(new CutPasteFragment.onPasteListener() {
-            @Override
-            public void onPaste(File[] files) {
-
-                mFileAction.cutPasteHeldFiles(mFileAction.getHeldFiles(), new File(mCurrentPath));
-                mSlidingMenu.setMode(SlidingMenu.LEFT);
-                mSlidingMenu.showContent();
-                mFileAction.setHeldFiles(null);
-                ((ImageArrayAdapter) mCutPasteFragment.getAdapter()).clear();
-                ((ImageArrayAdapter) mCutPasteFragment.getAdapter()).notifyDataSetChanged();
-                updateAdapter(mCurrentPath);
-
-            }
-
-
-            @Override
-            public void onCancelPaste() {
-                mFileAction.setHeldFiles(null);
-                mSlidingMenu.setMode(SlidingMenu.LEFT);
-                mSlidingMenu.showContent();
-                ((ImageArrayAdapter) mCutPasteFragment.getAdapter()).clear();
-                ((ImageArrayAdapter) mCutPasteFragment.getAdapter()).notifyDataSetChanged();
-            }
-
-        });
-
-
-        mSideNavigationFragment = (SideNavigationFragment) getFragmentManager().findFragmentById(R.id.fragment_side_navigation);
-        mSideNavigationFragment.setChildCallback(new SideNavigationFragment.ChildClickCallback() {
-            @Override
-            public boolean OnChildClick(String childFilePath, int groupPosition, int childInGroup) {
-                performClick(new File(childFilePath));
-                mSlidingMenu.showContent();
-                return true;
-            }
-        });
-        mSideNavigationFragment.setGroupCallback(new SideNavigationFragment.GroupClickCallback() {
-            @Override
-            public boolean OnGroupClick(int groupPosition) {
-                selectDrawerItem(groupPosition);
-                mSlidingMenu.showContent();
-                return true;
-            }
-        });
-
-        mSideNavigationFragment.setOnFavoriteAddedCallback(new SideNavigationFragment.OnFavoritesCallback() {
-            @Override
-            public void OnFavoriteAdded(String path) {
-
-            }
-
-            @Override
-            public void OnFavoriteRemoved(int group, int child) {
-
-            }
-        });
-
-    }
-
-
-    private void selectDrawerItem(int position) {
+   public void selectDrawerItem(int position) {
 
         LogWrapper.Logv(TAG, "Selecting drawer position" + position);
         switch (position) {
@@ -885,17 +786,9 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
 
     }
 
-    private void setupActionBar() {
-
-        getActivity().getActionBar().setDisplayHomeAsUpEnabled(true);
-        getActionBar().setHomeButtonEnabled(true);
-        getActionBar().setTitle(mCurrentPath);
 
 
-    }
-
-
-    public Intent prepareBroadcast(String f, String type, MenuAction action) {
+    public static Intent prepareBroadcast(String f, String type, MenuAction action) {
 
         Intent intent = new Intent(Constants.RESOURCE_VIEW_INTENT);
 
@@ -915,7 +808,7 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
     }
 
 
-    private void performClick(File f) {
+   public void performClick(File f) {
 
         if (f.isDirectory()) {
 
@@ -930,10 +823,6 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
 
     }
 
-    private void launchSettingMenu() {
-        Intent settings = new Intent(this.getActivity(), ApplicationSettings.class);
-        startActivity(settings);
-    }
 
     private ActionBar getActionBar() {
         return this.getActivity().getActionBar();
