@@ -254,4 +254,51 @@ public class Alerts {
     }
 
 
+    public interface RenameAlertListener{
+        public void onSelectPositiveButton(String newName);
+
+    }
+
+
+    public static void renameAlertBox(Context context, final RenameAlertListener listener){
+
+        Builder rename = new AlertDialog.Builder(context);
+        rename.setTitle("Rename files");
+        rename.setCancelable(true);
+        View v = ((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.layout_dialog_rename, null, false);
+        rename.setView(v);
+        final EditText text = (EditText) v.findViewById(R.id.dialog_file_folder_rename);
+
+        rename.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                // Do nothing if no name
+                if (text.getText().toString().equals(""))
+                    return;
+
+                LogWrapper.Logv(TAG, "Invoking the callback listener");
+                listener.onSelectPositiveButton(text.getText().toString());
+
+            }
+
+
+        });
+        rename.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface arg0, int arg1) {
+                // Do nothing
+
+            }
+
+
+        });
+
+        rename.show();
+
+    }
+
+
+
 }

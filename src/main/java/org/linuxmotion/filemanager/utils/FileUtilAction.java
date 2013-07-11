@@ -90,22 +90,31 @@ public class FileUtilAction {
 
     }
 
-    public boolean renameFiles(File[] toRename, String fileName) {
+    public boolean renameFiles(File[] toRename, String path, String fileName) {
 
         int i = 0;
         boolean success = false;
+        LogWrapper.Logv(TAG, "The number of files to rename is " + toRename.length);
 
         if (toRename.length == 1) {
-            File tmp = new File(toRename[0].getPath() + fileName);
+            File tmp = new File(path + "/" + fileName);
+            LogWrapper.Logv(TAG, "Renaming "+toRename[0].getName() +" to " + tmp.getName());
             success = toRename[0].renameTo(tmp);
         }
+        else{
 
-        for (File f : toRename) {
+            for (File f : toRename) {
+                String name = fileName.substring(0,fileName.lastIndexOf("."));
+                String ext = fileName.substring(fileName.lastIndexOf("."));
+                File tmp = new File(path + "/" + name + "_" + i++ +  ext);
+                LogWrapper.Logv(TAG, "Renaming "+toRename[0].getName() +" to " + tmp.getName());
+                success = f.renameTo(tmp);
 
-            File tmp = new File(f.getPath() + fileName + 0);
-            success = f.renameTo(tmp);
+            }
 
         }
+
+
         return success;
 
 

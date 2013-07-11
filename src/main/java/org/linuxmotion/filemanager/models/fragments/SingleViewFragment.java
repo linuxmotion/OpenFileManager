@@ -527,6 +527,7 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
         public void OnCutCallback(File[] files);
         public void OnFirstTimeCutCallback();
         public void OnMenuFavoriteCallback(ExpandableBaseArrayAdapter.Child child);
+        public boolean OnRenameCallback();
 
     }
     private void setupMainListView() {
@@ -590,6 +591,7 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
                         case R.id.menu_delete: {
                             LogWrapper.Logi(TAG, "Calling menu item DELETE");
                             deleteSelectedItems();
+                            updateAdapter(mCurrentPath);
                             mode.finish(); // Action picked, so close the CAB
                         }
                         return true;
@@ -658,8 +660,26 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
                         }
                         return true;
                         case R.id.menu_rename: {
+                            LogWrapper.Logi(TAG, "Action item RENAME selected");
                             // need to show an alert dialog
-                            //mFileAction.renameFiles(getCheckedFiles(), "BatchRename");
+
+                            final ActionMode fmode = mode;
+                            Alerts.RenameAlertListener listner = new Alerts.RenameAlertListener() {
+                                @Override
+                                public void onSelectPositiveButton(String newFile) {
+                                    LogWrapper.Logi(TAG, "onSelectPositiveButton called for rename dialog");
+                                    mFileAction.renameFiles(getCheckedFiles(), mCurrentPath, newFile);
+                                    LogWrapper.Logi(TAG, "Updating adapter after renaming");
+                                    fmode.finish(); // Action picked, so close the CAB
+                                    updateAdapter(mCurrentPath);
+                                    //mContextualActionBarMenu.OnRenameCallback();
+                                }
+                            };
+
+                            Alerts.renameAlertBox(getActivity(),listner);
+
+
+
 
 
                         }
@@ -691,6 +711,8 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
                                 mContextualActionBarMenu.OnMenuFavoriteCallback(child);
                                 //mSideNavigationFragment.AddFavorite(child);
                             }
+
+                            mode.finish(); // Action picked, so close the CAB
 
 
                         }
@@ -782,7 +804,7 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
     }
 
     private File[] getCheckedFiles() {
-
+        LogWrapper.Logi(TAG, "getCheckedFiles()");
         SparseBooleanArray array = mList.getCheckedItemPositions();
         ArrayList<File> files = new ArrayList<File>();
         LogWrapper.Logi(TAG, "Found " + mList.getCheckedItemCount() + " checked items");

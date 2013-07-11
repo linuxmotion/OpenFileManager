@@ -253,7 +253,6 @@ public class OpenFileManagerActivity extends ListActivity implements Alerts.GPLA
         edit.putInt(Constants.APP_NAME, -1);
         edit.commit();
         finish();
-        // TODO Auto-generated method stub
 
     }
 
@@ -381,6 +380,10 @@ public class OpenFileManagerActivity extends ListActivity implements Alerts.GPLA
 
             return false;
         } else {
+            mSingleView.performClick(new File((childFilePath)));
+            if(mSlidingMenu.isMenuShowing())
+                mSlidingMenu.toggle();
+            
             return false;
         }
     }
@@ -408,5 +411,16 @@ public class OpenFileManagerActivity extends ListActivity implements Alerts.GPLA
     @Override
     public void OnMenuFavoriteCallback(ExpandableBaseArrayAdapter.Child child) {
         mSideNavigationFragment.AddFavorite(child);
+    }
+
+    @Override
+    public boolean OnRenameCallback() {
+        if (mDualPane) {
+
+
+        } else {
+
+        }
+        return false;
     }
 }
