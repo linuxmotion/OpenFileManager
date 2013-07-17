@@ -1,25 +1,39 @@
-|***************************************************************************************************************|
-This program consist of free and open source software. It is free to for all to download, compile, change, and
-redistribute. At this point there is no license affixed to the software. At some point in the future either the 
-Apache or the GPL license will be affixed to the software. At that point distribution of all further derivetives 
-will be governed by that license and not this readme.
-|***************************************************************************************************************|
+***************************************************************************************************|
+|This program consist of free and open source software. It is free to for all to download, compile,
+|change, and redistribute. At this point there is no license affixed  to the software. At some point
+|in the future either the  Apache or the GPL license will be affixed to the software.  At that point
+| distribution of all further derivatives  will be governed by that license and not this readme.
+***************************************************************************************************|
 
 
 
-Hello and welcome to using openFileManager.
-This program is my goal at creating a entirely free and open source file browser for the Android powered
-devices. It currently only officially supports MDPI and HDPI as that is what screen i have tested it on.
-Any additions are appreciated and will be released under the license that is affixed to the software as a whole.
+ Hello and welcome to using openFileManager.
+ This program is my goal at creating a entirely free and open source file browser for the Android
+ powered devices. It currently only officially supports MDPI and HDPI as that is what screen i have
+ tested it on. Any additions are appreciated and will be released under the license that is affixed
+ to the software as a whole.
 
 
 
-Areas that are currently undergoing main development:
+ Areas that are currently undergoing main development:
 
-1)List item short click
-	A) Open selected file
-	B) Highlight selected list item
-2)List item long clicks
-	A) Edit selected file 
-	B) File selected sharing 
-	C) Highlight selected list item
+ Core features
+    --(Multiple)Item select
+    Open as
+    --Rename
+    --Cut/Paste
+    --Delete file/folder
+    --New file/folder
+    Add/remove favorites(Currently working on)
+    Set home directory(Needs a preference to set/read from)
+    Forward/Back directory switching(Needs the logic)
+
+ The application consists of two activities. The main file manager activity and the settings menu.
+ Since the main view takes an adapter, the adapter just needs have its data changed and refreshed
+ to update the list type view. This is done by having each item send a broadcast that the app
+ catches and in turn refreshes the adapter with the appropriate data.
+
+ Each major view group consists of a fragment, the main list view, the side view, the cut/paste view
+ and possibly others in the future. Each fragment has a series of callbacks(listeners) that is used
+ to communicate with the fragment in a defined manner. All fragments are managed in the main
+ activity and is used as the communication and callback medium. 
