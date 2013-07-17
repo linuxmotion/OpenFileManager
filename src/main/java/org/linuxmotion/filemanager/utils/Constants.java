@@ -51,6 +51,9 @@ public class Constants {
 
     public static final String RIGHT_CUT_PASTE_TUTORIAL_PREF = "right_cut_paste_tutorial";
 
+    public static final String FAVORITE_BASE_PREF = "favorite_base_pref_";
+
+
     public static MimeTypeMap MIME = MimeTypeMap.getSingleton();
 
 

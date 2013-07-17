@@ -139,17 +139,28 @@ public class PreferenceUtils {
     public static boolean getHasCompletedRightCutPasteTutorial(Context context) {
         SharedPreferences prefs = context.getSharedPreferences(Constants.OPEN_FILE_MANAGER_PREFERENCES, 0);
         return prefs.getBoolean(Constants.RIGHT_CUT_PASTE_TUTORIAL_PREF, false);
-
     }
 
 
     public static void putHasCompletedRightCutPasteTutorial(Context context, boolean hasCompleted) {
-
         SharedPreferences prefs = context.getSharedPreferences(Constants.OPEN_FILE_MANAGER_PREFERENCES, 0);
         SharedPreferences.Editor edit = prefs.edit();
         edit.putBoolean(Constants.RIGHT_CUT_PASTE_TUTORIAL_PREF, hasCompleted);
         edit.commit();
+    }
 
+
+    public static void putFavorite(Context context, int favoriteNumber, String favorite){
+        SharedPreferences prefs = context.getSharedPreferences(Constants.OPEN_FILE_MANAGER_PREFERENCES, 0);
+        SharedPreferences.Editor edit = prefs.edit();
+        edit.putString(Constants.FAVORITE_BASE_PREF +  favoriteNumber, favorite);
+        edit.commit();
+    }
+
+    public static String getFavorite(Context context, int favoriteNumber) {
+        SharedPreferences prefs = context.getSharedPreferences(Constants.OPEN_FILE_MANAGER_PREFERENCES, 0);
+        return prefs.getString(Constants.FAVORITE_BASE_PREF +  favoriteNumber, "");
 
     }
+
 }

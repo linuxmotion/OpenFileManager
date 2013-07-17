@@ -873,8 +873,6 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
             intent.putExtra("RESOURCE", f);
 
         }
-
-
         return intent;
 
     }

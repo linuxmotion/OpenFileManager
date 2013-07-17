@@ -3,7 +3,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.4'
+        classpath 'com.android.tools.build:gradle:0.5.+'
     }
 }
 apply plugin: 'android'
@@ -22,6 +22,45 @@ android {
         minSdkVersion 7
         targetSdkVersion 16
     }
+
+    signingConfigs {
+
+
+        betaConfig {
+            storeFile file("xxx")
+            storePassword "xxx"
+            keyAlias "xxx"
+            keyPassword "xxx"
+        }
+    }
+
+    buildTypes {
+        debug {
+            debuggable true
+            packageNameSuffix ".debug"
+        }
+        release{
+            debuggable false
+            zipAlign true
+            signingConfig signingConfigs.betaConfig
+        }
+
+        beta{
+            debuggable true
+            zipAlign true
+            signingConfig signingConfigs.betaConfig
+            packageNameSuffix ".beta"
+        }
+    }
+
+    productFlavors {
+        market {
+            packageName "org.linuxmotion.filemanager"
+            versionCode 2
+            versionName "0.5.1"
+        }
+    }
+
 
 
 }

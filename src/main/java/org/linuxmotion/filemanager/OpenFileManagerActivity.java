@@ -383,19 +383,21 @@ public class OpenFileManagerActivity extends ListActivity implements Alerts.GPLA
             mSingleView.performClick(new File((childFilePath)));
             if(mSlidingMenu.isMenuShowing())
                 mSlidingMenu.toggle();
-            
+
             return false;
         }
     }
 
     @Override
-    public void OnFavoriteAdded(String path) {
+    public void OnFavoriteAdded(String path, int child) {
         if (mDualPane) {
 
             return;
         } else {
 
         }
+
+        PreferenceUtils.putFavorite(this, child, path);
     }
 
     @Override

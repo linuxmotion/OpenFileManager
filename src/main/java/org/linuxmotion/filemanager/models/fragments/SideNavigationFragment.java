@@ -13,6 +13,7 @@ import org.linuxmotion.asyncloaders.LogWrapper;
 import org.linuxmotion.filemanager.R;
 import org.linuxmotion.filemanager.models.adapters.ExpandableDrawerListAdapter;
 import org.linuxmotion.filemanager.models.baseadapters.ExpandableBaseArrayAdapter;
+import org.linuxmotion.filemanager.preferences.PreferenceUtils;
 
 import java.util.ArrayList;
 
@@ -50,7 +51,7 @@ public class SideNavigationFragment extends Fragment {
 
 
         String[] groups = {"Home", "SdCard", "Favorites"};
-        String[][] children = {{}, {}, {"Fav 1", "Fav 2"}};
+        String[][] children = {{}, {}, {}};
 
 
         ArrayList<ArrayList<ExpandableBaseArrayAdapter.Child>> childrenList = new ArrayList<ArrayList<ExpandableBaseArrayAdapter.Child>>();
@@ -59,10 +60,12 @@ public class SideNavigationFragment extends Fragment {
 
             // Fill the group array
             childrenList.add(new ArrayList<ExpandableBaseArrayAdapter.Child>());
-            for (int j = 0; j < children[i].length; j++) {
-                // fill the children for the specifed groups
-                childrenList.get(i).add(new ExpandableBaseArrayAdapter.Child(i, j, children[i][j], "/sdcard"));
+            int j = 0;
+            while( !PreferenceUtils.getFavorite(this.getActivity(), j).equals("")){
+                childrenList.get(i).add(new ExpandableBaseArrayAdapter.Child(i, j, children[i][j], PreferenceUtils.getFavorite(this.getActivity(), j)));
+                j++;
             }
+
 
         }
 
@@ -175,7 +178,7 @@ public class SideNavigationFragment extends Fragment {
 
     public interface OnFavoritesCallback {
 
-        public void OnFavoriteAdded(String path);
+        public void OnFavoriteAdded(String path, int child);
 
         public void OnFavoriteRemoved(int group, int child);
     }
@@ -196,7 +199,7 @@ public class SideNavigationFragment extends Fragment {
         if (mOnFavoriteAdded == null) {
             throw new NullPointerException("Class must implement OnFavoritesCallback");
         }
-        mOnFavoriteAdded.OnFavoriteAdded(child.mPath);
+        mOnFavoriteAdded.OnFavoriteAdded(child.mPath, adapter.getChildrenCount(ExpandableDrawerListAdapter.FAVORITE_INDEX));
 
     }
 
