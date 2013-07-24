@@ -31,6 +31,7 @@ import android.view.View;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
 import org.linuxmotion.asyncloaders.LogWrapper;
+import org.linuxmotion.filemanager.database.DataBaseHelper;
 import org.linuxmotion.filemanager.models.MenuAction;
 import org.linuxmotion.filemanager.models.adapters.ImageArrayAdapter;
 import org.linuxmotion.filemanager.models.baseadapters.ExpandableBaseArrayAdapter;
@@ -49,7 +50,7 @@ import java.io.File;
 public class OpenFileManagerActivity extends ListActivity implements Alerts.GPLAlertClickDispatcher,
         SingleViewFragment.ContextualActionBarMenu, CutPasteFragment.onPasteListener,
         SideNavigationFragment.GroupClickCallback, SideNavigationFragment.ChildClickCallback,
-        SideNavigationFragment.OnFavoritesCallback  {
+        SideNavigationFragment.OnFavoritesCallback, DataBaseHelper.onDatabaseTransactionFinished {
 
     private static final String TAG = OpenFileManagerActivity.class.getSimpleName();
     private static final boolean DEBUG = (true || Constants.FULL_DBG);
@@ -63,7 +64,7 @@ public class OpenFileManagerActivity extends ListActivity implements Alerts.GPLA
     private boolean mDualPane;
     private SlidingMenu mSlidingMenu;
     private boolean mAttached = false;
-
+    DataBaseHelper mHelper= new DataBaseHelper();
     /**
      * Called when the activity is first created.
      */
@@ -75,6 +76,9 @@ public class OpenFileManagerActivity extends ListActivity implements Alerts.GPLA
 
         mDualPane = false;
 
+
+        mHelper.initDatabase(this, this);
+        mHelper.open();
 
         if (mDualPane) {
 
@@ -120,6 +124,7 @@ public class OpenFileManagerActivity extends ListActivity implements Alerts.GPLA
         super.onStop();
         LogWrapper.Logi(TAG, "onStop called");
 
+        mHelper.close();
     }
 
 
@@ -390,6 +395,11 @@ public class OpenFileManagerActivity extends ListActivity implements Alerts.GPLA
     }
 
     @Override
+    public void OnChildItemLongClicked(int childPosition) {
+
+    }
+
+    @Override
     public void OnFavoriteAdded(String path, int child) {
         if (mDualPane) {
 
@@ -398,17 +408,28 @@ public class OpenFileManagerActivity extends ListActivity implements Alerts.GPLA
 
         }
 
-        PreferenceUtils.putFavorite(this, child, path);
+        mHelper.AddToList(path);
+
+       // PreferenceUtils.putFavorite(this, child, path);
     }
 
     @Override
-    public void OnFavoriteRemoved(int group, int child) {
+    public void OnFavoriteRemoved(String path, int group, int child) {
+        LogWrapper.Logi(TAG, "OnFavoriteRemoved() called");
         if (mDualPane) {
 
             return;
         } else {
 
         }
+        mHelper.RemoveFromList(path);
+    }
+
+    @Override
+    public String[] OnFavoritesInitialized() {
+        String[] favorites = mHelper.getAllEntries();
+        LogWrapper.Logv(TAG, "Found " + favorites.length + " favorites to add");
+        return favorites;
     }
 
     @Override
@@ -425,5 +446,23 @@ public class OpenFileManagerActivity extends ListActivity implements Alerts.GPLA
 
         }
         return false;
+    }
+
+    @Override
+    public void onTransactionFinished(int action) {
+        switch (action){
+            case DataBaseHelper.onDatabaseTransactionFinished.TRANSACTION_ADD:{
+                LogWrapper.Logd(TAG, "Succesfully added favorite to database");
+
+            }break;
+            case DataBaseHelper.onDatabaseTransactionFinished.TRANSACTION_DELETE:{
+                LogWrapper.Logd(TAG, "Succesfully delete favorite to database");
+
+            }break;
+            case DataBaseHelper.onDatabaseTransactionFinished.TRANSACTION_INCOMPLETE:{
+                LogWrapper.Logd(TAG, "Database transaction was incomplete");
+
+            }break;
+        }
     }
 }

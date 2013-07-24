@@ -730,8 +730,9 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
                             File[] files = getCheckedFiles();
 
                             for (int i = 0; i < files.length; i++) {
-                                ExpandableBaseArrayAdapter.Child child = new ExpandableBaseArrayAdapter.Child(ExpandableDrawerListAdapter.
-                                        FAVORITE_INDEX, ExpandableDrawerListAdapter.ITEM_NEW,
+                                ExpandableBaseArrayAdapter.Child child = new ExpandableBaseArrayAdapter.Child(
+                                        ExpandableDrawerListAdapter.FAVORITE_INDEX,
+                                        ExpandableDrawerListAdapter.ITEM_NEW,
                                         files[i].getName(),
                                         files[i].toString());
 

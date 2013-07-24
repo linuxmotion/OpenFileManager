@@ -14,7 +14,9 @@ import org.linuxmotion.filemanager.R;
 import org.linuxmotion.filemanager.models.adapters.ExpandableDrawerListAdapter;
 import org.linuxmotion.filemanager.models.baseadapters.ExpandableBaseArrayAdapter;
 import org.linuxmotion.filemanager.preferences.PreferenceUtils;
+import org.linuxmotion.filemanager.utils.Alerts;
 
+import java.io.File;
 import java.util.ArrayList;
 
 /**
@@ -50,8 +52,10 @@ public class SideNavigationFragment extends Fragment {
     private void setupDrawerListView() {
 
 
+
         String[] groups = {"Home", "SdCard", "Favorites"};
-        String[][] children = {{}, {}, {}};
+        String[] favs = mOnFavoriteAdded.OnFavoritesInitialized();
+        String[][] children = {{}, {}, favs};
 
 
         ArrayList<ArrayList<ExpandableBaseArrayAdapter.Child>> childrenList = new ArrayList<ArrayList<ExpandableBaseArrayAdapter.Child>>();
@@ -61,13 +65,16 @@ public class SideNavigationFragment extends Fragment {
             // Fill the group array
             childrenList.add(new ArrayList<ExpandableBaseArrayAdapter.Child>());
             int j = 0;
-            while( !PreferenceUtils.getFavorite(this.getActivity(), j).equals("")){
-                childrenList.get(i).add(new ExpandableBaseArrayAdapter.Child(i, j, children[i][j], PreferenceUtils.getFavorite(this.getActivity(), j)));
+
+            while( j < children[i].length ){
+
+                childrenList.get(i).add(new ExpandableBaseArrayAdapter.Child(i, j,new File(children[i][j]).getName(), children[i][j] ));
                 j++;
             }
 
 
         }
+        LogWrapper.Logd(TAG, "Added " + childrenList.size() + " children");
 
 
         mDrawerList.setAdapter(new ExpandableDrawerListAdapter(getActivity(), groups, childrenList));
@@ -134,11 +141,20 @@ public class SideNavigationFragment extends Fragment {
                 long newId = mDrawerList.getExpandableListPosition(position);
                 if (ExpandableListView.getPackedPositionType(newId) == ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
                     LogWrapper.Logi(TAG, "OnItemLongClicked called on a child view");
-                    int groupPosition = ExpandableListView.getPackedPositionGroup(newId);
-                    int childPosition = ExpandableListView.getPackedPositionChild(newId);
+                    final int groupPosition = ExpandableListView.getPackedPositionGroup(newId);
+                    final int childPosition = ExpandableListView.getPackedPositionChild(newId);
 
+                    mChildCallback.OnChildItemLongClicked(childPosition);
+                    ExpandableDrawerListAdapter adapter = (ExpandableDrawerListAdapter) mDrawerList.getExpandableListAdapter();
+                    String childPath = ((ExpandableDrawerListAdapter.Child) adapter.getChild(groupPosition, childPosition)).mPath;
                     // show a alertdialog that asks the user if they want to remove the favorite
+                    Alerts.FavoriteRemoveAlertBox(getActivity(), new Alerts.FavoriteRemoveListener() {
+                        @Override
+                        public void OnFavoriteRemoved(String favorite) {
+                            removeFavorite(groupPosition, childPosition);
+                        }
 
+                    },childPath);
 
                     // You now have everything that you would as if this was an OnChildClickListener()
                     // Add your logic here.
@@ -174,13 +190,17 @@ public class SideNavigationFragment extends Fragment {
 
     public interface ChildClickCallback {
         public boolean OnChildClick(String childFilePath, int groupPosition, int childInGroup);
+
+        void OnChildItemLongClicked(int childPosition);
     }
 
     public interface OnFavoritesCallback {
 
         public void OnFavoriteAdded(String path, int child);
 
-        public void OnFavoriteRemoved(int group, int child);
+        public void OnFavoriteRemoved(String path, int group, int child);
+
+        public String[] OnFavoritesInitialized();
     }
 
     public void AddFavorite(ExpandableBaseArrayAdapter.Child child) {
@@ -204,16 +224,17 @@ public class SideNavigationFragment extends Fragment {
     }
 
 
-    private void removeFavorite(int group, int child) {
-        //mDrawerList.getAdapter().
+    private void removeFavorite( int group, int child) {
+
         ExpandableBaseArrayAdapter adapter = (ExpandableBaseArrayAdapter) mDrawerList.getExpandableListAdapter();
+        String path = ((ExpandableBaseArrayAdapter.Child)adapter.getChild(group, child)).mPath;
         adapter.removeChild(group, child);
         adapter.notifyDataSetChanged();
 
         if (mOnFavoriteAdded == null) {
             throw new NullPointerException("Class must implement OnFavoritesCallback");
         }
-        mOnFavoriteAdded.OnFavoriteRemoved(group, child);
+        mOnFavoriteAdded.OnFavoriteRemoved(path, group, child);
     }
 
 

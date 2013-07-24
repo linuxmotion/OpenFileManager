@@ -19,12 +19,12 @@
 
  Core features
     --(Multiple)Item select
-    Open as
+    --Open as
     --Rename
     --Cut/Paste
     --Delete file/folder
     --New file/folder
-    Add/remove favorites(Currently working on)
+    --Add/remove favorites
     Set home directory(Needs a preference to set/read from)
     Forward/Back directory switching(Needs the logic)
 

@@ -357,4 +357,32 @@ public class Alerts {
 
         rename.create().show();
     }
+    public interface FavoriteRemoveListener {
+        public void OnFavoriteRemoved(String favorite);
+    }
+    public static void FavoriteRemoveAlertBox(Context context,  final FavoriteRemoveListener listener,final String favorite){
+
+
+        String[] dialogs = {"Text","Music", "Video", "Picture"};
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setCancelable(true);
+        builder.setNegativeButton("Cancel", new OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+            }
+        });
+        builder.setPositiveButton("Delete", new OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                listener.OnFavoriteRemoved(favorite);
+            }
+        });
+
+        builder.show();
+
+    }
+
+
 }
