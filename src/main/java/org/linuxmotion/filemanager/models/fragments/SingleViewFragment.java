@@ -685,6 +685,7 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
                         }
                         return true;
                         case R.id.menu_open_as: {
+                            LogWrapper.Logi(TAG, "Calling menu item OPEN_AS");
                             // need to show an alert dialog
                             // to manully set the type
                             // of intent that should be sent
@@ -725,6 +726,7 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
                         }
                         return true;
                         case R.id.menu_favorite: {
+                            LogWrapper.Logi(TAG, "Calling menu item FAVORITE");
 
 
                             File[] files = getCheckedFiles();
@@ -744,6 +746,14 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
                             mode.finish(); // Action picked, so close the CAB
 
 
+                        }
+                        return true;
+                        case R.id.menu_home:{
+                            LogWrapper.Logi(TAG, "Calling menu item HOME");
+                            PreferenceUtils.putHomeDirectory(getActivity(), getCheckedFiles()[0].getPath());
+                            Toast.makeText(getActivity(), "Changed home directory to "
+                                    + getCheckedFiles()[0].getPath(), Toast.LENGTH_SHORT).show();
+                            mode.finish();
                         }
                         return true;
                         default:
@@ -872,7 +882,7 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
         LogWrapper.Logv(TAG, "Selecting drawer position" + position);
         switch (position) {
             case 0: {
-                mCurrentPath = Constants.SDCARD_DIR;
+                mCurrentPath = PreferenceUtils.getHomeDirectory(getActivity());
             }
             break;
             case 1: {

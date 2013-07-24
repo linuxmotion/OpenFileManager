@@ -150,16 +150,16 @@ public class PreferenceUtils {
     }
 
 
-    public static void putFavorite(Context context, int favoriteNumber, String favorite){
+    public static void putHomeDirectory(Context context, String favorite){
         SharedPreferences prefs = context.getSharedPreferences(Constants.OPEN_FILE_MANAGER_PREFERENCES, 0);
         SharedPreferences.Editor edit = prefs.edit();
-        edit.putString(Constants.FAVORITE_BASE_PREF +  favoriteNumber, favorite);
+        edit.putString(Constants.HOME_DIRECTORY_PREF, favorite);
         edit.commit();
     }
 
-    public static String getFavorite(Context context, int favoriteNumber) {
+    public static String getHomeDirectory(Context context) {
         SharedPreferences prefs = context.getSharedPreferences(Constants.OPEN_FILE_MANAGER_PREFERENCES, 0);
-        return prefs.getString(Constants.FAVORITE_BASE_PREF +  favoriteNumber, "");
+        return prefs.getString(Constants.HOME_DIRECTORY_PREF, Constants.SDCARD_DIR);
 
     }
 

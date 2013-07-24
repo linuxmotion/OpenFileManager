@@ -35,4 +35,10 @@
             android:icon="@drawable/ic_menu_rating_not_important"
             android:showAsAction="ifRoom"/>
 
+    <item
+            android:id="@+id/menu_home"
+            android:title="@string/menu_home"
+            android:icon="@drawable/ic_launcher"
+            android:showAsAction="ifRoom"/>
+
 </menu>

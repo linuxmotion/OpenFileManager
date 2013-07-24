@@ -25,7 +25,7 @@
     --Delete file/folder
     --New file/folder
     --Add/remove favorites
-    Set home directory(Needs a preference to set/read from)
+    --Set home directory
     Forward/Back directory switching(Needs the logic)
 
  The application consists of two activities. The main file manager activity and the settings menu.

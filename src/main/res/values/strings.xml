@@ -42,5 +42,6 @@
     <string name="dialog_file">File</string>
     <string name="dialog_folder">Folder</string>
     <string name="menu_favorite">Favorite</string>
+    <string name="menu_home">Home</string>
 
 </resources>

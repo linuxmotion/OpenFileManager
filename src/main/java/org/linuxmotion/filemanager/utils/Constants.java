@@ -17,6 +17,7 @@
  */
 package org.linuxmotion.filemanager.utils;
 
+import android.os.Environment;
 import android.webkit.MimeTypeMap;
 
 public class Constants {
@@ -27,7 +28,7 @@ public class Constants {
 
     public static final String RESOURCE_VIEW_INTENT = "org.linuxmotion.intent.HANDLE_VIEW_RESOURCE";
 
-    public static final String SDCARD_DIR = "/sdcard";
+    public static final String SDCARD_DIR = Environment.getExternalStorageDirectory().getPath();
 
     public static final int REFRESH_UI = 1;
 
@@ -51,7 +52,7 @@ public class Constants {
 
     public static final String RIGHT_CUT_PASTE_TUTORIAL_PREF = "right_cut_paste_tutorial";
 
-    public static final String FAVORITE_BASE_PREF = "favorite_base_pref_";
+    public static final String HOME_DIRECTORY_PREF = "favorite_base_pref_";
 
 
     public static MimeTypeMap MIME = MimeTypeMap.getSingleton();
