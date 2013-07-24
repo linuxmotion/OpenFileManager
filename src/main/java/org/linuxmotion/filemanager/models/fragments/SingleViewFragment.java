@@ -692,6 +692,34 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
                             // TEXT
                             // VIDEO
                             // PICTURE
+                            final File[] f = getCheckedFiles();
+                            mode.finish();
+                            Alerts.OpenAsAlertBox(getActivity(), new Alerts.OpenAsListener() {
+                                @Override
+                                public void onSelectTypeText() {
+                                    LogWrapper.Logi(TAG, "onSelectTypeText called");
+                                    startOpenAsActivity(f[0], "text/*");
+                                }
+
+                                @Override
+                                public void onSelectTypePictures() {
+                                    LogWrapper.Logi(TAG, "onSelectTypePictures");
+                                    startOpenAsActivity(f[0], "image/*");
+                                }
+
+                                @Override
+                                public void onSelectTypeMusic() {
+                                    LogWrapper.Logi(TAG, "onSelectTypeMusic");
+                                    startOpenAsActivity(f[0], "audio/*");
+                                }
+
+                                @Override
+                                public void onSelectTypeVideo() {
+
+                                    LogWrapper.Logi(TAG, "onSelectTypeVideo");
+                                    startOpenAsActivity(f[0], "video/*");
+                                }
+                            });
 
 
                         }
@@ -750,15 +778,12 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
                     MenuInflater inflater = mActionMode.getMenuInflater();
                     if (mMultiSelected) {
 
-
                         if(determineDataType(
                                 new Intent(), getCheckedFiles())){
                             inflater.inflate(R.menu.menu_context_actions_multiple_items_share, menu);
-
                         }else {
                             inflater.inflate(R.menu.menu_context_actions_multiple_items, menu);
                         }
-
 
                     } else {
                         inflater.inflate(R.menu.menu_context_actions, menu);
@@ -773,6 +798,17 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
         }
 
 
+    }
+
+    private void startOpenAsActivity(File file, String type) {
+        Intent resourceintent = new Intent(Intent.ACTION_VIEW);
+        resourceintent.setDataAndType(Uri.parse("file://" + file.getPath()), type);
+        try {
+            startActivity(resourceintent);
+        } catch (ActivityNotFoundException e) {
+            e.printStackTrace();
+            mUIRefresher.sendEmptyMessage(Constants.UNKNOWN_FILE_TYPE);
+        }
     }
 
     private boolean determineDataType(Intent shareIntent, File[] checkedFiles) {
@@ -805,7 +841,6 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
 
     private File[] getCheckedFiles() {
         LogWrapper.Logi(TAG, "getCheckedFiles()");
-        SparseBooleanArray array = mList.getCheckedItemPositions();
         ArrayList<File> files = new ArrayList<File>();
         LogWrapper.Logi(TAG, "Found " + mList.getCheckedItemCount() + " checked items");
 
@@ -928,16 +963,15 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
             // clear the adapter
             list.clear();
             if (files != null && files.length > 0) {
-                // TODO: Make this faster for large data sets
                 // Perceived lag on data sets > 1000
                 // unkown for smaller data sets
                 // when perceived lag starts
                 LogWrapper.Logv(TAG, "Files " + files.length + "");
                 files = FileUtils.sortFiles(files, mWContext.get());
-
                 LogWrapper.Logv(TAG, "Files " + files.length + " after sorting");
 
                 for (File f : files) {
+                    LogWrapper.Logv(TAG, "The file name is: " + f.getName() + " and the full path is " + f.getPath());
                     list.add(f);
                     list.notifyDataSetChanged();
                 }

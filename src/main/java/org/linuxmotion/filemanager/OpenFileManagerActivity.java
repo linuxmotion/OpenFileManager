@@ -17,7 +17,7 @@
  */
 package org.linuxmotion.filemanager;
 
-import android.app.Fragment;
+
 import android.app.FragmentTransaction;
 import android.app.ListActivity;
 import android.content.Context;
@@ -43,6 +43,7 @@ import org.linuxmotion.filemanager.utils.Alerts;
 import org.linuxmotion.filemanager.utils.Constants;
 
 import java.io.File;
+
 
 
 public class OpenFileManagerActivity extends ListActivity implements Alerts.GPLAlertClickDispatcher,

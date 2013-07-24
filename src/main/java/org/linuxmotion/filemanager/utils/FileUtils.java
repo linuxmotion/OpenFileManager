@@ -20,6 +20,7 @@ package org.linuxmotion.filemanager.utils;
 import android.content.Context;
 import android.util.Log;
 
+import org.linuxmotion.asyncloaders.LogWrapper;
 import org.linuxmotion.filemanager.preferences.PreferenceUtils;
 
 import java.io.File;
@@ -40,10 +41,10 @@ public class FileUtils {
 
         File temp = new File(directory);
         if (temp.exists()) {
-
-
-            if (temp.listFiles() != null) {
-                Log.d(TAG, "[Path = " + temp.toString() + " exists");
+            Log.d(TAG, "[Path = " + temp.toString() + " exists");
+            File[] files = temp.listFiles();
+            if (files != null) {
+                LogWrapper.Logd(TAG, "Found " + files.length + " files");
                 return temp.listFiles();
             } else {
                 // If this point is reached then the directory doesnt contain any

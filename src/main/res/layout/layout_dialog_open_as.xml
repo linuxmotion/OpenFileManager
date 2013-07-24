@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+    <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:text="Text"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:id="@+id/Open_as_text"
+            android:layout_gravity="center"
+            android:padding="15px"
+            android:enabled="true"
+            android:clickable="true"
+            android:background="@drawable/list_background_slected" />
+            />
+    <View style="@style/Divider"/>
+    <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Video"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:id="@+id/Open_as_video"
+            android:layout_gravity="center"
+            android:padding="15px"
+            android:clickable="true"
+            android:enabled="true"
+            android:background="@drawable/list_background_slected"/>
+    <View style="@style/Divider"/>
+    <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:text="Music"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:id="@+id/Open_as_music"
+            android:layout_gravity="center"
+            android:padding="15px"
+            android:clickable="true"
+            android:enabled="true"
+            android:background="@drawable/list_background_slected"/>
+
+</LinearLayout>

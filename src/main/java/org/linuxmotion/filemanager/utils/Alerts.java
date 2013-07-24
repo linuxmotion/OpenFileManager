@@ -10,13 +10,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Switch;
+import android.widget.TextView;
 
 import org.linuxmotion.asyncloaders.LogWrapper;
 import org.linuxmotion.filemanager.R;
 import org.linuxmotion.filemanager.models.FileDeleteDialogClickListener;
+import org.linuxmotion.filemanager.models.adapters.OpenAsAdapter;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * Wrapper class for showing different alerts.
@@ -300,5 +303,58 @@ public class Alerts {
     }
 
 
+    public interface OpenAsListener {
+        public void onSelectTypeText();
+        public void onSelectTypePictures();
+        public void onSelectTypeMusic();
+        public void onSelectTypeVideo();
+    }
+    public static void OpenAsAlertBox(Context context,  final OpenAsListener listener){
 
+
+        String[] dialogs = {"Text","Music", "Video", "Picture"};
+
+        AlertDialog.Builder rename = new AlertDialog.Builder(context);
+        rename.setTitle("Open As");
+        rename.setCancelable(true);
+        //View v = ((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.layout_dialog_open_as, null, false);
+        //rename.setView(v);
+
+        rename.setAdapter(new OpenAsAdapter(context, 0, dialogs), new OnClickListener(){
+
+                      @Override
+                      public void onClick(DialogInterface dialogInterface, int i) {
+                          switch (i){
+
+                              case 0:{
+                                  listener.onSelectTypeText();
+                              }break;
+                              case 1:{
+                                  listener.onSelectTypeMusic();
+                              }break;
+                              case 2:{
+                                  listener.onSelectTypeVideo();
+                              }break;
+                              case 3:{
+                                  listener.onSelectTypePictures();
+                              }break;
+                          }
+
+                      }
+                  });
+
+        rename.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface arg0, int arg1) {
+                // Do nothing
+
+            }
+
+
+        });
+
+
+        rename.create().show();
+    }
 }

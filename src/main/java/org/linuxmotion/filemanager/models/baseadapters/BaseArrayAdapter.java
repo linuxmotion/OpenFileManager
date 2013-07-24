@@ -3,6 +3,8 @@ package org.linuxmotion.filemanager.models.baseadapters;
 import android.content.Context;
 import android.widget.ArrayAdapter;
 
+import org.linuxmotion.asyncloaders.LogWrapper;
+
 import java.util.ArrayList;
 
 /**
@@ -10,19 +12,20 @@ import java.util.ArrayList;
  */
 public class BaseArrayAdapter<T> extends ArrayAdapter<T> {
 
-    private static boolean DBG = false;// (true || Constants.FULL_DBG);
-    private static String TAG = "FileArrayAdapter";
+    private static final boolean DBG = false;// (true || Constants.FULL_DBG);
+    private static final String TAG = "FileArrayAdapter";
 
     protected ArrayList<T> mArrayList = new ArrayList<T>();
 
     public BaseArrayAdapter(Context context, int textViewResourceId, T[] data) {
         super(context, textViewResourceId, data);
-
+        LogWrapper.Logv(TAG, "Creating an adapter from BaseArrayAdapter");
         mArrayList.clear();
         if (data != null && data.length > 0) {
             for (T item : data) {
                 mArrayList.add(item);
             }
+            LogWrapper.Logv(TAG, "Added " + mArrayList.size() + " items");
         }
 
 
@@ -32,7 +35,14 @@ public class BaseArrayAdapter<T> extends ArrayAdapter<T> {
     public void clear() {
         //super.clear();
         if (mArrayList != null) {
+            LogWrapper.Logd(TAG,"Clearing " + mArrayList.size() + " items");
             mArrayList.clear();
+            if (mArrayList.size() != 0){
+                // Wtf happened to get here
+                // why did the adapter not clear ??!!
+                LogWrapper.Loge(TAG,"Couldn't clear the adapter");
+                throw new RuntimeException("Couldn't clear the adapter");
+            }
         }
     }
 
