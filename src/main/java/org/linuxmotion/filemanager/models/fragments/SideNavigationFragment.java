@@ -54,6 +54,8 @@ public class SideNavigationFragment extends Fragment {
 
 
         String[] groups = {"Home", "SdCard", "Favorites"};
+        if(mOnFavoriteAdded == null)
+            throw new NullPointerException("Class must implement interface OnFavoriteAdded");
         String[] favs = mOnFavoriteAdded.OnFavoritesInitialized();
         String[][] children = {{}, {}, favs};
 

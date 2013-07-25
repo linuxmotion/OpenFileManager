@@ -3,6 +3,7 @@ package org.linuxmotion.filemanager.models.fragments;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
+import android.app.ListFragment;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
@@ -52,7 +53,7 @@ import java.util.Vector;
 /**
  * Created by john on 6/26/13.
  */
-public class SingleViewFragment extends Fragment implements Alerts.deleteAlertClickDispatcher, openFileManagerBroadcastReceiver.openFileManagerReceiverDispatcher {
+public class SingleViewFragment extends ListFragment implements Alerts.deleteAlertClickDispatcher, openFileManagerBroadcastReceiver.openFileManagerReceiverDispatcher {
 
 
     private static final String TAG = SingleViewFragment.class.getSimpleName();
@@ -498,7 +499,7 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
     protected FileArrayAdapter createAdapter(String path) {
 
         // Instatitate a adapter object
-        return new FileArrayAdapter(this.getActivity(), new File(path));
+        return new FileArrayAdapter(getActivity(), new File(path));
 
     }
 
@@ -531,6 +532,7 @@ public class SingleViewFragment extends Fragment implements Alerts.deleteAlertCl
 
     }
     private void setupMainListView() {
+        LogWrapper.Logi(TAG, "setupMainListView() called");
         ListAdapter adapter = createAdapter(mCurrentPath);
 
         if (adapter != null) {

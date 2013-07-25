@@ -18,6 +18,8 @@
 package org.linuxmotion.filemanager;
 
 
+import android.app.Activity;
+import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.app.ListActivity;
 import android.content.Context;
@@ -47,7 +49,7 @@ import java.io.File;
 
 
 
-public class OpenFileManagerActivity extends ListActivity implements Alerts.GPLAlertClickDispatcher,
+public class OpenFileManagerActivity extends Activity implements Alerts.GPLAlertClickDispatcher,
         SingleViewFragment.ContextualActionBarMenu, CutPasteFragment.onPasteListener,
         SideNavigationFragment.GroupClickCallback, SideNavigationFragment.ChildClickCallback,
         SideNavigationFragment.OnFavoritesCallback, DataBaseHelper.onDatabaseTransactionFinished {
@@ -61,7 +63,7 @@ public class OpenFileManagerActivity extends ListActivity implements Alerts.GPLA
     private SingleViewFragment mSingleView;
     private CutPasteFragment mCutPasteFragment;
     private SideNavigationFragment mSideNavigationFragment;
-    private boolean mDualPane;
+    private boolean mTabletMode = false;
     private SlidingMenu mSlidingMenu;
     private boolean mAttached = false;
     DataBaseHelper mHelper= new DataBaseHelper();
@@ -74,13 +76,33 @@ public class OpenFileManagerActivity extends ListActivity implements Alerts.GPLA
         super.onCreate(savedInstanceState);
         LogWrapper.Logi(TAG, "onCreate called");
 
-        mDualPane = false;
+        if(findViewById(R.id.sidenavigation_fragment_container) == null){
+            mTabletMode = true;
+            LogWrapper.Logd(TAG, "Starting app in tablet mode");
+        }
+        //mTabletMode = true;
+
+
 
 
         mHelper.initDatabase(this, this);
         mHelper.open();
 
-        if (mDualPane) {
+        if (mTabletMode) {
+
+            setContentView(R.layout.layout_main_content);
+
+             mSingleView = (SingleViewFragment) getFragmentManager().findFragmentById(R.id.main_fragment_container);
+             mCutPasteFragment = new CutPasteFragment();
+             mSideNavigationFragment = new SideNavigationFragment();
+             FragmentTransaction ft = getFragmentManager().beginTransaction();
+             ft.replace(R.id.main_fragment_container, mSingleView);
+             ft.replace(R.id.sidenavigation_fragment_container, mSideNavigationFragment);
+             ft.replace(R.id.cut_paste_fragment_container, mCutPasteFragment);
+             ft.commit();
+             showHideFragment(mCutPasteFragment, false);
+            //
+             mSingleView.setContextualActionBarMenuInterface(this);
 
 
         } else {
@@ -90,15 +112,15 @@ public class OpenFileManagerActivity extends ListActivity implements Alerts.GPLA
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
                 ft.replace(android.R.id.content, mSingleView);
                 ft.commit();
-
                 mSingleView.setContextualActionBarMenuInterface(this);
 
             }
 
             setupSlidingMenu();
-            setupFragments();
+
 
         }
+        setupFragments();
         setupEULA(this);
 
         //always setup the action bar
@@ -132,7 +154,8 @@ public class OpenFileManagerActivity extends ListActivity implements Alerts.GPLA
     public void onBackPressed() {
         LogWrapper.Logi(TAG, "onBackPressed called");
 
-        if (mDualPane) {
+        if (mTabletMode) {
+            mSingleView.onBackPressed();
 
 
         } else {
@@ -141,17 +164,18 @@ public class OpenFileManagerActivity extends ListActivity implements Alerts.GPLA
             if (mSlidingMenu.isMenuShowing()) {
                 // if a menu is open it need to closed.
                 mSlidingMenu.showContent();
-                return;
+
             } else {
 
                 mSingleView.onBackPressed();
-                return;
+
 
             }
 
 
         }
 
+        return;
 
     }
 
@@ -285,18 +309,19 @@ public class OpenFileManagerActivity extends ListActivity implements Alerts.GPLA
             PreferenceUtils.putHasCompletedLeftNavigationTutorial(this, true);
         }
 
-
+        // Find the fragments that are now in the view hierarchy
+        mCutPasteFragment =
+                (CutPasteFragment) getFragmentManager().findFragmentById(R.id.fragment_cut_paste);
+        mSideNavigationFragment = (SideNavigationFragment)
+                getFragmentManager().findFragmentById(R.id.fragment_side_navigation);
         // mSlidingMenu.setOnClosedListener(this);
         // mSlidingMenu.setOnOpenedListener(this);
     }
 
 
     private void setupFragments() {
-        mCutPasteFragment =
-                (CutPasteFragment) getFragmentManager().findFragmentById(R.id.fragment_cut_paste);
+        // Both tablet and phone have the same callbacks
         mCutPasteFragment.setPasteListener(this);
-        mSideNavigationFragment = (SideNavigationFragment)
-                getFragmentManager().findFragmentById(R.id.fragment_side_navigation);
         mSideNavigationFragment.setChildCallback(this);
         mSideNavigationFragment.setGroupCallback(this);
         mSideNavigationFragment.setOnFavoriteAddedCallback(this);
@@ -306,9 +331,11 @@ public class OpenFileManagerActivity extends ListActivity implements Alerts.GPLA
     @Override
     public void OnCutCallback(File[] files) {
 
-        if (mDualPane) {
+        if (mTabletMode) {
 
-            return;
+
+            showHideFragment(mCutPasteFragment, true);
+
         } else {
             mSlidingMenu.setMode(SlidingMenu.LEFT_RIGHT);
         }
@@ -329,7 +356,7 @@ public class OpenFileManagerActivity extends ListActivity implements Alerts.GPLA
 
     @Override
     public void OnFirstTimeCutCallback() {
-        if (mDualPane) {
+        if (mTabletMode) {
 
             return;
         }
@@ -338,8 +365,8 @@ public class OpenFileManagerActivity extends ListActivity implements Alerts.GPLA
 
     @Override
     public void onPaste(File[] files) {
-        if (mDualPane) {
-
+        if (mTabletMode) {
+            showHideFragment(mCutPasteFragment, false);
             return;
         } else {
             mSlidingMenu.setMode(SlidingMenu.LEFT);
@@ -351,11 +378,25 @@ public class OpenFileManagerActivity extends ListActivity implements Alerts.GPLA
         mSingleView.updateAdapter(mSingleView.getCurrentPath());
     }
 
+    private void showHideFragment(Fragment frag, boolean show) {
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        if(show){
+            ft.show(frag);
+            findViewById(R.id.cut_paste_fragment_container).setVisibility(View.VISIBLE);
+        }else{
+
+            ft.hide(frag);
+            findViewById(R.id.cut_paste_fragment_container).setVisibility(View.GONE);
+        }
+
+        ft.commit();
+    }
+
 
     @Override
     public void onCancelPaste() {
-        if (mDualPane) {
-
+        if (mTabletMode) {
+            showHideFragment(mCutPasteFragment, false);
             return;
         } else {
             mSlidingMenu.setMode(SlidingMenu.LEFT);
@@ -369,7 +410,7 @@ public class OpenFileManagerActivity extends ListActivity implements Alerts.GPLA
 
     @Override
     public boolean OnGroupClick(int groupPosition) {
-        if (mDualPane) {
+        if (mTabletMode) {
 
             return false;
         } else {
@@ -382,7 +423,7 @@ public class OpenFileManagerActivity extends ListActivity implements Alerts.GPLA
 
     @Override
     public boolean OnChildClick(String childFilePath, int groupPosition, int childInGroup) {
-        if (mDualPane) {
+        if (mTabletMode) {
 
             return false;
         } else {
@@ -401,7 +442,7 @@ public class OpenFileManagerActivity extends ListActivity implements Alerts.GPLA
 
     @Override
     public void OnFavoriteAdded(String path, int child) {
-        if (mDualPane) {
+        if (mTabletMode) {
 
             return;
         } else {
@@ -416,7 +457,7 @@ public class OpenFileManagerActivity extends ListActivity implements Alerts.GPLA
     @Override
     public void OnFavoriteRemoved(String path, int group, int child) {
         LogWrapper.Logi(TAG, "OnFavoriteRemoved() called");
-        if (mDualPane) {
+        if (mTabletMode) {
 
             return;
         } else {
@@ -439,7 +480,7 @@ public class OpenFileManagerActivity extends ListActivity implements Alerts.GPLA
 
     @Override
     public boolean OnRenameCallback() {
-        if (mDualPane) {
+        if (mTabletMode) {
 
 
         } else {
