@@ -52,6 +52,7 @@ public class FileArrayAdapter extends BaseArrayAdapter<File> {
     public FileArrayAdapter(Context context, File[] files) {
         super(context, 0, files);
 
+
         mImageLoader = new ImageLoader(context, R.drawable.ic_menu_gallery);
 
         setupBGImages(context);

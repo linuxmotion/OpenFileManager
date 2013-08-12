@@ -76,9 +76,16 @@ public class OpenFileManagerActivity extends Activity implements Alerts.GPLAlert
         super.onCreate(savedInstanceState);
         LogWrapper.Logi(TAG, "onCreate called");
 
-        if(findViewById(R.id.sidenavigation_fragment_container) == null){
+        // Setting the content view
+        setContentView(R.layout.layout_main_content);
+        mSingleView = (SingleViewFragment) getFragmentManager().findFragmentById(R.id.main_fragment_container);
+
+        if(findViewById(R.id.sidenavigation_fragment_container) != null){
             mTabletMode = true;
             LogWrapper.Logd(TAG, "Starting app in tablet mode");
+        }
+        else{
+            LogWrapper.Logd(TAG, "Starting app in phone mode");
         }
         //mTabletMode = true;
 
@@ -88,11 +95,13 @@ public class OpenFileManagerActivity extends Activity implements Alerts.GPLAlert
         mHelper.initDatabase(this, this);
         mHelper.open();
 
+
+
         if (mTabletMode) {
 
-            setContentView(R.layout.layout_main_content);
 
-             mSingleView = (SingleViewFragment) getFragmentManager().findFragmentById(R.id.main_fragment_container);
+
+            // mSingleView = (SingleViewFragment) getFragmentManager().findFragmentById(R.id.main_fragment_container);
              mCutPasteFragment = new CutPasteFragment();
              mSideNavigationFragment = new SideNavigationFragment();
              FragmentTransaction ft = getFragmentManager().beginTransaction();
@@ -102,17 +111,17 @@ public class OpenFileManagerActivity extends Activity implements Alerts.GPLAlert
              ft.commit();
              showHideFragment(mCutPasteFragment, false);
             //
-             mSingleView.setContextualActionBarMenuInterface(this);
+
 
 
         } else {
 
             if (savedInstanceState == null) {
-                mSingleView = new SingleViewFragment();
-                FragmentTransaction ft = getFragmentManager().beginTransaction();
-                ft.replace(android.R.id.content, mSingleView);
-                ft.commit();
-                mSingleView.setContextualActionBarMenuInterface(this);
+               // mSingleView = new SingleViewFragment();
+               // FragmentTransaction ft = getFragmentManager().beginTransaction();
+               // ft.replace(android.R.id.content, mSingleView);
+               // ft.commit();
+               // mSingleView.setContextualActionBarMenuInterface(this);
 
             }
 
@@ -120,11 +129,12 @@ public class OpenFileManagerActivity extends Activity implements Alerts.GPLAlert
 
 
         }
+        mSingleView.setContextualActionBarMenuInterface(this);
         setupFragments();
         setupEULA(this);
 
         //always setup the action bar
-        setupActionBar();
+        setupActionBar(mTabletMode);
 
 
     }
@@ -245,10 +255,12 @@ public class OpenFileManagerActivity extends Activity implements Alerts.GPLAlert
     }
 
 
-    private void setupActionBar() {
+    private void setupActionBar(boolean tabletMode) {
 
-        getActionBar().setDisplayHomeAsUpEnabled(true);
-        getActionBar().setHomeButtonEnabled(true);
+        if(!tabletMode){
+            getActionBar().setDisplayHomeAsUpEnabled(true);
+            getActionBar().setHomeButtonEnabled(true);
+        }
         getActionBar().setTitle(mSingleView.getCurrentPath());
 
 
