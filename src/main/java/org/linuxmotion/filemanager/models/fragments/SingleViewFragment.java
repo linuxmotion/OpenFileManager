@@ -34,6 +34,7 @@ import android.widget.Toast;
 
 import org.linuxmotion.asyncloaders.LogWrapper;
 import org.linuxmotion.filemanager.R;
+import org.linuxmotion.filemanager.models.ExtendedMimeTypeMap;
 import org.linuxmotion.filemanager.models.MenuAction;
 import org.linuxmotion.filemanager.models.adapters.ExpandableDrawerListAdapter;
 import org.linuxmotion.filemanager.models.adapters.FileArrayAdapter;
@@ -87,7 +88,7 @@ public class SingleViewFragment extends ListFragment implements Alerts.deleteAle
             switch (msg.what) {
 
                 case Constants.REFRESH_UI:
-                    getActivity().sendBroadcast(prepareBroadcast(mCurrentPath, Constants.UPDATE_INTENT, new MenuAction(MenuAction.ACTION_FORWARD)));
+                    getActivity().sendBroadcast(prepareBroadcast(mCurrentPath, Constants.UPDATE_INTENT, new MenuAction(MenuAction.ACTION_FORWARD), null));
                     //createBroadCast(mCurrentPath);
 
                 case Constants.UNKNOWN_FILE_TYPE:
@@ -195,7 +196,7 @@ public class SingleViewFragment extends ListFragment implements Alerts.deleteAle
 
 
         // navigate up
-        sendBroadcast(prepareBroadcast(null, Constants.UPDATE_INTENT, new MenuAction(MenuAction.ACTION_UP)));
+        sendBroadcast(prepareBroadcast(null, Constants.UPDATE_INTENT, new MenuAction(MenuAction.ACTION_UP), null));
 
 
     }
@@ -901,16 +902,16 @@ public class SingleViewFragment extends ListFragment implements Alerts.deleteAle
         }
 
         // Tell the UI to update
-        sendBroadcast(prepareBroadcast(mCurrentPath, Constants.UPDATE_INTENT, new MenuAction(MenuAction.ACTION_FORWARD)));
+        sendBroadcast(prepareBroadcast(mCurrentPath, Constants.UPDATE_INTENT, new MenuAction(MenuAction.ACTION_FORWARD), null));
         // Close the drawer
         //mDrawerLayout.closeDrawer(mDrawerList);
 
     }
 
 
-    public static Intent prepareBroadcast(String f, String type, MenuAction action) {
+    public static Intent prepareBroadcast(String f, String type, MenuAction action, Context context) {
 
-        Intent intent = new Intent(Constants.RESOURCE_VIEW_INTENT);
+        Intent intent = new Intent(type);
 
         if (type.equals(Constants.UPDATE_INTENT)) {
             intent = new Intent(Constants.UPDATE_INTENT);
@@ -918,7 +919,14 @@ public class SingleViewFragment extends ListFragment implements Alerts.deleteAle
             intent.putExtra("ACTION", action.getCurrentAction());
 
         } else if (type.equals(Constants.RESOURCE_VIEW_INTENT)) {
-            intent.putExtra("RESOURCE", f);
+            Intent i = new Intent(Intent.ACTION_VIEW);
+            i.putExtra("RESOURCE", f);
+            String ext = ExtendedMimeTypeMap.getFileExtensionFromUrl(f);
+            String itype = Constants.MIME.getMimeTypeFromExtension(ext);
+            LogWrapper.Logd(TAG, "ext = " + ext);
+            LogWrapper.Logd(TAG, "File = " + f);
+            i.setType(itype);
+            intent = i;
 
         }
         return intent;
@@ -932,10 +940,10 @@ public class SingleViewFragment extends ListFragment implements Alerts.deleteAle
 
             Log.d(TAG, "Sending UI refresh broadcast [dir=" + f.toString() + "]");
             PreferenceUtils.resetExitStatus(this.getActivity());
-            sendBroadcast(prepareBroadcast(f.getPath(), Constants.UPDATE_INTENT, new MenuAction(MenuAction.ACTION_FORWARD)));
+            sendBroadcast(prepareBroadcast(f.getPath(), Constants.UPDATE_INTENT, new MenuAction(MenuAction.ACTION_FORWARD), null));
         } else {
             Log.d(TAG, "Sending media broadcast");
-            sendBroadcast(prepareBroadcast(f.toString(), Constants.RESOURCE_VIEW_INTENT, null));
+            sendBroadcast(prepareBroadcast(f.toString(), Constants.RESOURCE_VIEW_INTENT, null, getActivity()));
         }
 
 
@@ -948,7 +956,12 @@ public class SingleViewFragment extends ListFragment implements Alerts.deleteAle
     }
 
     private void sendBroadcast(Intent i) {
-        this.getActivity().sendBroadcast(i);
+        if (i.hasExtra("RESOURCE")){
+            LogWrapper.Logd(TAG, "Starting an activity rather than sending a broadcast");
+            getActivity().startActivity(i);
+        }
+
+        getActivity().sendBroadcast(i);
     }
 
 

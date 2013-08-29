@@ -217,7 +217,7 @@ public class OpenFileManagerActivity extends Activity implements Alerts.GPLAlert
                 break;
             case R.id.menu_left: {
                 sendBroadcast(SingleViewFragment.prepareBroadcast(null, Constants.UPDATE_INTENT,
-                        new MenuAction(MenuAction.ACTION_BACK)));
+                        new MenuAction(MenuAction.ACTION_BACK), null));
             }
             break;
 
@@ -227,7 +227,7 @@ public class OpenFileManagerActivity extends Activity implements Alerts.GPLAlert
             break;
             case R.id.menu_forward: {
                 sendBroadcast(SingleViewFragment.prepareBroadcast(null, Constants.UPDATE_INTENT,
-                        new MenuAction(MenuAction.ACTION_FORWARD)));
+                        new MenuAction(MenuAction.ACTION_FORWARD), null));
             }
             break;
 

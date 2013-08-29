@@ -17,8 +17,15 @@
  */
 package org.linuxmotion.filemanager.utils;
 
+import android.content.ContentResolver;
+import android.content.Context;
+import android.net.Uri;
 import android.os.Environment;
 import android.webkit.MimeTypeMap;
+
+import org.linuxmotion.filemanager.models.ExtendedMimeTypeMap;
+
+import java.io.File;
 
 public class Constants {
 
@@ -55,7 +62,9 @@ public class Constants {
     public static final String HOME_DIRECTORY_PREF = "favorite_base_pref_";
 
 
-    public static MimeTypeMap MIME = MimeTypeMap.getSingleton();
+    public static ExtendedMimeTypeMap MIME = ExtendedMimeTypeMap.getSingleton();
+
+
 
 
 }
